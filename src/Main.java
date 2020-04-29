@@ -1,5 +1,4 @@
 import camera.QueasyCam;
-import org.ejml.simple.SimpleMatrix;
 import processing.core.PApplet;
 
 public class Main extends PApplet {
@@ -27,6 +26,7 @@ public class Main extends PApplet {
 
     public void draw() {
         background(0);
+        nLinkAgent.update(0.01f);
         nLinkAgent.draw();
     }
 

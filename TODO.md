@@ -13,6 +13,7 @@
 # Effects
 - [ ] Belay rope
 - [ ] Rock particle effects while holding on
+- [ ] Wind effects
 
 # Environment
 - [ ] Slippery holds

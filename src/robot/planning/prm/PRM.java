@@ -1,4 +1,4 @@
-package prm;
+package robot.planning.prm;
 
 import math.Vec;
 import processing.core.PApplet;

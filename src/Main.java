@@ -1,12 +1,15 @@
 import camera.QueasyCam;
+import math.Vec;
 import processing.core.PApplet;
+import robot.acting.RRAgent;
 
 public class Main extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
 
     QueasyCam cam;
-    NLinkAgent nLinkAgent;
+    RRAgent rrAgent;
+    Vec goal = new Vec(new float[]{0, 0});
 
     public void settings() {
         size(WIDTH, HEIGHT, P3D);
@@ -19,15 +22,44 @@ public class Main extends PApplet {
         noStroke();
 
         cam = new QueasyCam(this);
-        nLinkAgent = new NLinkAgent(this, 0, 0);
-        nLinkAgent.addLink(PI / 6, 10);
-        nLinkAgent.addLink(PI / 6, 10);
+        rrAgent = new RRAgent(this, 50, 50, 0, -90, 0, 0);
+        rrAgent.setGoalPosition(goal);
     }
 
     public void draw() {
+        // Interaction
+        if (keyPressed) {
+            if (keyCode == UP) {
+                goal.set(1, goal.get(1) - 1);
+                rrAgent.setGoalPosition(goal);
+            }
+            if (keyCode == DOWN) {
+                goal.set(1, goal.get(1) + 1);
+                rrAgent.setGoalPosition(goal);
+            }
+            if (keyCode == LEFT) {
+                goal.set(0, goal.get(0) - 1);
+                rrAgent.setGoalPosition(goal);
+            }
+            if (keyCode == RIGHT) {
+                goal.set(0, goal.get(0) + 1);
+                rrAgent.setGoalPosition(goal);
+            }
+        }
+
+        // Reset
         background(0);
-        nLinkAgent.update(0.01f);
-        nLinkAgent.draw();
+
+        // Update
+        rrAgent.update(0.01f);
+
+        // Draw
+        rrAgent.draw();
+        fill(0, 1, 0);
+        pushMatrix();
+        translate(0, goal.get(1), goal.get(0));
+        box(2);
+        popMatrix();
     }
 
     @Override

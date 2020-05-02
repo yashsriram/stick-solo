@@ -1,6 +1,7 @@
 import camera.QueasyCam;
 import math.Vec;
-import prm.PRM;
+import robot.acting.SphericalAgent;
+import robot.planning.prm.PRM;
 import processing.core.PApplet;
 
 public class Checkin extends PApplet {

@@ -9,11 +9,11 @@ public class Mat extends FMatrixRMaj {
         super(numRows, numCols);
     }
 
-    public Mat(float[][] values) {
+    protected Mat(float[] values) {
         super(values);
     }
 
-    public Mat(float[] values) {
+    public Mat(float[][] values) {
         super(values);
     }
 
@@ -21,23 +21,7 @@ public class Mat extends FMatrixRMaj {
         super(mat);
     }
 
-    /* Manipulators */
-    public Mat plusInPlace(Mat b) {
-        CommonOps_FDRM.addEquals(this, b);
-        return this;
-    }
-
-    public Mat minus(Mat b) {
-        Mat sum = new Mat(getNumRows(), getNumCols());
-        CommonOps_FDRM.subtract(this, b, sum);
-        return sum;
-    }
-
-    public Mat scaleInPlace(float b) {
-        CommonOps_FDRM.scale(b, this);
-        return this;
-    }
-
+    /* New allocation operations */
     public float norm() {
         int size = this.getNumElements();
         double sumOfSquares = 0.0;
@@ -45,6 +29,23 @@ public class Mat extends FMatrixRMaj {
             sumOfSquares += (data[i] * data[i]);
         }
         return (float) Math.sqrt(sumOfSquares);
+    }
+
+    public Vec mult(Vec b) {
+        Vec product = new Vec(this.numRows);
+        CommonOps_FDRM.mult(this, b, product);
+        return product;
+    }
+
+    /* In place operations */
+    public Mat plusInPlace(Mat b) {
+        CommonOps_FDRM.addEquals(this, b);
+        return this;
+    }
+
+    public Mat scaleInPlace(float b) {
+        CommonOps_FDRM.scale(b, this);
+        return this;
     }
 
     public Mat normalizeInPlace() {

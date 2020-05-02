@@ -3,6 +3,7 @@
 - [ ] Spherical obstacles, line segment obstacles
 - [ ] Angle bound obstacles, replanning in known environment
 - [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
+- [ ] Prismatic joints
 
 # Humanize
 - [ ] Human link agent

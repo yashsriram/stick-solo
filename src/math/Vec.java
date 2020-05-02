@@ -16,20 +16,42 @@ public class Vec extends Mat {
         super(vec);
     }
 
-    /* Manipulators */
+    /* New allocation operations */
     public void headSet(float... args) {
         System.arraycopy(args, 0, this.data, 0, args.length);
     }
 
-    public Vec plusInPlace(Mat b) {
-        super.plusInPlace(b);
-        return this;
+    public Vec plus(Vec b) {
+        Vec sum = new Vec(getNumElements());
+        CommonOps_FDRM.add(this, b, sum);
+        return sum;
     }
 
     public Vec minus(Vec b) {
-        Vec sum = new Vec(getNumElements());
-        CommonOps_FDRM.subtract(this, b, sum);
-        return sum;
+        Vec difference = new Vec(getNumElements());
+        CommonOps_FDRM.subtract(this, b, difference);
+        return difference;
+    }
+
+    public Vec scale(float b) {
+        Vec scaled = new Vec(getNumElements());
+        CommonOps_FDRM.scale(b, this, scaled);
+        return scaled;
+    }
+
+    public static float dist(Vec a, Vec b) {
+        assert (a.getNumElements() == b.getNumElements());
+        float squaredSum = 0;
+        for (int i = 0; i < a.getNumElements(); i++) {
+            squaredSum += Math.pow(a.get(i) - b.get(i), 2);
+        }
+        return (float) Math.sqrt(squaredSum);
+    }
+
+    /* In place operations */
+    public Vec plusInPlace(Mat b) {
+        super.plusInPlace(b);
+        return this;
     }
 
     public Vec scaleInPlace(float b) {

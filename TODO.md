@@ -12,7 +12,8 @@
 - n links => n joints => n sized joint tuple => n + 1 ends
 
 # Basics
-- [x] 2D PRM/A*
+- [ ] 2D PRM/A*
+    - [ ] Avoid duplication of same start and finish
 - [x] Spherical agent translating on 2D PRM/A* generated path
 - [x] RR agent milestone hopping on 2D PRM/A* generated path
     - [ ] min/max bounds on PRM neighbours

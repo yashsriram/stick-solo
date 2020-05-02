@@ -14,7 +14,7 @@ class Milestone {
 
     class SearchState {
         float distanceFromStart = 0;
-        float heuristicDistanceToFinish = 0;
+        float heuristicDistanceToGoal = 0;
         boolean isExplored = false;
         final List<Vec> pathFromStart = new ArrayList<>();
         final Vec color;
@@ -23,9 +23,9 @@ class Milestone {
             this.color = new Vec(1, 1, 1);
         }
 
-        void reset(Vec finishPosition) {
+        void reset(Vec goalPosition) {
             distanceFromStart = 0;
-            heuristicDistanceToFinish = position.minus(finishPosition).norm();
+            heuristicDistanceToGoal = position.minus(goalPosition).norm();
             isExplored = false;
             pathFromStart.clear();
             color.headSet(1, 1, 1);

@@ -52,10 +52,10 @@ public class PRM {
         }
     }
 
-    private void resetSearchState(final Vec finishPosition) {
+    private void resetSearchState(final Vec goalPosition) {
         PApplet.println("Resetting search states of vertices");
         for (Milestone v : milestones) {
-            v.searchState.reset(finishPosition);
+            v.searchState.reset(goalPosition);
         }
     }
 
@@ -64,12 +64,12 @@ public class PRM {
         next.searchState.addToFringeFrom(current);
     }
 
-    public List<Vec> dfs(final Vec startPosition, final Vec finishPosition, float maxEdgeLen) {
+    public List<Vec> dfs(final Vec startPosition, final Vec goalPosition, float maxEdgeLen) {
         PApplet.println("DFS");
 
         Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), maxEdgeLen);
-        Milestone finish = addMilestone(finishPosition.get(0), finishPosition.get(1), maxEdgeLen);
-        resetSearchState(finishPosition);
+        Milestone goal = addMilestone(goalPosition.get(0), goalPosition.get(1), maxEdgeLen);
+        resetSearchState(goalPosition);
 
         int numVerticesExplored = 0;
         final Stack<Milestone> fringe = new Stack<>();
@@ -78,10 +78,10 @@ public class PRM {
             // Pop one vertex
             Milestone current = fringe.pop();
             numVerticesExplored++;
-            // Check if finishMilestone
-            if (current.id == finish.id) {
-                PApplet.println("Reached finish, # vertices explored: " + numVerticesExplored);
-                return finish.searchState.pathFromStart;
+            // Check if goal milestone
+            if (current.id == goal.id) {
+                PApplet.println("Reached goal, # vertices explored: " + numVerticesExplored);
+                return goal.searchState.pathFromStart;
             }
             // Mark this vertex as explored
             current.searchState.setExplored();
@@ -93,7 +93,7 @@ public class PRM {
             }
         }
 
-        PApplet.println("Could not reach finishMilestone, # vertices explored: " + numVerticesExplored);
+        PApplet.println("Could not reach goal milestone, # vertices explored: " + numVerticesExplored);
         return Collections.singletonList(start.position);
     }
 
@@ -103,10 +103,10 @@ public class PRM {
         next.searchState.addToFringeFrom(current);
     }
 
-    private List<Vec> search(final Queue<Milestone> fringe, final Vec startPosition, final Vec finishPosition, float maxEdgeLen) {
+    private List<Vec> search(final Queue<Milestone> fringe, final Vec startPosition, final Vec goalPosition, float maxEdgeLen) {
         Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), maxEdgeLen);
-        Milestone finish = addMilestone(finishPosition.get(0), finishPosition.get(1), maxEdgeLen);
-        resetSearchState(finishPosition);
+        Milestone goal = addMilestone(goalPosition.get(0), goalPosition.get(1), maxEdgeLen);
+        resetSearchState(goalPosition);
 
         int numVerticesExplored = 0;
         addToFringe(fringe, start, start);
@@ -114,10 +114,10 @@ public class PRM {
             // Pop one vertex
             Milestone current = fringe.remove();
             numVerticesExplored++;
-            // Check if finish
-            if (current.id == finish.id) {
-                PApplet.println("Reached finish, # vertices explored: " + numVerticesExplored);
-                return finish.searchState.pathFromStart;
+            // Check if goal
+            if (current.id == goal.id) {
+                PApplet.println("Reached goal, # vertices explored: " + numVerticesExplored);
+                return goal.searchState.pathFromStart;
             }
             // Mark this vertex as explored
             current.searchState.setExplored();
@@ -129,35 +129,35 @@ public class PRM {
             }
         }
 
-        PApplet.println("Could not reach finish, # vertices explored: " + numVerticesExplored);
+        PApplet.println("Could not reach goal, # vertices explored: " + numVerticesExplored);
         return Collections.singletonList(start.position);
     }
 
-    public List<Vec> bfs(Vec startPosition, Vec finishPosition, float maxEdgeLen) {
+    public List<Vec> bfs(Vec startPosition, Vec goalPosition, float maxEdgeLen) {
         PApplet.println("BFS");
-        return search(new LinkedList<>(), startPosition, finishPosition, maxEdgeLen);
+        return search(new LinkedList<>(), startPosition, goalPosition, maxEdgeLen);
     }
 
-    public List<Vec> ucs(Vec startPosition, Vec finishPosition, float maxEdgeLen) {
+    public List<Vec> ucs(Vec startPosition, Vec goalPosition, float maxEdgeLen) {
         PApplet.println("UCS");
         return search(new PriorityQueue<>((v1, v2) ->
                         (int) (v1.searchState.distanceFromStart - v2.searchState.distanceFromStart)),
-                startPosition, finishPosition, maxEdgeLen);
+                startPosition, goalPosition, maxEdgeLen);
     }
 
-    public List<Vec> aStar(Vec startPosition, Vec finishPosition, float maxEdgeLen) {
+    public List<Vec> aStar(Vec startPosition, Vec goalPosition, float maxEdgeLen) {
         PApplet.println("A*");
         return search(new PriorityQueue<>((v1, v2) -> (int) (
-                        (v1.searchState.distanceFromStart + v1.searchState.heuristicDistanceToFinish)
-                                - (v2.searchState.distanceFromStart + v2.searchState.heuristicDistanceToFinish))),
-                startPosition, finishPosition, maxEdgeLen);
+                        (v1.searchState.distanceFromStart + v1.searchState.heuristicDistanceToGoal)
+                                - (v2.searchState.distanceFromStart + v2.searchState.heuristicDistanceToGoal))),
+                startPosition, goalPosition, maxEdgeLen);
     }
 
-    public List<Vec> weightedAStar(Vec startPosition, Vec finishPosition, float maxEdgeLen, final float epislon) {
+    public List<Vec> weightedAStar(Vec startPosition, Vec goalPosition, float maxEdgeLen, final float epislon) {
         PApplet.println("Weighted A* with epsilon = " + epislon);
         return search(new PriorityQueue<>((v1, v2) -> (int) (
-                        (v1.searchState.distanceFromStart + epislon * v1.searchState.heuristicDistanceToFinish)
-                                - (v2.searchState.distanceFromStart + epislon * v2.searchState.heuristicDistanceToFinish))),
-                startPosition, finishPosition, maxEdgeLen);
+                        (v1.searchState.distanceFromStart + epislon * v1.searchState.heuristicDistanceToGoal)
+                                - (v2.searchState.distanceFromStart + epislon * v2.searchState.heuristicDistanceToGoal))),
+                startPosition, goalPosition, maxEdgeLen);
     }
 }

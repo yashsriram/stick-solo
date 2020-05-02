@@ -4,7 +4,7 @@ import math.Vec;
 import processing.core.PApplet;
 
 public class RRIKSolver {
-    public static Vec solve(final Vec holdingPosition, final Vec lengths, final Vec goalPosition) {
+    public static Vec solve_minusPItoPlusPI(final Vec holdingPosition, final Vec lengths, final Vec goalPosition) {
         // RR IK specific math
         float l = (goalPosition.minus(holdingPosition)).norm();
         if (l < 1e-6) {

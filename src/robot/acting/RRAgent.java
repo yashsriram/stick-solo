@@ -1,6 +1,5 @@
 package robot.acting;
 
-import math.Mat;
 import math.Vec;
 import processing.core.PApplet;
 import robot.planning.ik.RRIKSolver;
@@ -26,16 +25,24 @@ public class RRAgent {
     }
 
     public void setGoalPosition(Vec goalPosition) {
-        Vec newGoalJointVariables = RRIKSolver.solve(holdingPosition, lengths, goalPosition);
+        Vec newGoalJointVariables = RRIKSolver.solve_minusPItoPlusPI(holdingPosition, lengths, goalPosition);
         goalJointVariables.headSet(newGoalJointVariables.get(0), newGoalJointVariables.get(1));
     }
 
+    private float absMinClamp(float v, float min) {
+        float absClamped = Math.max(Math.abs(v), min);
+        float signClamped = Math.signum(v) * absClamped;
+        return signClamped;
+    }
+
     public void update(float dt) {
+        // If distance is not too small
         if (Vec.dist(jointVariables, goalJointVariables) > 1e-6) {
-            float vq1 = goalJointVariables.get(0) - jointVariables.get(0);
-            float vq2 = goalJointVariables.get(1) - jointVariables.get(1);
-            jointVariables.set(0, jointVariables.get(0) + dt * vq1);
-            jointVariables.set(1, jointVariables.get(1) + dt * vq2);
+            // Update all joint variables
+            for (int i = 0; i < jointVariables.getNumElements(); i++) {
+                float vqi = absMinClamp(goalJointVariables.get(i) - jointVariables.get(i), 0.5f);
+                jointVariables.set(i, jointVariables.get(i) + vqi * dt);
+            }
         }
     }
 

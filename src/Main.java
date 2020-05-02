@@ -60,6 +60,8 @@ public class Main extends PApplet {
         translate(0, goal.get(1), goal.get(0));
         box(2);
         popMatrix();
+
+        surface.setTitle("Processing:"  + " FPS: " + frameRate);
     }
 
     @Override

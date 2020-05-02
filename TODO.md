@@ -16,7 +16,7 @@
     - [ ] Avoid duplication of same start and finish
 - [x] Spherical agent translating on 2D PRM/A* generated path
 - [x] RR agent milestone hopping on 2D PRM/A* generated path
-    - [ ] min/max bounds on PRM neighbours
+    - [x] min/max bounds on PRM neighbours
     - [ ] RRIK Iterative solver
 - [ ] NR agent milestone hopping on 2D PRM/A* generated path
 

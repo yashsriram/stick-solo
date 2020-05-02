@@ -13,7 +13,7 @@ public class SphericalAgentOnPRM extends PApplet {
     private static final Vec MIN_CORNER = new Vec(-SIZE, -SIZE);
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
     private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
-    private static final Vec FINISH_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
+    private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
     private static final float MAX_EDGE_LEN = 7;
 
     PRM prm;
@@ -32,7 +32,7 @@ public class SphericalAgentOnPRM extends PApplet {
         cam = new QueasyCam(this);
         prm = new PRM(this);
         int numMilestones = 2000;
-        int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, MAX_EDGE_LEN);
+        int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, 0, MAX_EDGE_LEN);
         PApplet.println("# milestones : " + numMilestones + " # edges : " + numEdges);
         sphericalAgent = new SphericalAgent(this, START_POSITION, 3, 10, new Vec(1, 1, 1));
     }
@@ -72,23 +72,23 @@ public class SphericalAgentOnPRM extends PApplet {
             PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
         }
         if (key == '1') {
-            sphericalAgent.spawn(START_POSITION, prm.dfs(START_POSITION, FINISH_POSITION, MAX_EDGE_LEN));
+            sphericalAgent.spawn(START_POSITION, prm.dfs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            sphericalAgent.spawn(START_POSITION, prm.bfs(START_POSITION, FINISH_POSITION, MAX_EDGE_LEN));
+            sphericalAgent.spawn(START_POSITION, prm.bfs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            sphericalAgent.spawn(START_POSITION, prm.ucs(START_POSITION, FINISH_POSITION, MAX_EDGE_LEN));
+            sphericalAgent.spawn(START_POSITION, prm.ucs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            sphericalAgent.spawn(START_POSITION, prm.aStar(START_POSITION, FINISH_POSITION, MAX_EDGE_LEN));
+            sphericalAgent.spawn(START_POSITION, prm.aStar(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            sphericalAgent.spawn(START_POSITION, prm.weightedAStar(START_POSITION, FINISH_POSITION, MAX_EDGE_LEN, 1.5f));
+            sphericalAgent.spawn(START_POSITION, prm.weightedAStar(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN, 1.5f));
             SEARCH_ALGORITHM = "weighted A*";
         }
     }

@@ -15,7 +15,11 @@ public class RRAgentOnPRM extends PApplet {
     private static final Vec MIN_CORNER = new Vec(-SIZE, -SIZE);
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
     private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
-    private static final Vec FINISH_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
+    private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
+    private static final float L1 = 10;
+    private static final float L2 = 7;
+    private static final float MAX_EDGE_LEN = L1 + L2 - 1;
+    private static final float MIN_EDGE_LEN = abs(L1 - L2) + 1;
 
     QueasyCam cam;
     PRM prm;
@@ -35,7 +39,7 @@ public class RRAgentOnPRM extends PApplet {
         prm = new PRM(this);
         rrAgent = new RRAgent(this);
         int numMilestones = 500;
-        int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, 10 + 7);
+        int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
         PApplet.println("# milestones : " + numMilestones + " # edges : " + numEdges);
     }
 
@@ -73,28 +77,28 @@ public class RRAgentOnPRM extends PApplet {
             PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
         }
         if (key == '1') {
-            List<Vec> path = prm.dfs(START_POSITION, FINISH_POSITION, 25);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, L1, L2, 0, -90, path);
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            List<Vec> path = prm.bfs(START_POSITION, FINISH_POSITION, 25);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, L1, L2, 0, -90, path);
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            List<Vec> path = prm.ucs(START_POSITION, FINISH_POSITION, 25);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, L1, L2, 0, -90, path);
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            List<Vec> path = prm.aStar(START_POSITION, FINISH_POSITION, 25);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, L1, L2, 0, -90, path);
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            List<Vec> path = prm.weightedAStar(START_POSITION, FINISH_POSITION, 25, 1.5f);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, L1, L2, 0, -90, path);
             SEARCH_ALGORITHM = "weighted A*";
         }
     }

@@ -4,7 +4,7 @@ import robot.acting.SphericalAgent;
 import robot.planning.prm.PRM;
 import processing.core.PApplet;
 
-public class Checkin extends PApplet {
+public class SphericalAgentOnPRM extends PApplet {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -94,7 +94,7 @@ public class Checkin extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"Checkin"};
+        String[] appletArgs = new String[]{"SphericalAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

@@ -7,7 +7,7 @@ import robot.planning.prm.PRM;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main extends PApplet {
+public class RRAgentOnPRM extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -51,7 +51,7 @@ public class Main extends PApplet {
         background(0);
 
         // Update
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 40; i++) {
             rrAgent.update(0.002f);
         }
 
@@ -70,7 +70,7 @@ public class Main extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"Main"};
+        String[] appletArgs = new String[]{"RRAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

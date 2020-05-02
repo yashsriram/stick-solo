@@ -78,27 +78,27 @@ public class RRAgentOnPRM extends PApplet {
         }
         if (key == '1') {
             List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) - 10, L1, L2, 0, -90, path);
+            rrAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
             List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) - 10, L1, L2, 0, -90, path);
+            rrAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
             List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) - 10, L1, L2, 0, -90, path);
+            rrAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
             List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) - 10, L1, L2, 0, -90, path);
+            rrAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
             List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
-            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) - 10, L1, L2, 0, -90, path);
+            rrAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "weighted A*";
         }
     }

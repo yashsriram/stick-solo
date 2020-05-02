@@ -10,6 +10,10 @@
 - [ ] Gravity
 - [ ] Springy limbs
 
+# Effects
+- [ ] Belay rope
+- [ ] Rock particle effects while holding on
+
 # Environment
 - [ ] Slippery holds
 

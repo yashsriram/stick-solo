@@ -8,7 +8,7 @@ public class Vec extends Mat {
         super(numElements, 1);
     }
 
-    public Vec(float[] values) {
+    public Vec(float... values) {
         super(values);
     }
 

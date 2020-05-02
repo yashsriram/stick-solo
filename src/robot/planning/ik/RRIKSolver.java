@@ -9,13 +9,13 @@ public class RRIKSolver {
         Vec relativeGoalPosition = goalPosition.minus(pivot);
         float l = relativeGoalPosition.norm();
         if (l < 1e-6 && (lengths.get(0) == lengths.get(1))) {
-            return new Vec(new float[]{0, PApplet.PI});
+            return new Vec(0, PApplet.PI);
         }
         float num = l * l + lengths.get(0) * lengths.get(0) - lengths.get(1) * lengths.get(1);
         float den = 2 * relativeGoalPosition.norm() * lengths.get(0);
         float q1 = (float) (Math.atan2(relativeGoalPosition.get(1), relativeGoalPosition.get(0)) - Math.acos(num / den));
         float q2 = (float) (Math.atan2(relativeGoalPosition.get(1) - lengths.get(0) * Math.sin(q1), relativeGoalPosition.get(0) - lengths.get(0) * Math.cos(q1)) - q1);
 
-        return new Vec(new float[]{q1, q2});
+        return new Vec(q1, q2);
     }
 }

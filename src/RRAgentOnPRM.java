@@ -12,10 +12,10 @@ public class RRAgentOnPRM extends PApplet {
     private static final int SIZE = 100;
     private static String SEARCH_ALGORITHM = "";
 
-    private static final Vec MIN_CORNER = new Vec(new float[]{-SIZE, -SIZE});
-    private static final Vec MAX_CORNER = new Vec(new float[]{SIZE, SIZE});
-    private static final Vec START_POSITION = new Vec(new float[]{SIZE * (-9f / 10), SIZE * (9f / 10)});
-    private static final Vec FINISH_POSITION = new Vec(new float[]{SIZE * (9f / 10), SIZE * (-9f / 10)});
+    private static final Vec MIN_CORNER = new Vec(-SIZE, -SIZE);
+    private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
+    private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
+    private static final Vec FINISH_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
 
     QueasyCam cam;
     PRM prm;

@@ -20,7 +20,7 @@ class Milestone {
         final Vec color;
 
         public SearchState() {
-            this.color = new Vec(new float[]{1, 1, 1});
+            this.color = new Vec(1, 1, 1);
         }
 
         void reset(Vec finishPosition) {
@@ -48,7 +48,7 @@ class Milestone {
     Milestone(PApplet applet, int id, float x, float y) {
         this.applet = applet;
         this.id = id;
-        this.position = new Vec(new float[]{x, y});
+        this.position = new Vec(x, y);
         this.searchState = new SearchState();
     }
 

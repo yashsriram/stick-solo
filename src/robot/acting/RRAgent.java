@@ -15,11 +15,11 @@ public class RRAgent {
 
     private List<Vec> path;
     private int nextMilestone = 0;
-    private final Vec goalJointTuple = new Vec(new float[]{Float.NaN, Float.NaN});
+    private final Vec goalJointTuple = new Vec(Float.NaN, Float.NaN);
 
-    private final Vec pivotPosition = new Vec(new float[]{0f, 0f});
-    private final Vec jointTuple = new Vec(new float[]{0f, 0f});
-    private final Vec lengths = new Vec(new float[]{0f, 0f});
+    private final Vec pivotPosition = new Vec(0f, 0f);
+    private final Vec jointTuple = new Vec(0f, 0f);
+    private final Vec lengths = new Vec(0f, 0f);
 
     public RRAgent(PApplet applet, float l1, float l2, float q1InDegrees, float q2InDegrees, float x, float y, List<Vec> path) {
         this.applet = applet;
@@ -126,7 +126,7 @@ public class RRAgent {
 
         // Links
         Vec start = new Vec(pivotPosition);
-        Vec direction = new Vec(new float[]{1f, 0f});
+        Vec direction = new Vec(1f, 0f);
         applet.noFill();
         if (isGoalJointVariablesValid()) {
             applet.stroke(1);

@@ -10,10 +10,10 @@ public class SphericalAgentOnPRM extends PApplet {
     private static final int SIZE = 100;
     private static String SEARCH_ALGORITHM = "";
 
-    private static final Vec MIN_CORNER = new Vec(new float[]{0, -SIZE, -SIZE});
-    private static final Vec MAX_CORNER = new Vec(new float[]{0, SIZE, SIZE});
-    private static final Vec START_POSITION = new Vec(new float[]{0, SIZE * (9f / 10), SIZE * (-9f / 10)});
-    private static final Vec FINISH_POSITION = new Vec(new float[]{0, SIZE * (-9f / 10), SIZE * (9f / 10)});
+    private static final Vec MIN_CORNER = new Vec(0, -SIZE, -SIZE);
+    private static final Vec MAX_CORNER = new Vec(0, SIZE, SIZE);
+    private static final Vec START_POSITION = new Vec(0, SIZE * (9f / 10), SIZE * (-9f / 10));
+    private static final Vec FINISH_POSITION = new Vec(0, SIZE * (-9f / 10), SIZE * (9f / 10));
     private static final float MAX_EDGE_LEN = 7;
 
     PRM prm;
@@ -34,7 +34,7 @@ public class SphericalAgentOnPRM extends PApplet {
         int numMilestones = 2000;
         int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, MAX_EDGE_LEN);
         PApplet.println("# milestones : " + numMilestones + " # edges : " + numEdges);
-        sphericalAgent = new SphericalAgent(this, START_POSITION, 3, 10, new Vec(new float[]{1, 1, 1}));
+        sphericalAgent = new SphericalAgent(this, START_POSITION, 3, 10, new Vec(1, 1, 1));
     }
 
     public void draw() {

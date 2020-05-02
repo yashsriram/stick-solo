@@ -11,8 +11,10 @@ import java.util.List;
 import static processing.core.PConstants.PI;
 
 public class RRAgent {
-    private final PApplet applet;
+    public static float MILESTONE_REACHED_SLACK = 0.01f;
     public boolean isPaused = false;
+
+    private final PApplet applet;
 
     private List<Vec> path = new ArrayList<>();
     private int nextMilestone = 0;
@@ -68,7 +70,7 @@ public class RRAgent {
         }
         if (isGoalJointVariablesValid() && nextMilestone < path.size()) {
             // Reached next milestone
-            if (Vec.dist(jointTuple, goalJointTuple) < 1e-2) {
+            if (Vec.dist(jointTuple, goalJointTuple) < MILESTONE_REACHED_SLACK) {
                 // Switch pivot
                 List<Vec> ends = getLinkEnds();
                 pivotPosition.headSet(ends.get(ends.size() - 1));

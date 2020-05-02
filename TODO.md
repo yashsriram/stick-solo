@@ -1,11 +1,27 @@
-# Basics
-- [ ] N link agent planning in known environment
-- [ ] Spherical obstacles, line segment obstacles
-- [ ] Angle bound obstacles, replanning in known environment
-- [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
-- [ ] Prismatic joints
+# assumptions
+- 2D wall and 2D constrained stick-figure agents
+- 2D circle and line segment obstacles on wall
 
-# Humanize
+# stick-figure agent
+- A stick-figure agent = rigid links + joints
+- Joint = revolute
+
+# serial stick-figure agent
+- links arranged serially
+- one pivot end and one free end
+- n links => n joints => n sized joint tuple => n + 1 ends
+
+# Basics
+- [x] 2D PRM/A*
+- [x] Spherical agent translating on 2D PRM/A* generated path
+- [x] RR agent milestone hopping on 2D PRM/A* generated path
+    - [ ] min/max bounds on PRM neighbours
+    - [ ] RRIK Iterative solver
+- [ ] NR agent milestone hopping on 2D PRM/A* generated path
+
+# Advanced agent
+- [ ] Angle bound obstacles, replanning in known environment
+- [ ] Prismatic joints
 - [ ] Human link agent
 - [ ] Energy spent in some form
 - [ ] Gravity
@@ -17,7 +33,9 @@
 - [ ] Wind effects
 
 # Environment
+- [ ] Spherical obstacles, line segment obstacles
 - [ ] Slippery holds
+- [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
 
 # Rendering
 - [ ] 3D context (holds, trees, waterfall, lavafall, birds)

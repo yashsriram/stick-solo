@@ -1,5 +1,6 @@
 package robot.acting;
 
+import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
 import robot.planning.ik.RRIKSolver;
@@ -42,7 +43,7 @@ public class RRAgent {
         this.path = new ArrayList<>(path);
         this.nextMilestone = 1;
         if (nextMilestone < path.size()) {
-            goalJointTuple.headSet(RRIKSolver.solve_minusPItoPlusPI(pivotPosition, lengths, path.get(nextMilestone)));
+            goalJointTuple.headSet(RRIKSolver.solve_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone)));
         }
     }
 
@@ -80,15 +81,15 @@ public class RRAgent {
                 List<Vec> ends = getLinkEnds();
                 pivotPosition.headSet(ends.get(ends.size() - 1));
                 // Reset joint angles
-                float sumOfPreviousAngles = 0;
+                float prevLinkAngleWithX = 0;
                 for (int i = ends.size() - 1; i > 0; --i) {
                     Vec start = ends.get(i);
                     Vec end = ends.get(i - 1);
                     float angleWithX = (float) Math.atan2(end.get(1) - start.get(1), end.get(0) - start.get(0));
-                    float angleWithPrevLink = angleWithX - sumOfPreviousAngles;
+                    float angleWithPrevLink = Angle.clamp_minusPI_plusPI(angleWithX - prevLinkAngleWithX);
                     int jointVariable_iter = ends.size() - 1 - i;
                     jointTuple.set(jointVariable_iter, angleWithPrevLink);
-                    sumOfPreviousAngles += angleWithX;
+                    prevLinkAngleWithX = angleWithX;
                 }
                 // Reverse lengths
                 Vec lengthsCopy = new Vec(lengths);
@@ -98,7 +99,7 @@ public class RRAgent {
                 // If there is yet another milestone on the path
                 if (nextMilestone + 1 < path.size()) {
                     // Update goal joint variables to take free end to that milestone
-                    goalJointTuple.headSet(RRIKSolver.solve_minusPItoPlusPI(pivotPosition, lengths, path.get(nextMilestone + 1)));
+                    goalJointTuple.headSet(RRIKSolver.solve_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone + 1)));
                 }
                 nextMilestone++;
                 return;
@@ -170,9 +171,14 @@ public class RRAgent {
         applet.line(0, -PI * scale, 0, 0, PI * scale, 0);
         applet.line(0, 0, -PI * scale, 0, 0, PI * scale);
         applet.noStroke();
-        applet.fill(1, 0, 0);
+        applet.fill(0, 0, 1);
         applet.pushMatrix();
         applet.translate(0, -jointTuple.get(1) * scale, jointTuple.get(0) * scale);
+        applet.box(2);
+        applet.popMatrix();
+        applet.fill(0, 1, 0);
+        applet.pushMatrix();
+        applet.translate(0, -goalJointTuple.get(1) * scale, goalJointTuple.get(0) * scale);
         applet.box(2);
         applet.popMatrix();
     }

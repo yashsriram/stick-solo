@@ -1,11 +1,11 @@
 package robot.planning.ik;
 
+import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
 
 public class RRIKSolver {
-    public static Vec solve_minusPItoPlusPI(final Vec pivot, final Vec lengths, final Vec goalPosition) {
-        // RR IK specific math
+    public static Vec solve_minusPI_plusPI(final Vec pivot, final Vec lengths, final Vec goalPosition) {
         Vec relativeGoalPosition = goalPosition.minus(pivot);
         float l = relativeGoalPosition.norm();
         if (l < 1e-6 && (lengths.get(0) == lengths.get(1))) {
@@ -15,6 +15,11 @@ public class RRIKSolver {
         float den = 2 * relativeGoalPosition.norm() * lengths.get(0);
         float q1 = (float) (Math.atan2(relativeGoalPosition.get(1), relativeGoalPosition.get(0)) - Math.acos(num / den));
         float q2 = (float) (Math.atan2(relativeGoalPosition.get(1) - lengths.get(0) * Math.sin(q1), relativeGoalPosition.get(0) - lengths.get(0) * Math.cos(q1)) - q1);
+
+        // Make q1 b/w -PI, PI
+        q1 = Angle.clamp_minusPI_plusPI(q1);
+        // Make q2 b/w -PI, PI
+        q2 = Angle.clamp_minusPI_plusPI(q2);
 
         return new Vec(q1, q2);
     }

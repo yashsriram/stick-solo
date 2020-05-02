@@ -17,6 +17,7 @@
 - [x] Spherical agent translating on 2D PRM/A* generated path
 - [x] RR agent milestone hopping on 2D PRM/A* generated path
     - [x] min/max bounds on PRM neighbours
+    - [x] Control joint tuple and goal joint tuple ranges
     - [ ] RRIK Iterative solver
 - [ ] NR agent milestone hopping on 2D PRM/A* generated path
 

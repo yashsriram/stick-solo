@@ -4,7 +4,6 @@ import processing.core.PApplet;
 import robot.acting.RRAgent;
 import robot.planning.prm.PRM;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RRAgentOnPRM extends PApplet {
@@ -13,15 +12,14 @@ public class RRAgentOnPRM extends PApplet {
     private static final int SIZE = 100;
     private static String SEARCH_ALGORITHM = "";
 
-    private static final Vec MIN_CORNER = new Vec(new float[]{0, -SIZE, -SIZE});
-    private static final Vec MAX_CORNER = new Vec(new float[]{0, SIZE, SIZE});
-    private static final Vec START_POSITION = new Vec(new float[]{0, SIZE * (9f / 10), SIZE * (-9f / 10)});
-    private static final Vec FINISH_POSITION = new Vec(new float[]{0, SIZE * (-9f / 10), SIZE * (9f / 10)});
+    private static final Vec MIN_CORNER = new Vec(new float[]{-SIZE, -SIZE});
+    private static final Vec MAX_CORNER = new Vec(new float[]{SIZE, SIZE});
+    private static final Vec START_POSITION = new Vec(new float[]{SIZE * (-9f / 10), SIZE * (9f / 10)});
+    private static final Vec FINISH_POSITION = new Vec(new float[]{SIZE * (9f / 10), SIZE * (-9f / 10)});
 
     QueasyCam cam;
     PRM prm;
     RRAgent rrAgent;
-    Vec goal = new Vec(new float[]{0, 0});
 
     public void settings() {
         size(WIDTH, HEIGHT, P3D);
@@ -39,11 +37,7 @@ public class RRAgentOnPRM extends PApplet {
         int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, 10 + 7);
         PApplet.println("# milestones : " + numMilestones + " # edges : " + numEdges);
         List<Vec> path = prm.weightedAStar(START_POSITION, FINISH_POSITION, 25, 1.5f);
-        List<Vec> cleanedPath = new ArrayList<>();
-        for (Vec v : path) {
-            cleanedPath.add(new Vec(new float[]{v.get(2), v.get(1)}));
-        }
-        rrAgent = new RRAgent(this, 10, 15, 0, -90, cleanedPath.get(0).get(0) - 10, cleanedPath.get(0).get(1) + 10, cleanedPath);
+        rrAgent = new RRAgent(this, 10, 15, 0, -90, path.get(0).get(0) - 10, path.get(0).get(1) + 10, path);
     }
 
     public void draw() {

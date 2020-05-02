@@ -17,10 +17,10 @@ public class PRM {
         this.applet = applet;
     }
 
-    private Milestone addMilestone(float x, float y, float z, float maxEdgeLen) {
+    private Milestone addMilestone(float x, float y, float maxEdgeLen) {
         // Generate milestone
         int newId = milestones.size();
-        Milestone newMilestone = new Milestone(applet, newId, x, y, z);
+        Milestone newMilestone = new Milestone(applet, newId, x, y);
         // Connect to its neighbours
         for (Milestone oldMilestone : milestones) {
             // If nearby then link
@@ -40,7 +40,6 @@ public class PRM {
             addMilestone(
                     applet.random(minCorner.get(0), maxCorner.get(0)),
                     applet.random(minCorner.get(1), maxCorner.get(1)),
-                    applet.random(minCorner.get(2), maxCorner.get(2)),
                     maxEdgeLen
             );
         }
@@ -68,8 +67,8 @@ public class PRM {
     public List<Vec> dfs(final Vec startPosition, final Vec finishPosition, float maxEdgeLen) {
         PApplet.println("DFS");
 
-        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), startPosition.get(2), maxEdgeLen);
-        Milestone finish = addMilestone(finishPosition.get(0), finishPosition.get(1), finishPosition.get(2), maxEdgeLen);
+        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), maxEdgeLen);
+        Milestone finish = addMilestone(finishPosition.get(0), finishPosition.get(1), maxEdgeLen);
         resetSearchState(finishPosition);
 
         int numVerticesExplored = 0;
@@ -105,8 +104,8 @@ public class PRM {
     }
 
     private List<Vec> search(final Queue<Milestone> fringe, final Vec startPosition, final Vec finishPosition, float maxEdgeLen) {
-        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), startPosition.get(2), maxEdgeLen);
-        Milestone finish = addMilestone(finishPosition.get(0), finishPosition.get(1), finishPosition.get(2), maxEdgeLen);
+        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), maxEdgeLen);
+        Milestone finish = addMilestone(finishPosition.get(0), finishPosition.get(1), maxEdgeLen);
         resetSearchState(finishPosition);
 
         int numVerticesExplored = 0;

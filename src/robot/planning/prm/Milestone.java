@@ -45,10 +45,10 @@ class Milestone {
 
     final SearchState searchState;
 
-    Milestone(PApplet applet, int id, float x, float y, float z) {
+    Milestone(PApplet applet, int id, float x, float y) {
         this.applet = applet;
         this.id = id;
-        this.position = new Vec(new float[]{x, y, z});
+        this.position = new Vec(new float[]{x, y});
         this.searchState = new SearchState();
     }
 
@@ -56,14 +56,14 @@ class Milestone {
         if (PRM.DRAW_MILESTONES) {
             // Milestone
             applet.stroke(searchState.color.get(0), searchState.color.get(1), searchState.color.get(2));
-            applet.point(position.get(0), position.get(1), position.get(2));
+            applet.point(0, position.get(1), position.get(0));
         }
         if (PRM.DRAW_EDGES) {
             // Edges
             for (Milestone neighbour : neighbours) {
                 applet.stroke(1);
-                applet.line(position.get(0), position.get(1), position.get(2),
-                        neighbour.position.get(0), neighbour.position.get(1), neighbour.position.get(2));
+                applet.line(0, position.get(1), position.get(0),
+                        0, neighbour.position.get(1), neighbour.position.get(0));
             }
         }
     }

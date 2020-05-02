@@ -33,11 +33,10 @@ public class RRAgentOnPRM extends PApplet {
 
         cam = new QueasyCam(this);
         prm = new PRM(this);
+        rrAgent = new RRAgent(this);
         int numMilestones = 500;
         int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, 10 + 7);
         PApplet.println("# milestones : " + numMilestones + " # edges : " + numEdges);
-        List<Vec> path = prm.weightedAStar(START_POSITION, FINISH_POSITION, 25, 1.5f);
-        rrAgent = new RRAgent(this, 10, 15, 0, -90, path.get(0).get(0) - 10, path.get(0).get(1) + 10, path);
     }
 
     public void draw() {
@@ -53,13 +52,50 @@ public class RRAgentOnPRM extends PApplet {
         rrAgent.draw();
         prm.draw();
 
-        surface.setTitle("Processing:" + " FPS: " + frameRate);
+        surface.setTitle("Processing:"
+                + " FPS: " + (int) frameRate
+                + " Search: " + SEARCH_ALGORITHM
+        );
     }
 
     @Override
     public void keyPressed() {
         if (key == 'c') {
             cam.controllable = !cam.controllable;
+        }
+        if (key == 'p') {
+            rrAgent.isPaused = !rrAgent.isPaused;
+        }
+        if (key == 'k') {
+            PRM.DRAW_MILESTONES = !PRM.DRAW_MILESTONES;
+        }
+        if (key == 'j') {
+            PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
+        }
+        if (key == '1') {
+            List<Vec> path = prm.dfs(START_POSITION, FINISH_POSITION, 25);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            SEARCH_ALGORITHM = "DFS";
+        }
+        if (key == '2') {
+            List<Vec> path = prm.bfs(START_POSITION, FINISH_POSITION, 25);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            SEARCH_ALGORITHM = "BFS";
+        }
+        if (key == '3') {
+            List<Vec> path = prm.ucs(START_POSITION, FINISH_POSITION, 25);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            SEARCH_ALGORITHM = "UCS";
+        }
+        if (key == '4') {
+            List<Vec> path = prm.aStar(START_POSITION, FINISH_POSITION, 25);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            SEARCH_ALGORITHM = "A*";
+        }
+        if (key == '5') {
+            List<Vec> path = prm.weightedAStar(START_POSITION, FINISH_POSITION, 25, 1.5f);
+            rrAgent.spawn(path.get(0).get(0) - 10, path.get(0).get(1) + 10, 10, 15, 0, -90, path);
+            SEARCH_ALGORITHM = "weighted A*";
         }
     }
 

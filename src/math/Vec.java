@@ -18,7 +18,19 @@ public class Vec extends Mat {
 
     /* New allocation operations */
     public void headSet(float... args) {
+        if (this.getNumElements() < args.length) {
+            throw new IllegalArgumentException("Too many args to set");
+        }
         System.arraycopy(args, 0, this.data, 0, args.length);
+    }
+
+    public void headSet(Vec b) {
+        if (this.getNumElements() < b.getNumElements()) {
+            throw new IllegalArgumentException("Too big vector to set");
+        }
+        for (int i = 0; i < b.getNumElements(); i++) {
+            this.set(i, b.get(i));
+        }
     }
 
     public Vec plus(Vec b) {

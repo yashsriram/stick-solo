@@ -159,4 +159,21 @@ public class RRAgent {
             start = end;
         }
     }
+
+    public void drawJointTupleSpace() {
+        float scale = 20;
+        applet.stroke(1);
+        applet.line(0, PI * scale, -PI * scale, 0, PI * scale, PI * scale);
+        applet.line(0, -PI * scale, -PI * scale, 0, -PI * scale, PI * scale);
+        applet.line(0, -PI * scale, PI * scale, 0, PI * scale, PI * scale);
+        applet.line(0, -PI * scale, -PI * scale, 0, PI * scale, -PI * scale);
+        applet.line(0, -PI * scale, 0, 0, PI * scale, 0);
+        applet.line(0, 0, -PI * scale, 0, 0, PI * scale);
+        applet.noStroke();
+        applet.fill(1, 0, 0);
+        applet.pushMatrix();
+        applet.translate(0, -jointTuple.get(1) * scale, jointTuple.get(0) * scale);
+        applet.box(2);
+        applet.popMatrix();
+    }
 }

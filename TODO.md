@@ -1,15 +1,15 @@
-# assumptions
+# Assumptions
 - 2D wall and 2D constrained stick-figure agents
 - 2D circle and line segment obstacles on wall
 
-# stick-figure agent
+# Stick-figure agent
 - A stick-figure agent = rigid links + joints
 - Joint = revolute
 
-# serial stick-figure agent
-- links arranged serially
-- one pivot end and one free end
-- n links => n joints => n sized joint tuple => n + 1 ends
+# Serial stick-figure agent
+- Links arranged serially
+- N links => N joints => N sized joint tuple => N + 1 ends
+- Always one pivot end and one free end
 
 # Basics
 - [ ] 2D PRM/A*

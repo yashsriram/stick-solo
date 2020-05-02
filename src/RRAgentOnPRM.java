@@ -55,6 +55,7 @@ public class RRAgentOnPRM extends PApplet {
         // Draw
         rrAgent.draw();
         prm.draw();
+        rrAgent.drawJointTupleSpace();
 
         surface.setTitle("Processing:"
                 + " FPS: " + (int) frameRate

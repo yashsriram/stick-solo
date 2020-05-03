@@ -30,7 +30,7 @@ public class RRIKSolver {
         return new Vec(q1, q2);
     }
 
-    public static Vec jacobianTransposeStep(final Vec pivot, final Vec lengths, final Vec jointTuple, final Vec goalPosition, float alpha) {
+    public static Vec jacobianTransposeStep(final Vec pivot, final Vec lengths, final Vec jointTuple, final Vec goalPosition) {
         // Find link ends coordinates w.r.t pivot
         List<Vec> a_i_0 = new ArrayList<>(Collections.singletonList(new Vec(pivot)));
         Vec prevEnd = new Vec(pivot);
@@ -53,6 +53,6 @@ public class RRIKSolver {
         Mat jacobian = new Mat(jacobianValues);
         Vec delta_x = goalPosition.minus(a_e_0);
         Vec delta_jointTuple = jacobian.transpose().mult(delta_x);
-        return delta_jointTuple.scaleInPlace(alpha);
+        return delta_jointTuple;
     }
 }

@@ -18,7 +18,8 @@
 - [x] RR agent milestone hopping on 2D PRM/A* generated path
     - [x] min/max bounds on PRM neighbours
     - [x] Control joint tuple and goal joint tuple ranges
-    - [ ] RRIK Iterative solver
+    - [x] RRIK Jacobian transpose iterative solver
+    - [ ] RRIK pseudo inverse method iterative solver
 - [ ] NR agent milestone hopping on 2D PRM/A* generated path
 
 # Advanced agent

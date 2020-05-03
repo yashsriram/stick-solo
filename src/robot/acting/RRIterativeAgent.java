@@ -13,7 +13,7 @@ import static processing.core.PConstants.PI;
 
 public class RRIterativeAgent {
     public static float MILESTONE_REACHED_SLACK = 1f;
-    public static float JERK_THRESHOLD = 1e-3f;
+    public static float JERK_THRESHOLD = 1e-6f;
     public boolean isPaused = false;
 
     private final PApplet applet;
@@ -99,10 +99,11 @@ public class RRIterativeAgent {
             }
 
             // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
-            Vec delta_jointTuple = RRIKSolver.jacobianTransposeStep(pivotPosition, lengths, jointTuple, path.get(nextMilestone), dt);
+            Vec delta_jointTuple = RRIKSolver.jacobianTransposeStep(pivotPosition, lengths, jointTuple, path.get(nextMilestone));
+            delta_jointTuple.scaleInPlace(dt);
             // If stuck in a singular configuration the give a little jerk
             if (delta_jointTuple.norm() < JERK_THRESHOLD) {
-                delta_jointTuple.plusInPlace(new Vec(applet.random(1f), applet.random(1f)));
+                delta_jointTuple.plusInPlace(new Vec(applet.random(0.5f), applet.random(0.5f)));
             }
             jointTuple.plusInPlace(delta_jointTuple);
         }

@@ -31,6 +31,12 @@ public class Mat extends FMatrixRMaj {
         return (float) Math.sqrt(sumOfSquares);
     }
 
+    public Mat mult(Mat b) {
+        Mat product = new Mat(this.numRows, b.numCols);
+        CommonOps_FDRM.mult(this, b, product);
+        return product;
+    }
+
     public Vec mult(Vec b) {
         Vec product = new Vec(this.numRows);
         CommonOps_FDRM.mult(this, b, product);
@@ -43,6 +49,14 @@ public class Mat extends FMatrixRMaj {
         return transpose;
     }
 
+    public Mat inverse() {
+        Mat inverted = new Mat(this.numRows, this.numCols);
+        boolean isSuccess = CommonOps_FDRM.invert(this, inverted);
+        if (!isSuccess) {
+            throw new IllegalArgumentException("Can't invert matrix");
+        }
+        return inverted;
+    }
 
     /* In place operations */
     public Mat plusInPlace(Mat b) {

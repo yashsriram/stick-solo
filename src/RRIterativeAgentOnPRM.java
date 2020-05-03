@@ -4,7 +4,6 @@ import processing.core.PApplet;
 import robot.acting.RRIterativeAgent;
 import robot.planning.prm.PRM;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class RRIterativeAgentOnPRM extends PApplet {

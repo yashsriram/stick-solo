@@ -11,7 +11,7 @@ import java.util.List;
 
 import static processing.core.PConstants.PI;
 
-public class RRAgent {
+public class RRAnalyticalAgent {
     public static float MILESTONE_REACHED_SLACK = 0.01f;
     public boolean isPaused = false;
 
@@ -25,7 +25,7 @@ public class RRAgent {
     private final Vec lengths = new Vec(0f, 0f);
     private final Vec jointTuple = new Vec(0f, 0f);
 
-    public RRAgent(PApplet applet) {
+    public RRAnalyticalAgent(PApplet applet) {
         this.applet = applet;
     }
 

@@ -1,12 +1,12 @@
 import camera.QueasyCam;
 import math.Vec;
 import processing.core.PApplet;
-import robot.acting.RRAgent;
+import robot.acting.RRAnalyticalAgent;
 import robot.planning.prm.PRM;
 
 import java.util.List;
 
-public class RRAgentOnPRM extends PApplet {
+public class RRAnalyticalAgentOnPRM extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -24,7 +24,7 @@ public class RRAgentOnPRM extends PApplet {
 
     QueasyCam cam;
     PRM prm;
-    RRAgent rrAgent;
+    RRAnalyticalAgent rrAnalyticalAgent;
 
     public void settings() {
         size(WIDTH, HEIGHT, P3D);
@@ -38,7 +38,7 @@ public class RRAgentOnPRM extends PApplet {
 
         cam = new QueasyCam(this);
         prm = new PRM(this);
-        rrAgent = new RRAgent(this);
+        rrAnalyticalAgent = new RRAnalyticalAgent(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
     }
@@ -49,13 +49,13 @@ public class RRAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 40; i++) {
-            rrAgent.update(0.002f);
+            rrAnalyticalAgent.update(0.002f);
         }
 
         // Draw
-        rrAgent.draw();
+        rrAnalyticalAgent.draw();
         prm.draw();
-        rrAgent.drawJointTupleSpace();
+        rrAnalyticalAgent.drawJointTupleSpace();
 
         surface.setTitle("Processing:"
                 + " FPS: " + (int) frameRate
@@ -69,7 +69,7 @@ public class RRAgentOnPRM extends PApplet {
             cam.controllable = !cam.controllable;
         }
         if (key == 'p') {
-            rrAgent.isPaused = !rrAgent.isPaused;
+            rrAnalyticalAgent.isPaused = !rrAnalyticalAgent.isPaused;
         }
         if (key == 'k') {
             PRM.DRAW_MILESTONES = !PRM.DRAW_MILESTONES;
@@ -79,33 +79,33 @@ public class RRAgentOnPRM extends PApplet {
         }
         if (key == '1') {
             List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path, L1, L2, 0, -90);
+            rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
             List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path, L1, L2, 0, -90);
+            rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
             List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path, L1, L2, 0, -90);
+            rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
             List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            rrAgent.spawn(path, L1, L2, 0, -90);
+            rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
             List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
-            rrAgent.spawn(path, L1, L2, 0, -90);
+            rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "weighted A*";
         }
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"RRAgentOnPRM"};
+        String[] appletArgs = new String[]{"RRAnalyticalAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

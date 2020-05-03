@@ -37,6 +37,13 @@ public class Mat extends FMatrixRMaj {
         return product;
     }
 
+    public Mat transpose() {
+        Mat transpose = new Mat(this.numCols, this.numRows);
+        CommonOps_FDRM.transpose(this, transpose);
+        return transpose;
+    }
+
+
     /* In place operations */
     public Mat plusInPlace(Mat b) {
         CommonOps_FDRM.addEquals(this, b);

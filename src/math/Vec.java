@@ -61,7 +61,7 @@ public class Vec extends Mat {
     }
 
     /* In place operations */
-    public Vec plusInPlace(Mat b) {
+    public Vec plusInPlace(Vec b) {
         super.plusInPlace(b);
         return this;
     }

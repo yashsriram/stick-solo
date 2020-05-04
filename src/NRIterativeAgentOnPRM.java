@@ -50,8 +50,8 @@ public class NRIterativeAgentOnPRM extends PApplet {
         background(0);
 
         // Update
-        for (int i = 0; i < 2; i++) {
-            nrIterativeAgent.update(0.0001f);
+        for (int i = 0; i < 15; i++) {
+            nrIterativeAgent.update(0.00001f);
         }
 
         // Draw

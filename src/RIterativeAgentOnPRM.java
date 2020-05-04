@@ -6,7 +6,7 @@ import robot.planning.prm.PRM;
 
 import java.util.List;
 
-public class RRIterativeAgentOnPRM extends PApplet {
+public class RIterativeAgentOnPRM extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -17,10 +17,9 @@ public class RRIterativeAgentOnPRM extends PApplet {
     private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
     private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
     private static final float L1 = 10;
-    private static final float L2 = 5;
-    private static final float MAX_EDGE_LEN = L1 + L2;
-    private static final float MIN_EDGE_LEN = L1 - L2;
-    private static final int NUM_MILESTONES = 500;
+    private static final float MAX_EDGE_LEN = L1 + 0.5f;
+    private static final float MIN_EDGE_LEN = L1 - 0.5f;
+    private static final int NUM_MILESTONES = 10000;
 
     QueasyCam cam;
     PRM prm;
@@ -37,7 +36,7 @@ public class RRIterativeAgentOnPRM extends PApplet {
         noStroke();
 
         cam = new QueasyCam(this);
-        nrIterativeAgent = new NRIterativeAgent(this, 2);
+        nrIterativeAgent = new NRIterativeAgent(this, 1);
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
@@ -78,33 +77,33 @@ public class RRIterativeAgentOnPRM extends PApplet {
         }
         if (key == '1') {
             List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
             List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
             List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
             List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
             List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "weighted A*";
         }
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"RRIterativeAgentOnPRM"};
+        String[] appletArgs = new String[]{"RIterativeAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

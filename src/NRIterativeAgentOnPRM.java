@@ -1,4 +1,6 @@
 import camera.QueasyCam;
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
 import robot.acting.NRIterativeAgent;
@@ -25,8 +27,10 @@ public class NRIterativeAgentOnPRM extends PApplet {
     private static final int NUM_MILESTONES = 500;
 
     QueasyCam cam;
-    PRM prm;
+    Minim minim;
+    AudioPlayer player;
     NRIterativeAgent nrIterativeAgent;
+    PRM prm;
 
     public void settings() {
         size(WIDTH, HEIGHT, P3D);
@@ -39,6 +43,8 @@ public class NRIterativeAgentOnPRM extends PApplet {
         noStroke();
 
         cam = new QueasyCam(this);
+        minim = new Minim(this);
+        player = minim.loadFile("sounds/snapping-fingers.mp3");
         nrIterativeAgent = new NRIterativeAgent(this, 4);
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
@@ -51,7 +57,10 @@ public class NRIterativeAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-            nrIterativeAgent.update(0.00001f);
+            boolean isPivotSwitched = nrIterativeAgent.update(0.00001f);
+            if (isPivotSwitched) {
+                player.play(0);
+            }
         }
 
         // Draw

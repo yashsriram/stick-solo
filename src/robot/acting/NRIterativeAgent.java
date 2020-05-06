@@ -13,10 +13,11 @@ public class NRIterativeAgent {
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;
 
-    private final PApplet applet;
     public boolean isPaused = false;
 
+    private final PApplet applet;
     private final int N;
+
     private final Vec pivotPosition = new Vec(0f, 0f);
     private final Vec lengths;
     private final Vec jointTuple;
@@ -75,9 +76,9 @@ public class NRIterativeAgent {
         return freeEnd;
     }
 
-    public void update(float dt) {
+    public boolean update(float dt) {
         if (isPaused) {
-            return;
+            return false;
         }
         if (nextMilestone < path.size()) {
             // Reached next milestone
@@ -103,7 +104,7 @@ public class NRIterativeAgent {
                 }
                 nextMilestone++;
                 isMinSpeedLimitCalculated = false;
-                return;
+                return true;
             }
             // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
             Vec deltaJointTupleUnscaled = RRIKSolver.jacobianTransposeStep(pivotPosition, lengths, jointTuple, path.get(nextMilestone));
@@ -122,6 +123,7 @@ public class NRIterativeAgent {
             }
             jointTuple.plusInPlace(deltaJointTuple);
         }
+        return false;
     }
 
     public void draw() {

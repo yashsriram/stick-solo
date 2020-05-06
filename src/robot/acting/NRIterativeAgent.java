@@ -12,20 +12,20 @@ import java.util.List;
 public class NRIterativeAgent {
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;
-    public static float SPEED_THRESHOLD = 1e-2f;
-    public static boolean CALCULATED = false ;
-    public boolean isPaused = false;
 
     private final PApplet applet;
+    public boolean isPaused = false;
+
+    private final int N;
+    private final Vec pivotPosition = new Vec(0f, 0f);
+    private final Vec lengths;
+    private final Vec jointTuple;
 
     private List<Vec> path = new ArrayList<>();
     private int nextMilestone = 1;
 
-    private final Vec pivotPosition = new Vec(0f, 0f);
-    private final int N;
-    private Vec delta_jointTheta ;
-    private final Vec lengths;
-    private final Vec jointTuple;
+    public float minSpeedLimit = 1e-2f;
+    public boolean isMinSpeedLimitCalculated = false;
 
     public NRIterativeAgent(PApplet applet, int N) {
         this.applet = applet;
@@ -102,29 +102,25 @@ public class NRIterativeAgent {
                     lengths.set(lengthsCopy.getNumElements() - 1 - i, lengthsCopy.get(i));
                 }
                 nextMilestone++;
-                CALCULATED = false;
+                isMinSpeedLimitCalculated = false;
                 return;
             }
-
-            if(!CALCULATED){
-                // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
-                Vec delta_jointTuple = RRIKSolver.jacobianTransposeStep(pivotPosition, lengths, jointTuple, path.get(nextMilestone));
-                delta_jointTheta = delta_jointTuple.scale(dt);
-                SPEED_THRESHOLD = delta_jointTheta.norm();
-                CALCULATED = true;
+            // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
+            Vec deltaJointTupleUnscaled = RRIKSolver.jacobianTransposeStep(pivotPosition, lengths, jointTuple, path.get(nextMilestone));
+            Vec deltaJointTuple = deltaJointTupleUnscaled.scaleInPlace(dt);
+            if (!isMinSpeedLimitCalculated) {
+                minSpeedLimit = deltaJointTuple.norm();
+                isMinSpeedLimitCalculated = true;
             }
-            delta_jointTheta = RRIKSolver.jacobianTransposeStep(pivotPosition, lengths, jointTuple, path.get(nextMilestone));
-            delta_jointTheta.scaleInPlace(dt);
-            if(delta_jointTheta.norm() < SPEED_THRESHOLD){
-                delta_jointTheta.normalizeInPlace();
-                delta_jointTheta.scaleInPlace(SPEED_THRESHOLD);
+            // If too speed is too low, increase it to a minimum
+            if (deltaJointTuple.norm() < minSpeedLimit) {
+                deltaJointTuple.normalizeInPlace().scaleInPlace(minSpeedLimit);
             }
-
             // If stuck in a singular configuration the give a little jerk
-            if (delta_jointTheta.norm() < JERK_THRESHOLD) {
-                delta_jointTheta.plusInPlace(new Vec(applet.random(0.5f), applet.random(0.5f)));
+            if (deltaJointTuple.norm() < JERK_THRESHOLD) {
+                deltaJointTuple.plusInPlace(new Vec(applet.random(0.5f), applet.random(0.5f)));
             }
-            jointTuple.plusInPlace(delta_jointTheta);
+            jointTuple.plusInPlace(deltaJointTuple);
         }
     }
 

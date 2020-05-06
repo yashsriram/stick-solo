@@ -82,9 +82,9 @@ public class NRIterativeAgent {
         }
         if (nextMilestone < path.size()) {
             // Reached next milestone
+            List<Vec> ends = getLinkEnds();
             if (Vec.dist(getFreeEnd(), path.get(nextMilestone)) < MILESTONE_REACHED_SLACK) {
                 // Switch pivot
-                List<Vec> ends = getLinkEnds();
                 pivotPosition.headSet(ends.get(ends.size() - 1));
                 // Reset joint angles
                 float prevLinkAngleWithX = 0;
@@ -107,7 +107,7 @@ public class NRIterativeAgent {
                 return true;
             }
             // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
-            Vec deltaJointTupleUnscaled = RRIKSolver.jacobianTransposeStep(pivotPosition, lengths, jointTuple, path.get(nextMilestone));
+            Vec deltaJointTupleUnscaled = RRIKSolver.jacobianTransposeStep(ends, jointTuple, path.get(nextMilestone));
             Vec deltaJointTuple = deltaJointTupleUnscaled.scaleInPlace(dt);
             if (!isMinSpeedLimitCalculated) {
                 minSpeedLimit = deltaJointTuple.norm();

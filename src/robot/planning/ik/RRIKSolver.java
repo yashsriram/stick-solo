@@ -30,17 +30,7 @@ public class RRIKSolver {
         return new Vec(q1, q2);
     }
 
-    public static Vec jacobianTransposeStep(final Vec pivot, final Vec lengths, final Vec jointTuple, final Vec goalPosition) {
-        // Find link ends coordinates w.r.t pivot
-        List<Vec> a_i_0 = new ArrayList<>(Collections.singletonList(new Vec(pivot)));
-        Vec prevEnd = new Vec(pivot);
-        float angleWithX = 0;
-        for (int i = 0; i < jointTuple.getNumElements(); i++) {
-            angleWithX += jointTuple.get(i);
-            prevEnd.set(0, prevEnd.get(0) + (float) (lengths.get(i) * Math.cos(angleWithX)));
-            prevEnd.set(1, prevEnd.get(1) + (float) (lengths.get(i) * Math.sin(angleWithX)));
-            a_i_0.add(new Vec(prevEnd));
-        }
+    public static Vec jacobianTransposeStep(final List<Vec> a_i_0, final Vec jointTuple, final Vec goalPosition) {
         // Free end coordinates
         Vec a_e_0 = a_i_0.get(a_i_0.size() - 1);
         // Building jacobian

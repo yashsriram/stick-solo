@@ -20,9 +20,9 @@ public class NRIterativeAgentOnPRM extends PApplet {
     private static final float L2 = 10;
     private static final float L3 = 5;
     private static final float L4 = 10;
-    private static final float MAX_EDGE_LEN = L1 + L2 + L3 + L4 - 1;
+    private static final float MAX_EDGE_LEN = L1 + L2 + L3 + L4 - 5;
     private static final float MIN_EDGE_LEN = 0;
-    private static final int NUM_MILESTONES = 200;
+    private static final int NUM_MILESTONES = 500;
 
     QueasyCam cam;
     PRM prm;

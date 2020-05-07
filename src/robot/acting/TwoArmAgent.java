@@ -107,7 +107,7 @@ public class TwoArmAgent {
                 }
                 break;
         }
-        return false;
+        return (state == 0 || state == 2);
     }
 
     public void draw() {
@@ -137,6 +137,14 @@ public class TwoArmAgent {
             applet.box(1);
             applet.popMatrix();
         }
+
+        // Neck
+        applet.noStroke();
+        applet.fill(1, 1, 0);
+        applet.pushMatrix();
+        applet.translate(0, neck.get(1), neck.get(0));
+        applet.box(3);
+        applet.popMatrix();
 
         arm1.draw();
         arm2.draw();

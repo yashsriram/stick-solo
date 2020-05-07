@@ -6,7 +6,7 @@ import processing.core.PApplet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SphericalAgent {
+public class CircularAgent {
     public static float MILESTONE_REACHED_SLACK = 2f;
     public boolean isPaused = false;
 
@@ -19,7 +19,7 @@ public class SphericalAgent {
     private List<Vec> path = new ArrayList<>();
     private int currentMilestone = 0;
 
-    public SphericalAgent(PApplet parent, Vec center, float radius, float speed, Vec color) {
+    public CircularAgent(PApplet parent, Vec center, float radius, float speed, Vec color) {
         this.parent = parent;
         this.center = new Vec(center);
         this.radius = radius;

@@ -4,14 +4,17 @@ import math.Vec;
 import processing.core.PApplet;
 
 public class TwoArmAgent {
+    public static float MIN_LIMB_SPEED = 0.003f;
+    public static float NECK_SPEED = 0.005f;
+
     public boolean isPaused = false;
 
     private final PApplet applet;
     private final NRIterativeBodyPartAgent arm1;
     private final NRIterativeBodyPartAgent arm2;
-    private final Vec neck = new Vec(-40, 40);
 
     private int state = 0;
+    private final Vec neck = new Vec(-40, 40);
     private final Vec goal = new Vec(-40, 40);
     private final Vec neckGoal = new Vec(neck);
 
@@ -39,7 +42,7 @@ public class TwoArmAgent {
                 state++;
                 break;
             case 1:
-                if (arm1.update(dt, 0.003f)) {
+                if (arm1.update(dt, MIN_LIMB_SPEED)) {
                     state++;
                 }
                 break;
@@ -59,12 +62,12 @@ public class TwoArmAgent {
                 state++;
                 break;
             case 3:
-                neck.plusInPlace(neckGoal.minus(neck).scaleInPlace(0.001f));
+                neck.plusInPlace(neckGoal.minus(neck).scaleInPlace(NECK_SPEED));
                 arm1.setGoal(neck);
                 arm2.setGoal(neck);
                 while (true) {
-                    boolean arm1Ok = arm1.update(dt, 0.003f);
-                    boolean arm2Ok = arm2.update(dt, 0.003f);
+                    boolean arm1Ok = arm1.update(dt, MIN_LIMB_SPEED);
+                    boolean arm2Ok = arm2.update(dt, MIN_LIMB_SPEED);
                     if (arm1Ok && arm2Ok) {
                         break;
                     }
@@ -81,7 +84,7 @@ public class TwoArmAgent {
                 state++;
                 break;
             case 5:
-                if (arm2.update(dt, 0.003f)) {
+                if (arm2.update(dt, MIN_LIMB_SPEED)) {
                     state = 0;
                 }
                 break;

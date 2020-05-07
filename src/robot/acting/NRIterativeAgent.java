@@ -144,6 +144,15 @@ public class NRIterativeAgent {
         }
         applet.noStroke();
 
+        // Goal milestone
+        if (nextMilestone < path.size()) {
+            applet.fill(1, 0, 0);
+            applet.pushMatrix();
+            applet.translate(0, path.get(nextMilestone).get(1), path.get(nextMilestone).get(0));
+            applet.box(1);
+            applet.popMatrix();
+        }
+
         // Pivot
         applet.pushMatrix();
         applet.noStroke();

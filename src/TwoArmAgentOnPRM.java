@@ -20,9 +20,9 @@ public class TwoArmAgentOnPRM extends PApplet {
     private static final float L1 = 10;
     private static final float L2 = 15;
     private static final float MAX_EDGE_LEN = 10;
-    private static final float MIN_EDGE_LEN = L1 - L2;
+    private static final float MIN_EDGE_LEN = 2;
     private static final int NUM_MILESTONES = 1500;
-    private static final float NECK_ARM_DIST = 15;
+    private static final float NECK_ARM_DIST = 14;
 
     QueasyCam cam;
     Minim minim;

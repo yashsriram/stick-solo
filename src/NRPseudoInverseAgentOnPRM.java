@@ -8,7 +8,7 @@ import robot.planning.prm.PRM;
 
 import java.util.List;
 
-public class NRIterativeAgentOnPRM extends PApplet {
+public class NRPseudoInverseAgentOnPRM extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -46,6 +46,7 @@ public class NRIterativeAgentOnPRM extends PApplet {
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
         nrIterativeAgent = new NRIterativeAgent(this, 4);
+        NRIterativeAgent.METHOD = NRIterativeAgent.IKMethod.PSEUDO_INVERSE;
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
@@ -57,7 +58,7 @@ public class NRIterativeAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-            boolean isPivotSwitched = nrIterativeAgent.update(0.00001f);
+            boolean isPivotSwitched = nrIterativeAgent.update(0.001f);
             if (isPivotSwitched) {
                 player.play(0);
             }
@@ -115,7 +116,7 @@ public class NRIterativeAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"NRIterativeAgentOnPRM"};
+        String[] appletArgs = new String[]{"NRPseudoInverseAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

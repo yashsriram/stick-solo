@@ -58,6 +58,10 @@ public class Mat extends FMatrixRMaj {
         return inverted;
     }
 
+    public float determinant() {
+        return CommonOps_FDRM.det(this);
+    }
+
     /* In place operations */
     public Mat plusInPlace(Mat b) {
         CommonOps_FDRM.addEquals(this, b);

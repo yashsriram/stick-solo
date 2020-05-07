@@ -3,7 +3,7 @@ package robot.acting;
 import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
-import robot.planning.ik.RRIKSolver;
+import robot.planning.ik.NRIKSolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class RRAnalyticalAgent {
         this.path = new ArrayList<>(path);
         this.nextMilestone = 1;
         if (nextMilestone < path.size()) {
-            goalJointTuple.headSet(RRIKSolver.solve_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone)));
+            goalJointTuple.headSet(NRIKSolver.solve_RR_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone)));
         }
     }
 
@@ -99,7 +99,7 @@ public class RRAnalyticalAgent {
                 // If there is yet another milestone on the path
                 if (nextMilestone + 1 < path.size()) {
                     // Update goal joint variables to take free end to that milestone
-                    goalJointTuple.headSet(RRIKSolver.solve_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone + 1)));
+                    goalJointTuple.headSet(NRIKSolver.solve_RR_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone + 1)));
                 }
                 nextMilestone++;
                 return;

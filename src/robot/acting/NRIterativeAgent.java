@@ -3,15 +3,18 @@ package robot.acting;
 import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
-import robot.planning.ik.RRIKSolver;
+import robot.planning.ik.NRIKSolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class NRIterativeAgent {
+    public enum IKMethod {JACOBIAN_TRANSOPOSE, PSEUDO_INVERSE}
+
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;
+    public static IKMethod METHOD = IKMethod.JACOBIAN_TRANSOPOSE;
 
     public boolean isPaused = false;
 
@@ -107,7 +110,12 @@ public class NRIterativeAgent {
                 return true;
             }
             // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
-            Vec deltaJointTupleUnscaled = RRIKSolver.jacobianTransposeStep(ends, jointTuple, path.get(nextMilestone));
+            Vec deltaJointTupleUnscaled;
+            if (METHOD == IKMethod.PSEUDO_INVERSE) {
+                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(ends, jointTuple, path.get(nextMilestone));
+            } else {
+                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(ends, jointTuple, path.get(nextMilestone));
+            }
             Vec deltaJointTuple = deltaJointTupleUnscaled.scaleInPlace(dt);
             if (!isMinSpeedLimitCalculated) {
                 minSpeedLimit = deltaJointTuple.norm();
@@ -119,7 +127,9 @@ public class NRIterativeAgent {
             }
             // If stuck in a singular configuration the give a little jerk
             if (deltaJointTuple.norm() < JERK_THRESHOLD) {
-                deltaJointTuple.plusInPlace(new Vec(applet.random(0.5f), applet.random(0.5f)));
+                for (int i = 0; i < jointTuple.getNumElements(); i++) {
+                    deltaJointTuple.set(i, deltaJointTuple.get(i) + applet.random(0.5f));
+                }
             }
             jointTuple.plusInPlace(deltaJointTuple);
         }

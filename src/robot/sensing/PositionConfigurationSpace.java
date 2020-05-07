@@ -23,15 +23,6 @@ public class PositionConfigurationSpace {
         return false;
     }
 
-    public boolean isInside(final Vec p) {
-        for (Obstacle obs : obstacles) {
-            if (obs.isInside(p)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void draw() {
         for (Obstacle obs : obstacles) {
             obs.draw();

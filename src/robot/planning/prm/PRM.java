@@ -45,14 +45,9 @@ public class PRM {
 
     public int grow(int num, Vec minCorner, Vec maxCorner, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
         for (int i = 0; i < num; ++i) {
-            // If sample inside obstacles, resample
-            Vec newMilestone = new Vec(applet.random(minCorner.get(0), maxCorner.get(0)), applet.random(minCorner.get(1), maxCorner.get(1)));
-            while (cs.isInside(newMilestone)) {
-                newMilestone.headSet(applet.random(minCorner.get(0), maxCorner.get(0)), applet.random(minCorner.get(1), maxCorner.get(1)));
-            }
             addMilestone(
-                    newMilestone.get(0),
-                    newMilestone.get(1),
+                    applet.random(minCorner.get(0), maxCorner.get(0)),
+                    applet.random(minCorner.get(1), maxCorner.get(1)),
                     minEdgeLen,
                     maxEdgeLen,
                     cs

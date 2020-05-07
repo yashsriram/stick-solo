@@ -32,10 +32,6 @@ public class LineSegmentObstacle implements Obstacle {
         return scale;
     }
 
-    public boolean isInside(Vec p) {
-        return false;
-    }
-
     public boolean doesIntersect(final Vec p1, final Vec p2) {
         // A
         Mat A = new Mat(new float[][]{

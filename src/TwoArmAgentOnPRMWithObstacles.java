@@ -5,6 +5,7 @@ import math.Vec;
 import processing.core.PApplet;
 import robot.acting.TwoArmAgent;
 import robot.planning.prm.PRM;
+import robot.sensing.CircleObstacle;
 import robot.sensing.LineSegmentObstacle;
 import robot.sensing.PositionConfigurationSpace;
 
@@ -48,10 +49,12 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         player = minim.loadFile("sounds/snapping-fingers.mp3");
         twoArmAgent = new TwoArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of(
-                new LineSegmentObstacle(this, new Vec(-30, -30), new Vec(30, -30), new Vec(1, 0, 1)),
-                new LineSegmentObstacle(this, new Vec(-30, 30), new Vec(30, 30), new Vec(1, 0, 1)),
-                new LineSegmentObstacle(this, new Vec(-30, -30), new Vec(-30, 30), new Vec(1, 0, 1)),
-                new LineSegmentObstacle(this, new Vec(30, -30), new Vec(30, 30), new Vec(1, 0, 1))
+                new LineSegmentObstacle(this, new Vec(-20, -20), new Vec(20, -20), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(-20, 20), new Vec(20, 20), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(-20, -20), new Vec(-20, 20), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(20, -20), new Vec(20, 20), new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(0, 20), 20, new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(0, -20), 20, new Vec(1, 0, 1))
         ));
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);

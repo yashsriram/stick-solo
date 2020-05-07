@@ -33,6 +33,14 @@ public class NRIterativeBodyPartAgent {
         this.jointTuple = new Vec(new float[N]);
     }
 
+    public float totalArmLength() {
+        float len = 0;
+        for (int i = 0; i < lengths.getNumElements(); i++) {
+            len += lengths.get(i);
+        }
+        return len;
+    }
+
     private Vec getFreeEnd() {
         Vec freeEnd = new Vec(pivot);
         float angleWithX = 0;

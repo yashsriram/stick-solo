@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TwoArmAgent {
-    public static float MIN_LIMB_SPEED = 0.003f;
-    public static float NECK_SPEED = 0.005f;
+    public static boolean DRAW_PATH = true;
+    public static float MIN_LIMB_SPEED = 0.006f;
+    public static float NECK_SPEED = 0.01f;
     public static float NECK_SYNC_ITERATIONS = 100;
 
     public boolean isPaused = false;
@@ -49,13 +50,17 @@ public class TwoArmAgent {
         if (nextMilestone >= path.size()) {
             return false;
         }
-        Vec goal = path.get(nextMilestone);
         switch (state) {
             case 0:
                 if (!arm1.isStraight()) {
                     arm1.switchPivot();
                 }
-                arm1.setGoal(goal);
+                if (nextMilestone + 1 < path.size()
+                        && path.get(nextMilestone + 1).get(1) <= path.get(nextMilestone).get(1)
+                        && path.get(nextMilestone + 1).minus(neck).norm() < arm1.totalArmLength()) {
+                    nextMilestone = nextMilestone + 1;
+                }
+                arm1.setGoal(path.get(nextMilestone));
                 state++;
                 break;
             case 1:
@@ -97,7 +102,12 @@ public class TwoArmAgent {
                 if (!arm2.isStraight()) {
                     arm2.switchPivot();
                 }
-                arm2.setGoal(goal);
+                if (nextMilestone + 1 < path.size()
+                        && path.get(nextMilestone + 1).get(1) <= path.get(nextMilestone).get(1)
+                        && path.get(nextMilestone + 1).minus(neck).norm() < arm2.totalArmLength()) {
+                    nextMilestone = nextMilestone + 1;
+                }
+                arm2.setGoal(path.get(nextMilestone));
                 state++;
                 break;
             case 5:
@@ -138,11 +148,13 @@ public class TwoArmAgent {
 
     public void draw() {
         // path
-        applet.stroke(1);
-        for (int i = 0; i < path.size() - 1; i++) {
-            Vec v1 = path.get(i);
-            Vec v2 = path.get(i + 1);
-            applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
+        if (DRAW_PATH) {
+            applet.stroke(1);
+            for (int i = 0; i < path.size() - 1; i++) {
+                Vec v1 = path.get(i);
+                Vec v2 = path.get(i + 1);
+                applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
+            }
         }
         applet.noStroke();
         applet.fill(1);

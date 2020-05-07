@@ -17,12 +17,12 @@ public class TwoArmAgentOnPRM extends PApplet {
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
     private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
     private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
-    private static final float L1 = 10;
-    private static final float L2 = 15;
-    private static final float MAX_EDGE_LEN = 10;
+    private static final float L1 = 12;
+    private static final float L2 = 12;
+    private static final float MAX_EDGE_LEN = 8;
     private static final float MIN_EDGE_LEN = 2;
-    private static final int NUM_MILESTONES = 1500;
-    private static final float NECK_ARM_DIST = 14;
+    private static final int NUM_MILESTONES = 2000;
+    private static final float NECK_ARM_DIST = 12;
 
     QueasyCam cam;
     Minim minim;
@@ -84,6 +84,9 @@ public class TwoArmAgentOnPRM extends PApplet {
         }
         if (key == 'j') {
             PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
+        }
+        if (key == 'h') {
+            TwoArmAgent.DRAW_PATH = !TwoArmAgent.DRAW_PATH;
         }
         if (key == '1') {
             List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);

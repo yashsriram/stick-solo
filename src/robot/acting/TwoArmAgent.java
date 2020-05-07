@@ -16,7 +16,7 @@ public class TwoArmAgent {
     private final PApplet applet;
     private final NRIterativeBodyPartAgent arm1;
     private final NRIterativeBodyPartAgent arm2;
-    public float neckToArmDistance = 0;
+    public float neckArmDistance = 0;
 
     private final Vec neck = new Vec(0, 0);
     private final Vec neckGoal = new Vec(neck);
@@ -32,7 +32,7 @@ public class TwoArmAgent {
     }
 
     public void spawn(Vec neck, float neckToArmDistance, List<Vec> path, Vec armLengths) {
-        this.neckToArmDistance = neckToArmDistance;
+        this.neckArmDistance = neckToArmDistance;
         this.neck.headSet(neck);
         this.neckGoal.headSet(neck);
         this.arm1.spawn(neck, new Vec(armLengths), new Vec(-PApplet.PI * 0.25f, -PApplet.PI * 0.25f));
@@ -66,8 +66,8 @@ public class TwoArmAgent {
             case 2:
                 Vec neckToGoal = path.get(nextMilestone).minus(neck);
                 float neckToGoalDist = neckToGoal.norm();
-                if (neckToGoalDist > neckToArmDistance) {
-                    neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - neckToArmDistance);
+                if (neckToGoalDist > neckArmDistance) {
+                    neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - neckArmDistance);
                     neckGoal.headSet(neck.plus(neckToGoal));
                 }
                 if (arm1.isStraight()) {
@@ -102,12 +102,38 @@ public class TwoArmAgent {
                 break;
             case 5:
                 if (arm2.update(dt, MIN_LIMB_SPEED)) {
+                    state++;
+                }
+                break;
+            case 6:
+                Vec neckToBelowMilestone = new Vec(path.get(nextMilestone).get(0), path.get(nextMilestone).get(1) + neckArmDistance);
+                neckGoal.headSet(neckToBelowMilestone);
+                if (arm1.isStraight()) {
+                    arm1.switchPivot();
+                }
+                if (arm2.isStraight()) {
+                    arm2.switchPivot();
+                }
+                state++;
+                break;
+            case 7:
+                if (Vec.dist(neck, neckGoal) < NRIterativeBodyPartAgent.MILESTONE_REACHED_SLACK) {
                     nextMilestone++;
                     state = 0;
                 }
+                neck.plusInPlace(neckGoal.minus(neck).scaleInPlace(NECK_SPEED));
+                arm1.setGoal(neck);
+                arm2.setGoal(neck);
+                for (int i = 0; i < NECK_SYNC_ITERATIONS; i++) {
+                    boolean arm1Ok = arm1.update(dt, MIN_LIMB_SPEED);
+                    boolean arm2Ok = arm2.update(dt, MIN_LIMB_SPEED);
+                    if (arm1Ok && arm2Ok) {
+                        break;
+                    }
+                }
                 break;
         }
-        return (state == 0 || state == 2);
+        return false;
     }
 
     public void draw() {

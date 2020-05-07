@@ -26,9 +26,10 @@
 
 # Humanize
 - [ ] Two arm agent
+- [ ] Two arm Two leg agent
 
 # Effects
-- [x] Sound on pivot change
+- [ ] Sound on pivot change
 - [ ] Rock particle effects while holding on
 - [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [ ] Wind effects

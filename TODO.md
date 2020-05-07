@@ -20,29 +20,37 @@
     - [x] Control joint tuple and goal joint tuple ranges
     - [x] RRIK Jacobian transpose iterative solver
     - [ ] RRIK pseudo inverse method iterative solver
-- [ ] NR agent milestone hopping on 2D PRM/A* generated path
+- [x] NR agent milestone hopping on 2D PRM/A* generated path
+    - [x] Jacobian method
+    - [x] Pseudo inverse method
 
-# Advanced agent
-- [ ] Angle bound obstacles, replanning in known environment
-- [ ] Prismatic joints
-- [ ] Human link agent
-- [ ] Energy spent in some form
-- [ ] Gravity
-- [ ] Springy limbs
+# Humanize
+- [ ] Two arm agent
 
 # Effects
+- [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [ ] Belay rope
 - [ ] Rock particle effects while holding on
 - [ ] Wind effects
+
+# Sound 
+- [x] Sound on pivot change
+
+# Rendering
+- [ ] 3D context (holds, trees, waterfall, lavafall, birds)
+- [ ] 3D models for agent links (hands, legs, body and tail)?
 
 # Environment
 - [ ] Spherical obstacles, line segment obstacles
 - [ ] Slippery holds
 - [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
 
-# Rendering
-- [ ] 3D context (holds, trees, waterfall, lavafall, birds)
-- [ ] 3D models for agent links (hands, legs, body and tail)?
+# Advanced agent
+- [ ] Angle bound obstacles, replanning in known environment
+- [ ] Prismatic joints
+- [ ] Energy spent in some form
+- [ ] Gravity
+- [ ] Springy limbs
 
 # Make a game
 - [ ] Multiple such agents trying to catch player

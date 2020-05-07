@@ -6,6 +6,7 @@ import processing.core.PApplet;
 import robot.acting.TwoArmAgent;
 import robot.planning.prm.PRM;
 import robot.sensing.LineSegmentObstacle;
+import robot.sensing.PositionConfigurationSpace;
 
 import java.util.List;
 
@@ -30,8 +31,7 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     AudioPlayer player;
     TwoArmAgent twoArmAgent;
     PRM prm;
-    LineSegmentObstacle obs1;
-    LineSegmentObstacle obs2;
+    PositionConfigurationSpace cs;
 
     public void settings() {
         size(WIDTH, HEIGHT, P3D);
@@ -47,12 +47,15 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
         twoArmAgent = new TwoArmAgent(this);
+        cs = new PositionConfigurationSpace(this, List.of(
+                new LineSegmentObstacle(this, new Vec(-30, -30), new Vec(30, -30), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(-30, 30), new Vec(30, 30), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(-30, -30), new Vec(-30, 30), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(30, -30), new Vec(30, 30), new Vec(1, 0, 1))
+        ));
         prm = new PRM(this);
-        int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
+        int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
-        obs1 = new LineSegmentObstacle(this, new Vec(-10, 0), new Vec(10, 0), new Vec(1, 0, 1));
-        obs2 = new LineSegmentObstacle(this, new Vec(11, 0), new Vec(20, 0), new Vec(1, 0, 1));
-        PApplet.println(obs1.doesIntersect(obs2.e1, obs2.e2));
     }
 
     public void draw() {
@@ -60,18 +63,17 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         background(0);
 
         // Update
-//        for (int i = 0; i < 15; i++) {
-//            boolean playSound = twoArmAgent.update(0.00001f);
-//            if (playSound) {
-//                player.play(0);
-//            }
-//        }
+        for (int i = 0; i < 15; i++) {
+            boolean playSound = twoArmAgent.update(0.00001f);
+            if (playSound) {
+                player.play(0);
+            }
+        }
 
         // Draw
-//        twoArmAgent.draw();
-//        prm.draw();
-        obs1.draw();
-        obs2.draw();
+        twoArmAgent.draw();
+        prm.draw();
+        cs.draw();
 
         surface.setTitle("Processing:"
                 + " FPS: " + (int) frameRate
@@ -97,27 +99,27 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
             TwoArmAgent.DRAW_PATH = !TwoArmAgent.DRAW_PATH;
         }
         if (key == '1') {
-            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
+            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "weighted A*";
         }

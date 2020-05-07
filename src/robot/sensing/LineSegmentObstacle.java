@@ -4,7 +4,7 @@ import math.Mat;
 import math.Vec;
 import processing.core.PApplet;
 
-public class LineSegmentObstacle {
+public class LineSegmentObstacle implements Obstacle {
     private final PApplet applet;
     public final Vec e1 = new Vec(0, 0);
     public final Vec e2 = new Vec(0, 0);
@@ -30,6 +30,10 @@ public class LineSegmentObstacle {
         }
         scale = scale / numNonZeroElements;
         return scale;
+    }
+
+    public boolean isInside(Vec p) {
+        return false;
     }
 
     public boolean doesIntersect(final Vec p1, final Vec p2) {

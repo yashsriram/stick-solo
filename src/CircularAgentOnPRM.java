@@ -3,6 +3,9 @@ import math.Vec;
 import processing.core.PApplet;
 import robot.acting.CircularAgent;
 import robot.planning.prm.PRM;
+import robot.sensing.PositionConfigurationSpace;
+
+import java.util.List;
 
 public class CircularAgentOnPRM extends PApplet {
     private static final int WIDTH = 800;
@@ -16,6 +19,7 @@ public class CircularAgentOnPRM extends PApplet {
     private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
     private static final float MAX_EDGE_LEN = 7;
 
+    PositionConfigurationSpace cs;
     PRM prm;
     QueasyCam cam;
     CircularAgent circularAgent;
@@ -30,9 +34,10 @@ public class CircularAgentOnPRM extends PApplet {
         rectMode(CENTER);
 
         cam = new QueasyCam(this);
+        cs = new PositionConfigurationSpace(this, List.of());
         prm = new PRM(this);
         int numMilestones = 2000;
-        int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, 0, MAX_EDGE_LEN);
+        int numEdges = prm.grow(numMilestones, MIN_CORNER, MAX_CORNER, 0, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + numMilestones + " # edges : " + numEdges);
         circularAgent = new CircularAgent(this, START_POSITION, 3, 10, new Vec(1, 1, 1));
     }
@@ -72,23 +77,23 @@ public class CircularAgentOnPRM extends PApplet {
             PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
         }
         if (key == '1') {
-            circularAgent.spawn(START_POSITION, prm.dfs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
+            circularAgent.spawn(START_POSITION, prm.dfs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN, cs));
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            circularAgent.spawn(START_POSITION, prm.bfs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
+            circularAgent.spawn(START_POSITION, prm.bfs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN, cs));
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            circularAgent.spawn(START_POSITION, prm.ucs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
+            circularAgent.spawn(START_POSITION, prm.ucs(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN, cs));
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            circularAgent.spawn(START_POSITION, prm.aStar(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN));
+            circularAgent.spawn(START_POSITION, prm.aStar(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN, cs));
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            circularAgent.spawn(START_POSITION, prm.weightedAStar(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN, 1.5f));
+            circularAgent.spawn(START_POSITION, prm.weightedAStar(START_POSITION, GOAL_POSITION, 0, MAX_EDGE_LEN, cs, 1.5f));
             SEARCH_ALGORITHM = "weighted A*";
         }
     }

@@ -5,6 +5,7 @@ import math.Vec;
 import processing.core.PApplet;
 import robot.acting.RRAnalyticalAgent;
 import robot.planning.prm.PRM;
+import robot.sensing.PositionConfigurationSpace;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class RRAnalyticalAgentOnPRM extends PApplet {
     QueasyCam cam;
     Minim minim;
     AudioPlayer player;
+    PositionConfigurationSpace cs;
     PRM prm;
     RRAnalyticalAgent rrAnalyticalAgent;
 
@@ -43,9 +45,10 @@ public class RRAnalyticalAgentOnPRM extends PApplet {
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
+        cs = new PositionConfigurationSpace(this, List.of());
         prm = new PRM(this);
         rrAnalyticalAgent = new RRAnalyticalAgent(this);
-        int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
+        int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
     }
 
@@ -87,27 +90,27 @@ public class RRAnalyticalAgentOnPRM extends PApplet {
             PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
         }
         if (key == '1') {
-            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
+            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
             rrAnalyticalAgent.spawn(path, L1, L2, 0, -90);
             SEARCH_ALGORITHM = "weighted A*";
         }

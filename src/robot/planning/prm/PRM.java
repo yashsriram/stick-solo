@@ -2,6 +2,7 @@ package robot.planning.prm;
 
 import math.Vec;
 import processing.core.PApplet;
+import robot.sensing.PositionConfigurationSpace;
 
 import java.util.*;
 
@@ -9,40 +10,52 @@ public class PRM {
     public static boolean DRAW_MILESTONES = true;
     public static boolean DRAW_EDGES = false;
 
-    final PApplet applet;
-    final List<Milestone> milestones = new ArrayList<>();
-    int numEdges = 0;
+    private final PApplet applet;
+    private final List<Milestone> milestones = new ArrayList<>();
+    private int numEdges = 0;
 
     public PRM(PApplet applet) {
         this.applet = applet;
     }
 
-    private Milestone addMilestone(float x, float y, float minEdgeLen, float maxEdgeLen) {
+    private Milestone addMilestone(float x, float y, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
         // Generate milestone
         int newId = milestones.size();
         Milestone newMilestone = new Milestone(applet, newId, x, y);
         // Connect to its neighbours
         for (Milestone oldMilestone : milestones) {
-            // If nearby then link
+            // If not in min max range do not connect
             float distance = newMilestone.position.minus(oldMilestone.position).norm();
-            if (minEdgeLen <= distance && distance <= maxEdgeLen) {
-                newMilestone.neighbours.add(oldMilestone);
-                oldMilestone.neighbours.add(newMilestone);
-                numEdges++;
+            if (distance < minEdgeLen || distance > maxEdgeLen) {
+                continue;
             }
+            // If intersects an obstacle do not connect
+            if (cs.doesIntersect(newMilestone.position, oldMilestone.position)) {
+                continue;
+            }
+            // If all ok connect
+            newMilestone.neighbours.add(oldMilestone);
+            oldMilestone.neighbours.add(newMilestone);
+            numEdges++;
         }
         // Add to existing
         milestones.add(newMilestone);
         return newMilestone;
     }
 
-    public int grow(int num, Vec minCorner, Vec maxCorner, float minEdgeLen, float maxEdgeLen) {
+    public int grow(int num, Vec minCorner, Vec maxCorner, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
         for (int i = 0; i < num; ++i) {
+            // If sample inside obstacles, resample
+            Vec newMilestone = new Vec(applet.random(minCorner.get(0), maxCorner.get(0)), applet.random(minCorner.get(1), maxCorner.get(1)));
+            while (cs.isInside(newMilestone)) {
+                newMilestone.headSet(applet.random(minCorner.get(0), maxCorner.get(0)), applet.random(minCorner.get(1), maxCorner.get(1)));
+            }
             addMilestone(
-                    applet.random(minCorner.get(0), maxCorner.get(0)),
-                    applet.random(minCorner.get(1), maxCorner.get(1)),
+                    newMilestone.get(0),
+                    newMilestone.get(1),
                     minEdgeLen,
-                    maxEdgeLen
+                    maxEdgeLen,
+                    cs
             );
         }
         return numEdges;
@@ -66,11 +79,11 @@ public class PRM {
         next.searchState.addToFringeFrom(current);
     }
 
-    public List<Vec> dfs(final Vec startPosition, final Vec goalPosition, float minEdgeLen, float maxEdgeLen) {
+    public List<Vec> dfs(final Vec startPosition, final Vec goalPosition, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
         PApplet.println("DFS");
 
-        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), minEdgeLen, maxEdgeLen);
-        Milestone goal = addMilestone(goalPosition.get(0), goalPosition.get(1), minEdgeLen, maxEdgeLen);
+        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), minEdgeLen, maxEdgeLen, cs);
+        Milestone goal = addMilestone(goalPosition.get(0), goalPosition.get(1), minEdgeLen, maxEdgeLen, cs);
         resetSearchState(goalPosition);
 
         int numVerticesExplored = 0;
@@ -105,9 +118,9 @@ public class PRM {
         next.searchState.addToFringeFrom(current);
     }
 
-    private List<Vec> search(final Queue<Milestone> fringe, final Vec startPosition, final Vec goalPosition, float minEdgeLen, float maxEdgeLen) {
-        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), minEdgeLen, maxEdgeLen);
-        Milestone goal = addMilestone(goalPosition.get(0), goalPosition.get(1), minEdgeLen, maxEdgeLen);
+    private List<Vec> search(final Queue<Milestone> fringe, final Vec startPosition, final Vec goalPosition, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
+        Milestone start = addMilestone(startPosition.get(0), startPosition.get(1), minEdgeLen, maxEdgeLen, cs);
+        Milestone goal = addMilestone(goalPosition.get(0), goalPosition.get(1), minEdgeLen, maxEdgeLen, cs);
         resetSearchState(goalPosition);
 
         int numVerticesExplored = 0;
@@ -135,31 +148,31 @@ public class PRM {
         return Collections.singletonList(start.position);
     }
 
-    public List<Vec> bfs(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen) {
+    public List<Vec> bfs(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
         PApplet.println("BFS");
-        return search(new LinkedList<>(), startPosition, goalPosition, minEdgeLen, maxEdgeLen);
+        return search(new LinkedList<>(), startPosition, goalPosition, minEdgeLen, maxEdgeLen, cs);
     }
 
-    public List<Vec> ucs(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen) {
+    public List<Vec> ucs(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
         PApplet.println("UCS");
         return search(new PriorityQueue<>((v1, v2) ->
                         (int) (v1.searchState.distanceFromStart - v2.searchState.distanceFromStart)),
-                startPosition, goalPosition, minEdgeLen, maxEdgeLen);
+                startPosition, goalPosition, minEdgeLen, maxEdgeLen, cs);
     }
 
-    public List<Vec> aStar(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen) {
+    public List<Vec> aStar(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs) {
         PApplet.println("A*");
         return search(new PriorityQueue<>((v1, v2) -> (int) (
                         (v1.searchState.distanceFromStart + v1.searchState.heuristicDistanceToGoal)
                                 - (v2.searchState.distanceFromStart + v2.searchState.heuristicDistanceToGoal))),
-                startPosition, goalPosition, minEdgeLen, maxEdgeLen);
+                startPosition, goalPosition, minEdgeLen, maxEdgeLen, cs);
     }
 
-    public List<Vec> weightedAStar(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen, final float epislon) {
+    public List<Vec> weightedAStar(Vec startPosition, Vec goalPosition, float minEdgeLen, float maxEdgeLen, PositionConfigurationSpace cs, final float epislon) {
         PApplet.println("Weighted A* with epsilon = " + epislon);
         return search(new PriorityQueue<>((v1, v2) -> (int) (
                         (v1.searchState.distanceFromStart + epislon * v1.searchState.heuristicDistanceToGoal)
                                 - (v2.searchState.distanceFromStart + epislon * v2.searchState.heuristicDistanceToGoal))),
-                startPosition, goalPosition, minEdgeLen, maxEdgeLen);
+                startPosition, goalPosition, minEdgeLen, maxEdgeLen, cs);
     }
 }

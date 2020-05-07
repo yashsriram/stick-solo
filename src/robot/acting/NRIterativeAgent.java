@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class NRIterativeAgent {
-    public enum IKMethod {JACOBIAN_TRANSOPOSE, PSEUDO_INVERSE}
+    public enum IKMethod {JACOBIAN_TRANSPOSE, PSEUDO_INVERSE}
 
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;
-    public static IKMethod METHOD = IKMethod.JACOBIAN_TRANSOPOSE;
+    public static IKMethod METHOD = IKMethod.JACOBIAN_TRANSPOSE;
 
     public boolean isPaused = false;
 
@@ -26,6 +26,7 @@ public class NRIterativeAgent {
     private final Vec jointTuple;
 
     private List<Vec> path = new ArrayList<>();
+    private List<Boolean> shouldSwitches = new ArrayList<>();
     private int nextMilestone = 1;
 
     public float minSpeedLimit = 1e-2f;
@@ -52,7 +53,15 @@ public class NRIterativeAgent {
         this.lengths.headSet(lengths);
         this.jointTuple.headSet(jointTuple);
         this.path = new ArrayList<>(path);
+        for (int i = 0; i < path.size(); i++) {
+            shouldSwitches.add(true);
+        }
         this.nextMilestone = 1;
+    }
+
+    public void addMilestone(Vec newMilestone, boolean shouldSwitch) {
+        path.add(newMilestone);
+        shouldSwitches.add(shouldSwitch);
     }
 
     private List<Vec> getLinkEnds() {
@@ -79,32 +88,41 @@ public class NRIterativeAgent {
         return freeEnd;
     }
 
+    public void switchPivot() {
+        List<Vec> ends = getLinkEnds();
+        // Switch pivot
+        pivotPosition.headSet(ends.get(ends.size() - 1));
+        // Reset joint angles
+        float prevLinkAngleWithX = 0;
+        for (int i = ends.size() - 1; i > 0; --i) {
+            Vec start = ends.get(i);
+            Vec end = ends.get(i - 1);
+            float angleWithX = (float) Math.atan2(end.get(1) - start.get(1), end.get(0) - start.get(0));
+            float angleWithPrevLink = Angle.clamp_minusPI_plusPI(angleWithX - prevLinkAngleWithX);
+            int jointVariable_iter = ends.size() - 1 - i;
+            jointTuple.set(jointVariable_iter, angleWithPrevLink);
+            prevLinkAngleWithX = angleWithX;
+        }
+        // Reverse lengths
+        Vec lengthsCopy = new Vec(lengths);
+        for (int i = lengthsCopy.getNumElements() - 1; i >= 0; i--) {
+            lengths.set(lengthsCopy.getNumElements() - 1 - i, lengthsCopy.get(i));
+        }
+    }
+
     public boolean update(float dt) {
         if (isPaused) {
             return false;
         }
         if (nextMilestone < path.size()) {
             // Reached next milestone
-            List<Vec> ends = getLinkEnds();
             if (Vec.dist(getFreeEnd(), path.get(nextMilestone)) < MILESTONE_REACHED_SLACK) {
-                // Switch pivot
-                pivotPosition.headSet(ends.get(ends.size() - 1));
-                // Reset joint angles
-                float prevLinkAngleWithX = 0;
-                for (int i = ends.size() - 1; i > 0; --i) {
-                    Vec start = ends.get(i);
-                    Vec end = ends.get(i - 1);
-                    float angleWithX = (float) Math.atan2(end.get(1) - start.get(1), end.get(0) - start.get(0));
-                    float angleWithPrevLink = Angle.clamp_minusPI_plusPI(angleWithX - prevLinkAngleWithX);
-                    int jointVariable_iter = ends.size() - 1 - i;
-                    jointTuple.set(jointVariable_iter, angleWithPrevLink);
-                    prevLinkAngleWithX = angleWithX;
+                if (!shouldSwitches.get(nextMilestone)) {
+                    nextMilestone++;
+                    isMinSpeedLimitCalculated = false;
+                    return true;
                 }
-                // Reverse lengths
-                Vec lengthsCopy = new Vec(lengths);
-                for (int i = lengthsCopy.getNumElements() - 1; i >= 0; i--) {
-                    lengths.set(lengthsCopy.getNumElements() - 1 - i, lengthsCopy.get(i));
-                }
+                switchPivot();
                 nextMilestone++;
                 isMinSpeedLimitCalculated = false;
                 return true;
@@ -112,24 +130,25 @@ public class NRIterativeAgent {
             // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
             Vec deltaJointTupleUnscaled;
             if (METHOD == IKMethod.PSEUDO_INVERSE) {
-                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(ends, jointTuple, path.get(nextMilestone));
+                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(getLinkEnds(), jointTuple, path.get(nextMilestone));
             } else {
-                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(ends, jointTuple, path.get(nextMilestone));
+                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(getLinkEnds(), jointTuple, path.get(nextMilestone));
             }
+            // Scale the delta
             Vec deltaJointTuple = deltaJointTupleUnscaled.scaleInPlace(dt);
+            // If stuck in a singular configuration the give a little jerk
+            if (deltaJointTuple.norm() < JERK_THRESHOLD) {
+                for (int i = 0; i < jointTuple.getNumElements(); i++) {
+                    deltaJointTuple.set(i, deltaJointTuple.get(i) + applet.random(1f / (jointTuple.getNumElements() + 1)));
+                }
+            }
+            // If too speed is too low, increase it to a minimum
             if (!isMinSpeedLimitCalculated) {
                 minSpeedLimit = deltaJointTuple.norm();
                 isMinSpeedLimitCalculated = true;
             }
-            // If too speed is too low, increase it to a minimum
             if (deltaJointTuple.norm() < minSpeedLimit) {
                 deltaJointTuple.normalizeInPlace().scaleInPlace(minSpeedLimit);
-            }
-            // If stuck in a singular configuration the give a little jerk
-            if (deltaJointTuple.norm() < JERK_THRESHOLD) {
-                for (int i = 0; i < jointTuple.getNumElements(); i++) {
-                    deltaJointTuple.set(i, deltaJointTuple.get(i) + applet.random(0.5f));
-                }
             }
             jointTuple.plusInPlace(deltaJointTuple);
         }

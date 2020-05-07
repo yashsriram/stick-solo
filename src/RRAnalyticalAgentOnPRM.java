@@ -1,4 +1,6 @@
 import camera.QueasyCam;
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
 import robot.acting.RRAnalyticalAgent;
@@ -23,6 +25,8 @@ public class RRAnalyticalAgentOnPRM extends PApplet {
     private static final int NUM_MILESTONES = 1000;
 
     QueasyCam cam;
+    Minim minim;
+    AudioPlayer player;
     PRM prm;
     RRAnalyticalAgent rrAnalyticalAgent;
 
@@ -37,6 +41,8 @@ public class RRAnalyticalAgentOnPRM extends PApplet {
         noStroke();
 
         cam = new QueasyCam(this);
+        minim = new Minim(this);
+        player = minim.loadFile("sounds/snapping-fingers.mp3");
         prm = new PRM(this);
         rrAnalyticalAgent = new RRAnalyticalAgent(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN);
@@ -49,7 +55,10 @@ public class RRAnalyticalAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 40; i++) {
-            rrAnalyticalAgent.update(0.002f);
+            boolean isPivotSwitched = rrAnalyticalAgent.update(0.002f);
+            if (isPivotSwitched) {
+                player.play(0);
+            }
         }
 
         // Draw

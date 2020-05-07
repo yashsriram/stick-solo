@@ -70,9 +70,9 @@ public class RRAnalyticalAgent {
         return !Float.isNaN(goalJointTuple.get(0)) && !Float.isNaN(goalJointTuple.get(1));
     }
 
-    public void update(float dt) {
+    public boolean update(float dt) {
         if (isPaused) {
-            return;
+            return false;
         }
         if (isGoalJointVariablesValid() && nextMilestone < path.size()) {
             // Reached next milestone
@@ -102,7 +102,7 @@ public class RRAnalyticalAgent {
                     goalJointTuple.headSet(NRIKSolver.solve_RR_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone + 1)));
                 }
                 nextMilestone++;
-                return;
+                return true;
             }
 
             // Distance from goal is significant => Update all joint variables such that free end moves to goal
@@ -111,30 +111,40 @@ public class RRAnalyticalAgent {
                 jointTuple.set(i, jointTuple.get(i) + vqi * dt);
             }
         }
+        return false;
     }
 
     public void draw() {
         // path
-        applet.stroke(1, 1, 0);
+        applet.stroke(1);
         for (int i = 0; i < path.size() - 1; i++) {
             Vec v1 = path.get(i);
             Vec v2 = path.get(i + 1);
             applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
         }
         applet.noStroke();
-        applet.fill(1, 1, 0);
+        applet.fill(1);
         for (Vec v : path) {
             applet.pushMatrix();
             applet.translate(0, v.get(1), v.get(0));
-            applet.box(2);
+            applet.box(1);
             applet.popMatrix();
         }
         applet.noStroke();
 
+        // Goal milestone
+        if (nextMilestone < path.size()) {
+            applet.fill(1, 0, 0);
+            applet.pushMatrix();
+            applet.translate(0, path.get(nextMilestone).get(1), path.get(nextMilestone).get(0));
+            applet.box(1);
+            applet.popMatrix();
+        }
+
         // Pivot
         applet.pushMatrix();
         applet.noStroke();
-        applet.fill(0, 0, 1);
+        applet.fill(0, 1, 0);
         applet.translate(0, pivotPosition.get(1), pivotPosition.get(0));
         applet.box(2);
         applet.popMatrix();
@@ -143,6 +153,7 @@ public class RRAnalyticalAgent {
         Vec start = new Vec(pivotPosition);
         Vec direction = new Vec(1f, 0f);
         applet.noFill();
+        applet.strokeWeight(4);
         if (isGoalJointVariablesValid()) {
             applet.stroke(1);
         } else {
@@ -156,9 +167,17 @@ public class RRAnalyticalAgent {
             float length = lengths.get(i);
             Vec end = start.plus(direction.scale(length));
             // Draw link
+            applet.stroke(1);
             applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
+            applet.noStroke();
+            applet.fill(0, 0, 1);
+            applet.pushMatrix();
+            applet.translate(0, end.get(1), end.get(0));
+            applet.box(1.5f);
+            applet.popMatrix();
             start = end;
         }
+        applet.strokeWeight(1);
     }
 
     public void drawJointTupleSpace() {

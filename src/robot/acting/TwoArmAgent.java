@@ -52,6 +52,7 @@ public class TwoArmAgent {
         }
         boolean shouldPlayClickSound = false;
         switch (state) {
+            // Set arm1 goal to next milestone or next + 1 milestone
             case 0:
                 if (!arm1.isStraight()) {
                     arm1.switchPivot();
@@ -64,12 +65,14 @@ public class TwoArmAgent {
                 arm1.setGoal(path.get(nextMilestone));
                 state++;
                 break;
+            // Move arm1
             case 1:
                 if (arm1.update(dt, MIN_LIMB_SPEED)) {
                     state++;
                     shouldPlayClickSound = true;
                 }
                 break;
+            // Set neck goal to distance from the next milestone
             case 2:
                 Vec neckToGoal = path.get(nextMilestone).minus(neck);
                 float neckToGoalDist = neckToGoal.norm();
@@ -83,6 +86,7 @@ public class TwoArmAgent {
                 }
                 state++;
                 break;
+            // Move neck, i.e. move both arms simultaneously
             case 3:
                 if (Vec.dist(neck, neckGoal) < NRIterativeBodyPartAgent.MILESTONE_REACHED_SLACK) {
                     state++;
@@ -98,6 +102,7 @@ public class TwoArmAgent {
                     }
                 }
                 break;
+            // Set arm1 goal to next milestone or next + 1 milestone
             case 4:
                 if (!arm2.isStraight()) {
                     arm2.switchPivot();
@@ -110,12 +115,14 @@ public class TwoArmAgent {
                 arm2.setGoal(path.get(nextMilestone));
                 state++;
                 break;
+            // Move arm2
             case 5:
                 if (arm2.update(dt, MIN_LIMB_SPEED)) {
                     shouldPlayClickSound = true;
                     state++;
                 }
                 break;
+            // Set neck goal to below the next milestone
             case 6:
                 Vec neckToBelowMilestone = new Vec(path.get(nextMilestone).get(0), path.get(nextMilestone).get(1) + neckArmDistance);
                 neckGoal.headSet(neckToBelowMilestone);
@@ -127,6 +134,7 @@ public class TwoArmAgent {
                 }
                 state++;
                 break;
+            // Move neck, i.e. move both arms simultaneously
             case 7:
                 if (Vec.dist(neck, neckGoal) < NRIterativeBodyPartAgent.MILESTONE_REACHED_SLACK) {
                     nextMilestone++;

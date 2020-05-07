@@ -79,15 +79,6 @@ public class TwoArmAgentOnPRM extends PApplet {
 //        if (key == 'p') {
 //            twoArmAgent.isPaused = !twoArmAgent.isPaused;
 //        }
-        if (key == 'u') {
-            twoArmAgent.move1();
-        }
-        if (key == 'i') {
-            twoArmAgent.move2();
-        }
-        if (key == 'o') {
-            twoArmAgent.move3();
-        }
         if (key == 'k') {
             PRM.DRAW_MILESTONES = !PRM.DRAW_MILESTONES;
         }

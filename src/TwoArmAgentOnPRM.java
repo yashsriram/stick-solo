@@ -15,8 +15,8 @@ public class TwoArmAgentOnPRM extends PApplet {
     private static String SEARCH_ALGORITHM = "";
     private static final Vec MIN_CORNER = new Vec(-SIZE, -SIZE);
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
-    private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
-    private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
+    private static final Vec START_POSITION = new Vec(-SIZE * 0.9f, SIZE * 0.9f);
+    private static final Vec GOAL_POSITION = new Vec(SIZE * 0.9f, -SIZE * 0.9f);
     private static final float L1 = 12;
     private static final float L2 = 12;
     private static final float MAX_EDGE_LEN = 8;

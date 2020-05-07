@@ -60,3 +60,13 @@
 
 # Data structures
 - [ ] KD tree for finding nearest hold
+
+# Demos
+- [ ] RRAnalytical demo
+- [ ] NRIterative agent demos
+    - [ ] Jacobian vs Pseudo inverse
+- [ ] Two arm agent demo
+    - [ ] Climbing up-left, up-right
+    - [ ] Climbing down-left, down-right
+    - [ ] Climbing sideways
+    - [ ] Climbing all in same path

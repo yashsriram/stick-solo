@@ -50,6 +50,7 @@ public class TwoArmAgent {
         if (nextMilestone >= path.size()) {
             return false;
         }
+        boolean shouldPlayClickSound = false;
         switch (state) {
             case 0:
                 if (!arm1.isStraight()) {
@@ -66,15 +67,14 @@ public class TwoArmAgent {
             case 1:
                 if (arm1.update(dt, MIN_LIMB_SPEED)) {
                     state++;
+                    shouldPlayClickSound = true;
                 }
                 break;
             case 2:
                 Vec neckToGoal = path.get(nextMilestone).minus(neck);
                 float neckToGoalDist = neckToGoal.norm();
-                if (neckToGoalDist > neckArmDistance) {
-                    neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - neckArmDistance);
-                    neckGoal.headSet(neck.plus(neckToGoal));
-                }
+                neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - neckArmDistance);
+                neckGoal.headSet(neck.plus(neckToGoal));
                 if (arm1.isStraight()) {
                     arm1.switchPivot();
                 }
@@ -112,6 +112,7 @@ public class TwoArmAgent {
                 break;
             case 5:
                 if (arm2.update(dt, MIN_LIMB_SPEED)) {
+                    shouldPlayClickSound = true;
                     state++;
                 }
                 break;
@@ -143,7 +144,7 @@ public class TwoArmAgent {
                 }
                 break;
         }
-        return false;
+        return shouldPlayClickSound;
     }
 
     public void draw() {
@@ -183,6 +184,12 @@ public class TwoArmAgent {
         applet.translate(0, neck.get(1), neck.get(0));
         applet.box(3);
         applet.popMatrix();
+
+        // Body
+        applet.stroke(1);
+        applet.strokeWeight(4);
+        applet.line(0, neck.get(1), neck.get(0), 0, neck.get(1) + 20, neck.get(0));
+        applet.strokeWeight(1);
 
         arm1.draw();
         arm2.draw();

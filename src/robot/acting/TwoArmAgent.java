@@ -13,6 +13,7 @@ public class TwoArmAgent {
 
     private int state = 0;
     private final Vec goal = new Vec(-40, 40);
+    private final Vec neckGoal = new Vec(neck);
 
     public TwoArmAgent(PApplet applet) {
         this.applet = applet;
@@ -47,7 +48,7 @@ public class TwoArmAgent {
                 float neckToGoalDist = neckToGoal.norm();
                 if (neckToGoalDist > 15) {
                     neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - 15);
-                    neck.plusInPlace(neckToGoal);
+                    neckGoal.headSet(neck.plus(neckToGoal));;
                 }
                 if (arm1.isStraight()) {
                     arm1.switchPivot();
@@ -55,14 +56,20 @@ public class TwoArmAgent {
                 if (arm2.isStraight()) {
                     arm2.switchPivot();
                 }
-                arm1.setGoal(neck);
-                arm2.setGoal(neck);
                 state++;
                 break;
             case 3:
-                boolean arm1Ok = arm1.update(dt, 0.003f);
-                boolean arm2Ok = arm2.update(dt, 0.003f);
-                if (arm1Ok && arm2Ok) {
+                neck.plusInPlace(neckGoal.minus(neck).scaleInPlace(0.001f));
+                arm1.setGoal(neck);
+                arm2.setGoal(neck);
+                while (true) {
+                    boolean arm1Ok = arm1.update(dt, 0.003f);
+                    boolean arm2Ok = arm2.update(dt, 0.003f);
+                    if (arm1Ok && arm2Ok) {
+                        break;
+                    }
+                }
+                if (Vec.dist(neck, neckGoal) < NRIterativeBodyPartAgent.MILESTONE_REACHED_SLACK) {
                     state++;
                 }
                 break;

@@ -51,6 +51,10 @@ public class Vec extends Mat {
         return scaled;
     }
 
+    public float dot(Vec b) {
+        return CommonOps_FDRM.dot(this, b);
+    }
+
     public static float dist(Vec a, Vec b) {
         assert (a.getNumElements() == b.getNumElements());
         float squaredSum = 0;

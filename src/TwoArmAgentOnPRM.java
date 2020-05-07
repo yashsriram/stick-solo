@@ -6,23 +6,22 @@ import processing.core.PApplet;
 import robot.acting.TwoArmAgent;
 import robot.planning.prm.PRM;
 
+import java.util.List;
+
 public class TwoArmAgentOnPRM extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
     private static String SEARCH_ALGORITHM = "";
-
     private static final Vec MIN_CORNER = new Vec(-SIZE, -SIZE);
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
     private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
     private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
-    private static final float L1 = 5;
-    private static final float L2 = 10;
-    private static final float L3 = 5;
-    private static final float L4 = 10;
-    private static final float MAX_EDGE_LEN = L1 + L2 + L3 + L4 - 5;
-    private static final float MIN_EDGE_LEN = 0;
-    private static final int NUM_MILESTONES = 500;
+    private static final float L1 = 15;
+    private static final float L2 = 15;
+    private static final float MAX_EDGE_LEN = 10;
+    private static final float MIN_EDGE_LEN = L1 - L2;
+    private static final int NUM_MILESTONES = 1000;
 
     QueasyCam cam;
     Minim minim;
@@ -85,31 +84,31 @@ public class TwoArmAgentOnPRM extends PApplet {
         if (key == 'j') {
             PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
         }
-//        if (key == '1') {
-//            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-//            twoArmAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
-//            SEARCH_ALGORITHM = "DFS";
-//        }
-//        if (key == '2') {
-//            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-//            twoArmAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
-//            SEARCH_ALGORITHM = "BFS";
-//        }
-//        if (key == '3') {
-//            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-//            twoArmAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
-//            SEARCH_ALGORITHM = "UCS";
-//        }
-//        if (key == '4') {
-//            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
-//            twoArmAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
-//            SEARCH_ALGORITHM = "A*";
-//        }
-//        if (key == '5') {
-//            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
-//            twoArmAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
-//            SEARCH_ALGORITHM = "weighted A*";
-//        }
+        if (key == '1') {
+            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            twoArmAgent.spawn(START_POSITION.plus(new Vec(0, 12)), 12, path, new Vec(L1, L2));
+            SEARCH_ALGORITHM = "DFS";
+        }
+        if (key == '2') {
+            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            twoArmAgent.spawn(START_POSITION.plus(new Vec(0, 12)), 12, path, new Vec(L1, L2));
+            SEARCH_ALGORITHM = "BFS";
+        }
+        if (key == '3') {
+            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            twoArmAgent.spawn(START_POSITION.plus(new Vec(0, 12)), 12, path, new Vec(L1, L2));
+            SEARCH_ALGORITHM = "UCS";
+        }
+        if (key == '4') {
+            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN);
+            twoArmAgent.spawn(START_POSITION.plus(new Vec(0, 12)), 12, path, new Vec(L1, L2));
+            SEARCH_ALGORITHM = "A*";
+        }
+        if (key == '5') {
+            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, 1.5f);
+            twoArmAgent.spawn(START_POSITION.plus(new Vec(0, 12)), 12, path, new Vec(L1, L2));
+            SEARCH_ALGORITHM = "weighted A*";
+        }
     }
 
     static public void main(String[] passedArgs) {

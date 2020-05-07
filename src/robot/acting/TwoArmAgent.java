@@ -3,38 +3,55 @@ package robot.acting;
 import math.Vec;
 import processing.core.PApplet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TwoArmAgent {
     public static float MIN_LIMB_SPEED = 0.003f;
     public static float NECK_SPEED = 0.005f;
+    public static float NECK_SYNC_ITERATIONS = 100;
 
     public boolean isPaused = false;
 
     private final PApplet applet;
     private final NRIterativeBodyPartAgent arm1;
     private final NRIterativeBodyPartAgent arm2;
+    public float neckToArmDistance = 0;
 
-    private int state = 0;
-    private final Vec neck = new Vec(-40, 40);
-    private final Vec goal = new Vec(-40, 40);
+    private final Vec neck = new Vec(0, 0);
     private final Vec neckGoal = new Vec(neck);
+
+    private List<Vec> path = new ArrayList<>();
+    private int nextMilestone = 0;
+    private int state = 0;
 
     public TwoArmAgent(PApplet applet) {
         this.applet = applet;
         this.arm1 = new NRIterativeBodyPartAgent(applet, 2);
         this.arm2 = new NRIterativeBodyPartAgent(applet, 2);
+    }
 
-        arm1.spawn(neck, new Vec(20, 20), new Vec(-PApplet.PI * 0.25f, -PApplet.PI * 0.25f));
-        arm2.spawn(neck, new Vec(20, 20), new Vec(-PApplet.PI * 0.75f, PApplet.PI * 0.25f));
+    public void spawn(Vec neck, float neckToArmDistance, List<Vec> path, Vec armLengths) {
+        this.neckToArmDistance = neckToArmDistance;
+        this.neck.headSet(neck);
+        this.neckGoal.headSet(neck);
+        this.arm1.spawn(neck, new Vec(armLengths), new Vec(-PApplet.PI * 0.25f, -PApplet.PI * 0.25f));
+        this.arm2.spawn(neck, new Vec(armLengths), new Vec(-PApplet.PI * 0.75f, PApplet.PI * 0.25f));
+        this.path = new ArrayList<>(path);
+        this.nextMilestone = 0;
+        this.state = 0;
     }
 
     public boolean update(float dt) {
         if (isPaused) {
             return false;
         }
-        PApplet.println(state);
+        if (nextMilestone >= path.size()) {
+            return false;
+        }
+        Vec goal = path.get(nextMilestone);
         switch (state) {
             case 0:
-                goal.headSet(goal.get(0) + 15, goal.get(1) - 15);
                 if (!arm1.isStraight()) {
                     arm1.switchPivot();
                 }
@@ -47,11 +64,11 @@ public class TwoArmAgent {
                 }
                 break;
             case 2:
-                Vec neckToGoal = goal.minus(neck);
+                Vec neckToGoal = path.get(nextMilestone).minus(neck);
                 float neckToGoalDist = neckToGoal.norm();
-                if (neckToGoalDist > 15) {
-                    neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - 15);
-                    neckGoal.headSet(neck.plus(neckToGoal));;
+                if (neckToGoalDist > neckToArmDistance) {
+                    neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - neckToArmDistance);
+                    neckGoal.headSet(neck.plus(neckToGoal));
                 }
                 if (arm1.isStraight()) {
                     arm1.switchPivot();
@@ -62,18 +79,18 @@ public class TwoArmAgent {
                 state++;
                 break;
             case 3:
+                if (Vec.dist(neck, neckGoal) < NRIterativeBodyPartAgent.MILESTONE_REACHED_SLACK) {
+                    state++;
+                }
                 neck.plusInPlace(neckGoal.minus(neck).scaleInPlace(NECK_SPEED));
                 arm1.setGoal(neck);
                 arm2.setGoal(neck);
-                while (true) {
+                for (int i = 0; i < NECK_SYNC_ITERATIONS; i++) {
                     boolean arm1Ok = arm1.update(dt, MIN_LIMB_SPEED);
                     boolean arm2Ok = arm2.update(dt, MIN_LIMB_SPEED);
                     if (arm1Ok && arm2Ok) {
                         break;
                     }
-                }
-                if (Vec.dist(neck, neckGoal) < NRIterativeBodyPartAgent.MILESTONE_REACHED_SLACK) {
-                    state++;
                 }
                 break;
             case 4:
@@ -85,6 +102,7 @@ public class TwoArmAgent {
                 break;
             case 5:
                 if (arm2.update(dt, MIN_LIMB_SPEED)) {
+                    nextMilestone++;
                     state = 0;
                 }
                 break;
@@ -93,6 +111,33 @@ public class TwoArmAgent {
     }
 
     public void draw() {
+        // path
+        applet.stroke(1);
+        for (int i = 0; i < path.size() - 1; i++) {
+            Vec v1 = path.get(i);
+            Vec v2 = path.get(i + 1);
+            applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
+        }
+        applet.noStroke();
+        applet.fill(1);
+        for (Vec v : path) {
+            applet.pushMatrix();
+            applet.translate(0, v.get(1), v.get(0));
+            applet.box(1);
+            applet.popMatrix();
+        }
+        applet.noStroke();
+
+        // Next milestone
+        if (nextMilestone < path.size()) {
+            applet.noStroke();
+            applet.fill(1, 0, 0);
+            applet.pushMatrix();
+            applet.translate(0, path.get(nextMilestone).get(1), path.get(nextMilestone).get(0));
+            applet.box(1);
+            applet.popMatrix();
+        }
+
         arm1.draw();
         arm2.draw();
     }

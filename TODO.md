@@ -28,25 +28,26 @@
 - [ ] Two arm agent
 
 # Effects
-- [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
-- [ ] Belay rope
-- [ ] Rock particle effects while holding on
-- [ ] Wind effects
-
-# Sound 
 - [x] Sound on pivot change
+- [ ] Rock particle effects while holding on
+- [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
+- [ ] Wind effects
+- [ ] Belay rope
 
 # Rendering
 - [ ] 3D context (holds, trees, waterfall, lavafall, birds)
 - [ ] 3D models for agent links (hands, legs, body and tail)?
 
-# Environment
+# Obstacles
 - [ ] Spherical obstacles, line segment obstacles
+- [ ] Re planning on obstacle collision
+- [ ] Angle bound obstacles, replanning in known environment
+
+# Environment
 - [ ] Slippery holds
 - [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
 
 # Advanced agent
-- [ ] Angle bound obstacles, replanning in known environment
 - [ ] Prismatic joints
 - [ ] Energy spent in some form
 - [ ] Gravity

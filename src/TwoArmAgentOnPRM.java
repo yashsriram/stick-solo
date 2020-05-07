@@ -55,8 +55,8 @@ public class TwoArmAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-            boolean isPivotSwitched = twoArmAgent.update(0.00001f);
-            if (isPivotSwitched) {
+            boolean playSound = twoArmAgent.update(0.00001f);
+            if (playSound) {
                 player.play(0);
             }
         }
@@ -76,9 +76,9 @@ public class TwoArmAgentOnPRM extends PApplet {
         if (key == 'c') {
             cam.controllable = !cam.controllable;
         }
-//        if (key == 'p') {
-//            twoArmAgent.isPaused = !twoArmAgent.isPaused;
-//        }
+        if (key == 'p') {
+            twoArmAgent.isPaused = !twoArmAgent.isPaused;
+        }
         if (key == 'k') {
             PRM.DRAW_MILESTONES = !PRM.DRAW_MILESTONES;
         }

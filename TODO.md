@@ -26,43 +26,30 @@
 
 # Humanize
 - [x] Two arm agent
+- [x] Gravity effect
 - [ ] Two arm Two leg agent
+- [ ] Energy spent in some form
+
+# Obstacles
+- [ ] Spherical obstacles, line segment obstacles, Re planning on obstacle collision
+- [ ] Slippery holds
 
 # Effects
 - [x] Sound on pivot change
 - [ ] Rock particle effects while holding on
 - [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [ ] Wind effects
-- [ ] Belay rope
 
 # Rendering
 - [ ] 3D context (holds, trees, waterfall, lavafall, birds)
 - [ ] 3D models for agent links (hands, legs, body and tail)?
 
-# Obstacles
-- [ ] Spherical obstacles, line segment obstacles
-- [ ] Re planning on obstacle collision
-- [ ] Angle bound obstacles, replanning in known environment
-
-# Environment
-- [ ] Better path creations
-- [ ] Slippery holds
-- [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
-
-# Advanced agent
-- [ ] Prismatic joints
-- [ ] Energy spent in some form
-- [ ] Gravity
-- [ ] Springy limbs
-
 # Make a game
 - [ ] Multiple such agents trying to catch player
 - [ ] Shoot down agent from ground
 
-# Data structures
-- [ ] KD tree for finding nearest hold
-
 # Demos
+- [ ] Better path creations
 - [ ] RRAnalytical demo
 - [ ] NRIterative agent demos
     - [ ] Jacobian vs Pseudo inverse
@@ -71,3 +58,11 @@
     - [ ] Climbing down-left, down-right
     - [ ] Climbing sideways
     - [ ] Climbing all in same path
+
+# Future work
+- [ ] Prismatic joints
+- [ ] Angle bound obstacles, replanning in known environment
+- [ ] Belay rope
+- [ ] Springy limbs
+- [ ] Spatial data structures
+- [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)

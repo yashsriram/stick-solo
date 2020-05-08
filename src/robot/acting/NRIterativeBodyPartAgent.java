@@ -12,6 +12,8 @@ import java.util.List;
 public class NRIterativeBodyPartAgent {
     public enum IKMethod {JACOBIAN_TRANSPOSE, PSEUDO_INVERSE}
 
+    public final int id;
+
     public static boolean DRAW_GOAL = false;
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;
@@ -26,8 +28,9 @@ public class NRIterativeBodyPartAgent {
     private final Vec jointTuple;
     private final Vec goal = new Vec(0, 0);
 
-    public NRIterativeBodyPartAgent(PApplet applet, int N) {
+    public NRIterativeBodyPartAgent(PApplet applet, int id, int N) {
         this.applet = applet;
+        this.id = id;
         this.N = N;
         this.lengths = new Vec(new float[N]);
         this.jointTuple = new Vec(new float[N]);

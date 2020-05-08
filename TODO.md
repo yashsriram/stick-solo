@@ -31,8 +31,9 @@
 - [ ] Energy spent in some form
 
 # Obstacles
-- [ ] Spherical obstacles, line segment obstacles, Re planning on obstacle collision
+- [ ] Spherical obstacles, line segment obstacles
 - [ ] Slippery holds
+- [ ] Re planning on obstacle collision or slipping
 
 # Effects
 - [x] Sound on pivot change

@@ -74,10 +74,8 @@ public class TwoArmAgent {
                 break;
             // Set neck goal to distance from the next milestone
             case 2:
-                Vec neckToGoal = path.get(nextMilestone).minus(neck);
-                float neckToGoalDist = neckToGoal.norm();
-                neckToGoal.normalizeInPlace().scaleInPlace(neckToGoalDist - neckArmDistance);
-                neckGoal.headSet(neck.plus(neckToGoal));
+                Vec neckToBelowMilestone1 = new Vec(path.get(nextMilestone).get(0), path.get(nextMilestone).get(1) + neckArmDistance);
+                neckGoal.headSet(neckToBelowMilestone1);
                 if (arm1.isStraight()) {
                     arm1.switchPivot();
                 }
@@ -124,8 +122,8 @@ public class TwoArmAgent {
                 break;
             // Set neck goal to below the next milestone
             case 6:
-                Vec neckToBelowMilestone = new Vec(path.get(nextMilestone).get(0), path.get(nextMilestone).get(1) + neckArmDistance);
-                neckGoal.headSet(neckToBelowMilestone);
+                Vec neckToBelowMilestone2 = new Vec(path.get(nextMilestone).get(0), path.get(nextMilestone).get(1) + neckArmDistance);
+                neckGoal.headSet(neckToBelowMilestone2);
                 if (arm1.isStraight()) {
                     arm1.switchPivot();
                 }

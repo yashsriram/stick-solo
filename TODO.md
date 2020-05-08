@@ -19,7 +19,7 @@
     - [x] min/max bounds on PRM neighbours
     - [x] Control joint tuple and goal joint tuple ranges
     - [x] RRIK Jacobian transpose iterative solver
-    - [ ] RRIK pseudo inverse method iterative solver
+    - [x] RRIK pseudo inverse method iterative solver
 - [x] NR agent milestone hopping on 2D PRM/A* generated path
     - [x] Jacobian method
     - [x] Pseudo inverse method
@@ -45,6 +45,7 @@
 - [ ] Angle bound obstacles, replanning in known environment
 
 # Environment
+- [ ] Better path creations
 - [ ] Slippery holds
 - [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
 

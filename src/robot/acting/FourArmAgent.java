@@ -2,6 +2,7 @@ package robot.acting;
 
 import math.Vec;
 import processing.core.PApplet;
+import robot.planning.prm.Milestone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class FourArmAgent {
     private NRIterativeBodyPartAgent currentlyMovingLeg;
     private final Vec looseLeg = new Vec(0, 0);
 
-    private List<Vec> path = new ArrayList<>();
+    private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 0;
     private int state = 0;
 
@@ -43,7 +44,7 @@ public class FourArmAgent {
         this.arm4 = new NRIterativeBodyPartAgent(applet, 3, 2);
     }
 
-    public void spawn(Vec neck, Vec tail, float neckToArmDistance, List<Vec> path, Vec armLengths) {
+    public void spawn(Vec neck, Vec tail, float neckToArmDistance, List<Milestone> path, Vec armLengths) {
         this.neckArmDistance = neckToArmDistance;
         this.tailLegDistance = neckToArmDistance;
         this.neck.headSet(neck);
@@ -105,7 +106,7 @@ public class FourArmAgent {
                 if (!currentlyMovingArm.isStraight()) {
                     currentlyMovingArm.switchPivot();
                 }
-                currentlyMovingArm.setGoal(path.get(nextMilestone));
+                currentlyMovingArm.setGoal(path.get(nextMilestone).position);
                 state++;
                 break;
             // Move arm1
@@ -118,7 +119,7 @@ public class FourArmAgent {
             // Set neck goal to distance from the next milestone
             // move tail on the same line as neck
             case 2:
-                Vec neckToBelowMilestone = new Vec(path.get(nextMilestone).get(0), path.get(nextMilestone).get(1) + neckArmDistance);
+                Vec neckToBelowMilestone = new Vec(path.get(nextMilestone).position.get(0), path.get(nextMilestone).position.get(1) + neckArmDistance);
                 neckGoal.headSet(neckToBelowMilestone);
                 if (arm1.isStraight()) {
                     arm1.switchPivot();
@@ -193,14 +194,15 @@ public class FourArmAgent {
         if (DRAW_PATH) {
             applet.stroke(1);
             for (int i = 0; i < path.size() - 1; i++) {
-                Vec v1 = path.get(i);
-                Vec v2 = path.get(i + 1);
+                Vec v1 = path.get(i).position;
+                Vec v2 = path.get(i + 1).position;
                 applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
             }
         }
         applet.noStroke();
         applet.fill(1);
-        for (Vec v : path) {
+        for (Milestone milestone : path) {
+        	Vec v = milestone.position;
             applet.pushMatrix();
             applet.translate(0, v.get(1), v.get(0));
             applet.box(1);
@@ -213,7 +215,7 @@ public class FourArmAgent {
             applet.noStroke();
             applet.fill(1, 0, 0);
             applet.pushMatrix();
-            applet.translate(0, path.get(nextMilestone).get(1), path.get(nextMilestone).get(0));
+            applet.translate(0, path.get(nextMilestone).position.get(1), path.get(nextMilestone).position.get(0));
             applet.box(1);
             applet.popMatrix();
         }

@@ -72,6 +72,10 @@ public class NRIterativeBodyPartAgent {
         this.goal.headSet(goal);
     }
 
+    public Vec getGoal() {
+        return goal;
+    }
+
     private List<Vec> getLinkEnds() {
         List<Vec> ends = new ArrayList<>(Collections.singletonList(new Vec(pivot)));
         Vec prevEnd = new Vec(pivot);
@@ -124,6 +128,10 @@ public class NRIterativeBodyPartAgent {
 
     public boolean isStraight() {
         return isStraight;
+    }
+
+    public Vec getJointTuple() {
+        return jointTuple;
     }
 
     public boolean update(float dt, float minSpeedLimit) {

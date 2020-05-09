@@ -54,13 +54,18 @@ public class Vec extends Mat {
     public float dot(Vec b) {
         return CommonOps_FDRM.dot(this, b);
     }
-
-    public static float dist(Vec a, Vec b) {
+    
+    public static float distSquared(Vec a, Vec b) {
         assert (a.getNumElements() == b.getNumElements());
         float squaredSum = 0;
         for (int i = 0; i < a.getNumElements(); i++) {
             squaredSum += Math.pow(a.get(i) - b.get(i), 2);
         }
+        return squaredSum;
+    }
+
+    public static float dist(Vec a, Vec b) {
+        float squaredSum = distSquared(a, b);
         return (float) Math.sqrt(squaredSum);
     }
 
@@ -78,5 +83,18 @@ public class Vec extends Mat {
     public Vec normalizeInPlace() {
         super.normalizeInPlace();
         return this;
+    }
+    
+    public float distanceToSegment(Vec v, Vec w) {
+		// Return minimum distance between line segment vw and point p
+		float l2 = Vec.distSquared(v, w);  // i.e. |w-v|^2 -  avoid a sqrt
+		if (l2 == 0.0) return Vec.dist(this, v);   // v == w case
+		// Consider the line extending the segment, parameterized as v + t (w - v).
+		// We find projection of point p onto the line. 
+		// It falls where t = [(p-v) . (w-v)] / |w-v|^2
+		// We clamp t from [0,1] to handle points outside the segment vw.
+		float t = Math.max(0, Math.min(1, this.minus(v).dot(w.minus(v)) / l2));
+		Vec projection = v.plus( w.minus(v).scale(t) );  // Projection falls on the segment
+		return Vec.dist(this, projection);
     }
 }

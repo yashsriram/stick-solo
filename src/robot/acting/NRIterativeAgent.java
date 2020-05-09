@@ -4,6 +4,7 @@ import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
 import robot.planning.ik.NRIKSolver;
+import robot.planning.prm.Milestone;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,7 @@ public class NRIterativeAgent {
     private final Vec lengths;
     private final Vec jointTuple;
 
-    private List<Vec> path = new ArrayList<>();
+    private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 1;
 
     private float minSpeedLimit = 0;
@@ -38,13 +39,13 @@ public class NRIterativeAgent {
         this.jointTuple = new Vec(new float[N]);
     }
 
-    public void spawn(List<Vec> path, Vec lengths, Vec jointTuple) {
+    public void spawn(List<Milestone> path, Vec lengths, Vec jointTuple) {
         if (lengths.getNumElements() != N || jointTuple.getNumElements() != N) {
             PApplet.println("Invalid spawn parameters");
             return;
         }
         if (path.size() > 0) {
-            Vec firstMilestone = path.get(0);
+            Vec firstMilestone = path.get(0).position;
             this.pivotPosition.headSet(firstMilestone.get(0), firstMilestone.get(1));
         } else {
             this.pivotPosition.headSet(0, 0);
@@ -107,7 +108,7 @@ public class NRIterativeAgent {
         }
         if (nextMilestone < path.size()) {
             // Reached next milestone
-            if (Vec.dist(getFreeEnd(), path.get(nextMilestone)) < MILESTONE_REACHED_SLACK) {
+            if (Vec.dist(getFreeEnd(), path.get(nextMilestone).position) < MILESTONE_REACHED_SLACK) {
                 switchPivot();
                 nextMilestone++;
                 isMinSpeedLimitCalculated = false;
@@ -116,9 +117,9 @@ public class NRIterativeAgent {
             // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
             Vec deltaJointTupleUnscaled;
             if (METHOD == IKMethod.PSEUDO_INVERSE) {
-                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(getLinkEnds(), jointTuple, path.get(nextMilestone));
+                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(getLinkEnds(), jointTuple, path.get(nextMilestone).position);
             } else {
-                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(getLinkEnds(), jointTuple, path.get(nextMilestone));
+                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(getLinkEnds(), jointTuple, path.get(nextMilestone).position);
             }
             // Scale the delta
             Vec deltaJointTuple = deltaJointTupleUnscaled.scaleInPlace(dt);
@@ -145,13 +146,14 @@ public class NRIterativeAgent {
         // path
         applet.stroke(1);
         for (int i = 0; i < path.size() - 1; i++) {
-            Vec v1 = path.get(i);
-            Vec v2 = path.get(i + 1);
+            Vec v1 = path.get(i).position;
+            Vec v2 = path.get(i + 1).position;
             applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
         }
         applet.noStroke();
         applet.fill(1);
-        for (Vec v : path) {
+        for (Milestone milestone : path) {
+        	Vec v  = milestone.position;
             applet.pushMatrix();
             applet.translate(0, v.get(1), v.get(0));
             applet.box(1);
@@ -163,7 +165,7 @@ public class NRIterativeAgent {
         if (nextMilestone < path.size()) {
             applet.fill(1, 0, 0);
             applet.pushMatrix();
-            applet.translate(0, path.get(nextMilestone).get(1), path.get(nextMilestone).get(0));
+            applet.translate(0, path.get(nextMilestone).position.get(1), path.get(nextMilestone).position.get(0));
             applet.box(1);
             applet.popMatrix();
         }

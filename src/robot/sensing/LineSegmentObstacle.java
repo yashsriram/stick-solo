@@ -8,12 +8,14 @@ public class LineSegmentObstacle implements Obstacle {
     private final PApplet applet;
     public final Vec e1 = new Vec(0, 0);
     public final Vec e2 = new Vec(0, 0);
+    public final float length;
     private final Vec color = new Vec(1, 0, 1);
 
     public LineSegmentObstacle(PApplet applet, Vec e1, Vec e2, Vec color) {
         this.applet = applet;
         this.e1.headSet(e1);
         this.e2.headSet(e2);
+        this.length = Vec.dist(this.e1, this.e2);
         this.color.headSet(color);
     }
 
@@ -77,6 +79,14 @@ public class LineSegmentObstacle implements Obstacle {
         return true;
     }
 
+    public boolean doesIntersect(final Vec point, float margin) {
+    	return (point.distanceToSegment(this.e1, this.e2) <= margin);
+    }
+    
+    public boolean doesIntersect(final Vec point) {
+    	return this.doesIntersect(point, 0);
+    }
+    
     public void draw() {
         applet.fill(color.get(0), color.get(1), color.get(2));
         applet.stroke(color.get(0), color.get(1), color.get(2));

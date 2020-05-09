@@ -22,6 +22,15 @@ public class PositionConfigurationSpace {
         }
         return false;
     }
+    
+    public boolean doesIntersect(final Vec point, float margin) {
+        for (Obstacle obs : obstacles) {
+            if (obs.doesIntersect(point, margin)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void draw() {
         for (Obstacle obs : obstacles) {

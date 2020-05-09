@@ -4,11 +4,14 @@ import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
 import robot.acting.TwoArmAgent;
+import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.CircleObstacle;
 import robot.sensing.LineSegmentObstacle;
 import robot.sensing.PositionConfigurationSpace;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TwoArmAgentOnPRMWithObstacles extends PApplet {
@@ -33,8 +36,10 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     TwoArmAgent twoArmAgent;
     PRM prm;
     PositionConfigurationSpace cs;
+	private boolean pathChangeProcessing = false;
+	private Drawing draw;
 
-    public void settings() {
+	public void settings() {
         size(WIDTH, HEIGHT, P3D);
     }
 
@@ -47,6 +52,8 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
+        draw = new Drawing(this, MIN_CORNER, MAX_CORNER);
+        this.randomSeed(0);
         twoArmAgent = new TwoArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of(
                 new LineSegmentObstacle(this, new Vec(-20, -20), new Vec(20, -20), new Vec(1, 0, 1)),
@@ -57,6 +64,7 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
                 new CircleObstacle(this, new Vec(0, -20), 20, new Vec(1, 0, 1))
         ));
         prm = new PRM(this);
+        prm.margin = L1 * 1.5f;
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
     }
@@ -67,6 +75,12 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
+        	this.pathChangeProcessing = twoArmAgent.switchPath;
+        	if(!this.pathChangeProcessing) {
+        		// While it's already changing path, don't do any replanning 
+        		if(twoArmAgent.doesIntersect(cs)){replan();}
+        		checkSlippery();
+        	}
             boolean playSound = twoArmAgent.update(0.00001f);
             if (playSound) {
                 player.play(0);
@@ -74,6 +88,7 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         }
 
         // Draw
+        draw.drawWorld();
         twoArmAgent.draw();
         prm.draw();
         cs.draw();
@@ -82,6 +97,25 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
                 + " FPS: " + (int) frameRate
                 + " Search: " + SEARCH_ALGORITHM
         );
+    }
+    
+    private void checkSlippery() {
+		List<Milestone> milestones = twoArmAgent.getMilestones();
+		if(milestones.size() <= 0) { return;}
+		Milestone milestone = milestones.get(0);
+		if(milestone.slippery) {
+			prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
+			replan();
+		}
+	}
+
+	void replan() {
+		if(pathChangeProcessing ) {return;}
+    	if(!twoArmAgent.goalReached()) {
+    		prm.removeMilestones(twoArmAgent.getMilestones());
+        	List<Milestone> path = prm.aStar(twoArmAgent.neck, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+        	twoArmAgent.setPath(path);
+    	}
     }
 
     @Override
@@ -101,28 +135,32 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         if (key == 'h') {
             TwoArmAgent.DRAW_PATH = !TwoArmAgent.DRAW_PATH;
         }
+        if (key == 'r') {
+        	this.replan();
+        }
+        
         if (key == '1') {
-            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
+            List<Milestone> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));
             SEARCH_ALGORITHM = "weighted A*";
         }

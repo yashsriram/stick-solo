@@ -2,6 +2,7 @@ package robot.acting;
 
 import math.Vec;
 import processing.core.PApplet;
+import robot.planning.prm.Milestone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ public class CircularAgent {
     private final float speed;
     private final Vec color;
 
-    private List<Vec> path = new ArrayList<>();
+    private List<Milestone> path = new ArrayList<>();
     private int currentMilestone = 0;
 
     public CircularAgent(PApplet parent, Vec center, float radius, float speed, Vec color) {
@@ -27,7 +28,7 @@ public class CircularAgent {
         this.color = new Vec(color);
     }
 
-    public void spawn(Vec startPosition, List<Vec> newPath) {
+    public void spawn(Vec startPosition, List<Milestone> newPath) {
         center.set(startPosition);
         path = new ArrayList<>(newPath);
         currentMilestone = 0;
@@ -37,7 +38,7 @@ public class CircularAgent {
         if (path.size() == 0) {
             return;
         }
-        center.set(path.get(currentMilestone));
+        center.set(path.get(currentMilestone).position);
         if (currentMilestone < path.size() - 1) {
             currentMilestone++;
         }
@@ -47,7 +48,7 @@ public class CircularAgent {
         if (path.size() == 0) {
             return;
         }
-        center.set(path.get(currentMilestone));
+        center.set(path.get(currentMilestone).position);
         if (currentMilestone > 0) {
             currentMilestone--;
         }
@@ -59,13 +60,14 @@ public class CircularAgent {
         }
         if (currentMilestone < path.size() - 1) {
             // Reached next milestone?
-            if (path.get(currentMilestone + 1).minus(center).norm() < MILESTONE_REACHED_SLACK) {
+            if (path.get(currentMilestone + 1).position.minus(center).norm() < MILESTONE_REACHED_SLACK) {
                 currentMilestone++;
                 return;
             }
             // Move towards next milestone
             Vec velocityDir = path.get(currentMilestone + 1)
-                    .minus(center)
+            		.position
+            		.minus(center)
                     .normalizeInPlace();
             Vec displacement = velocityDir.scaleInPlace(speed * dt);
             center.plusInPlace(displacement);
@@ -76,8 +78,8 @@ public class CircularAgent {
         // path
         parent.stroke(color.get(0), color.get(1), color.get(2));
         for (int i = 0; i < path.size() - 1; i++) {
-            Vec v1 = path.get(i);
-            Vec v2 = path.get(i + 1);
+            Vec v1 = path.get(i).position;
+            Vec v2 = path.get(i + 1).position;
             parent.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
         }
         parent.noStroke();
@@ -89,7 +91,7 @@ public class CircularAgent {
         parent.popMatrix();
         // next milestone
         if (currentMilestone < path.size() - 1) {
-            Vec nextMilestonePosition = path.get(currentMilestone + 1);
+            Vec nextMilestonePosition = path.get(currentMilestone + 1).position;
             parent.pushMatrix();
             parent.fill(1, 0, 0);
             parent.translate(0, nextMilestonePosition.get(1), nextMilestonePosition.get(0));

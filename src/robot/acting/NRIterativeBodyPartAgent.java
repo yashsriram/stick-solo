@@ -4,6 +4,7 @@ import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
 import robot.planning.ik.NRIKSolver;
+import robot.sensing.PositionConfigurationSpace;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,6 +83,20 @@ public class NRIterativeBodyPartAgent {
             ends.add(new Vec(prevEnd));
         }
         return ends;
+    }
+    
+    public boolean doesIntersect(PositionConfigurationSpace cs) {
+    	List<Vec> points = this.getLinkEnds();
+    	boolean intersect = false;
+    	for(int i=0; i<points.size()-1; i++) {
+    		intersect = intersect || cs.doesIntersect(points.get(i), 5);
+    		if(intersect) {return true;}
+    	}
+    	for(int i=0; i<points.size()-1; i++) {
+    		intersect = intersect || cs.doesIntersect(points.get(i), points.get(i+1));
+    		if(intersect) {return true;}
+    	}
+    	return intersect;
     }
 
     public void switchPivot() {

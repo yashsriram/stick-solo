@@ -4,6 +4,7 @@ import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
 import robot.acting.NRIterativeAgent;
+import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.PositionConfigurationSpace;
 
@@ -88,27 +89,27 @@ public class RIterativeAgentOnPRM extends PApplet {
             PRM.DRAW_EDGES = !PRM.DRAW_EDGES;
         }
         if (key == '1') {
-            List<Vec> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            List<Vec> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            List<Vec> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            List<Vec> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            List<Milestone> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            List<Vec> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
+            List<Milestone> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
             nrIterativeAgent.spawn(path, new Vec(L1), new Vec(0));
             SEARCH_ALGORITHM = "weighted A*";
         }

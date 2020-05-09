@@ -34,6 +34,13 @@ public class CircleObstacle implements Obstacle {
         // Discriminant < 0 => no intersection
         return false;
     }
+    
+    public boolean doesIntersect(final Vec point, float margin) {
+    	if(Vec.dist(this.center, point) <= (this.radius+margin)) {
+    		return true;
+    	}
+    	return false;
+    }
 
     public void draw() {
         applet.noFill();

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-cdense-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-cdense-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-core-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-core-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-ddense-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-ddense-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-dsparse-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-dsparse-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-experimental-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-experimental-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-fdense-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-fdense-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-simple-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-simple-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-zdense-0.39-sources.jar"/>
+	<classpathentry kind="lib" path="jars/ejml-v0.39-libs/ejml-zdense-0.39.jar"/>
+	<classpathentry kind="lib" path="jars/processing/core.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt-natives-linux-aarch64.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt-natives-linux-armv6hf.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt-natives-windows-amd64.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="jars/processing/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all-natives-linux-aarch64.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all-natives-linux-armv6hf.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all-natives-windows-amd64.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="jars/processing/jogl-all.jar"/>
+	<classpathentry kind="lib" path="jars/minim/minim.jar"/>
+	<classpathentry kind="lib" path="jars/minim/jl1.0.1.jar"/>
+	<classpathentry kind="lib" path="jars/minim/jsminim.jar"/>
+	<classpathentry kind="lib" path="jars/minim/mp3spi1.9.5.jar"/>
+	<classpathentry kind="lib" path="jars/minim/tritonus_aos.jar"/>
+	<classpathentry kind="lib" path="jars/minim/tritonus_share.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

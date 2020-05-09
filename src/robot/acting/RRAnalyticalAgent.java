@@ -4,6 +4,7 @@ import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
 import robot.planning.ik.NRIKSolver;
+import robot.planning.prm.Milestone;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +18,7 @@ public class RRAnalyticalAgent {
 
     private final PApplet applet;
 
-    private List<Vec> path = new ArrayList<>();
+    private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 1;
     private final Vec goalJointTuple = new Vec(Float.NaN, Float.NaN);
 
@@ -29,9 +30,9 @@ public class RRAnalyticalAgent {
         this.applet = applet;
     }
 
-    public void spawn(List<Vec> path, float l1, float l2, float q1InDegrees, float q2InDegrees) {
+    public void spawn(List<Milestone> path, float l1, float l2, float q1InDegrees, float q2InDegrees) {
         if (path.size() > 0) {
-            Vec firstMilestone = path.get(0);
+            Vec firstMilestone = path.get(0).position;
             this.pivotPosition.headSet(firstMilestone.get(0), firstMilestone.get(1));
         } else {
             this.pivotPosition.headSet(0, 0);
@@ -43,7 +44,7 @@ public class RRAnalyticalAgent {
         this.path = new ArrayList<>(path);
         this.nextMilestone = 1;
         if (nextMilestone < path.size()) {
-            goalJointTuple.headSet(NRIKSolver.solve_RR_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone)));
+            goalJointTuple.headSet(NRIKSolver.solve_RR_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone).position));
         }
     }
 
@@ -99,7 +100,7 @@ public class RRAnalyticalAgent {
                 // If there is yet another milestone on the path
                 if (nextMilestone + 1 < path.size()) {
                     // Update goal joint variables to take free end to that milestone
-                    goalJointTuple.headSet(NRIKSolver.solve_RR_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone + 1)));
+                    goalJointTuple.headSet(NRIKSolver.solve_RR_minusPI_plusPI(pivotPosition, lengths, path.get(nextMilestone + 1).position));
                 }
                 nextMilestone++;
                 return true;
@@ -118,13 +119,14 @@ public class RRAnalyticalAgent {
         // path
         applet.stroke(1);
         for (int i = 0; i < path.size() - 1; i++) {
-            Vec v1 = path.get(i);
-            Vec v2 = path.get(i + 1);
+            Vec v1 = path.get(i).position;
+            Vec v2 = path.get(i + 1).position;
             applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
         }
         applet.noStroke();
         applet.fill(1);
-        for (Vec v : path) {
+        for (Milestone milestone : path) {
+        	Vec v = milestone.position;
             applet.pushMatrix();
             applet.translate(0, v.get(1), v.get(0));
             applet.box(1);
@@ -136,7 +138,7 @@ public class RRAnalyticalAgent {
         if (nextMilestone < path.size()) {
             applet.fill(1, 0, 0);
             applet.pushMatrix();
-            applet.translate(0, path.get(nextMilestone).get(1), path.get(nextMilestone).get(0));
+            applet.translate(0, path.get(nextMilestone).position.get(1), path.get(nextMilestone).position.get(0));
             applet.box(1);
             applet.popMatrix();
         }

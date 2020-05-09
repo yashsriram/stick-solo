@@ -6,17 +6,19 @@ import processing.core.PApplet;
 import java.util.ArrayList;
 import java.util.List;
 
-class Milestone {
+public class Milestone {
     final PApplet applet;
     final int id;
-    final Vec position;
+    public final Vec position;
     final List<Milestone> neighbours = new ArrayList<>();
-
+    public boolean slippery = false;
+    public final float SLIPPERY_PROBABILITY = 0.1f; 
+    
     class SearchState {
         float distanceFromStart = 0;
         float heuristicDistanceToGoal = 0;
         boolean isExplored = false;
-        final List<Vec> pathFromStart = new ArrayList<>();
+        final List<Milestone> pathFromStart = new ArrayList<>();
         final Vec color;
 
         public SearchState() {
@@ -34,7 +36,7 @@ class Milestone {
         void addToFringeFrom(Milestone parent) {
             isExplored = true;
             pathFromStart.addAll(parent.searchState.pathFromStart);
-            pathFromStart.add(Milestone.this.position);
+            pathFromStart.add(Milestone.this);
             color.headSet(0, 1, 0);
         }
 
@@ -50,12 +52,17 @@ class Milestone {
         this.id = id;
         this.position = new Vec(x, y);
         this.searchState = new SearchState();
+        this.slippery = (applet.random(0,1) < SLIPPERY_PROBABILITY);
     }
 
     void draw() {
         if (PRM.DRAW_MILESTONES) {
             // Milestone
+        	applet.strokeWeight(3);
             applet.stroke(searchState.color.get(0), searchState.color.get(1), searchState.color.get(2));
+            if(this.slippery) {
+            	applet.stroke(0,0,255);
+            }
             applet.point(0, position.get(1), position.get(0));
         }
         if (PRM.DRAW_EDGES) {

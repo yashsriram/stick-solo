@@ -52,7 +52,6 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
-        draw = new Drawing(this, MIN_CORNER, MAX_CORNER);
         this.randomSeed(0);
         twoArmAgent = new TwoArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of(
@@ -63,6 +62,7 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
                 new CircleObstacle(this, new Vec(0, 20), 20, new Vec(1, 0, 1)),
                 new CircleObstacle(this, new Vec(0, -20), 20, new Vec(1, 0, 1))
         ));
+        draw = new Drawing(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
         prm = new PRM(this);
         prm.margin = L1 * 1.5f;
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
@@ -82,6 +82,7 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         		checkSlippery();
         	}
             boolean playSound = twoArmAgent.update(0.00001f);
+            updateGravity(0.01f);
             if (playSound) {
                 player.play(0);
             }
@@ -99,15 +100,26 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         );
     }
     
-    private void checkSlippery() {
+    private void updateGravity(float dt) {
+		for(Stone stone : draw.stones) {
+			stone.update(dt);
+		}
+	}
+
+	private void checkSlippery() {
 		List<Milestone> milestones = twoArmAgent.getMilestones();
 		if(milestones.size() <= 0) { return;}
 		Milestone milestone = milestones.get(0);
 		if(milestone.slippery) {
+			spawnStones(milestone.position);
 			prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
 			replan();
 		}
 	}
+    
+    void spawnStones(Vec position) {
+    	draw.stones.add(new Stone(position));
+    }
 
 	void replan() {
 		if(pathChangeProcessing ) {return;}

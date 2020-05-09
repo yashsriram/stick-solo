@@ -70,12 +70,11 @@ public class TwoArmAgent {
     }
     
     public List<Milestone> getMilestones(){
-    	if(this.nextMilestone >= this.path.size()) {return new ArrayList<>();}
+    	if(this.nextMilestone >= this.path.size() 
+		   || this.nextMilestone <= 0) {return new ArrayList<>();}
     	List<Milestone> milestones = new ArrayList<>();
-    	milestones.add(this.path.get(this.nextMilestone));
-    	if(this.nextMilestone < this.path.size()-1) {
-    		milestones.add(this.path.get(this.nextMilestone+1));
-    	}
+    	milestones.add(this.path.get(this.nextMilestone-1));
+		milestones.add(this.path.get(this.nextMilestone));
     	return milestones; 
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PositionConfigurationSpace {
     private final PApplet applet;
-    private final List<Obstacle> obstacles;
+    public final List<Obstacle> obstacles;
 
     public PositionConfigurationSpace(PApplet applet, List<Obstacle> obstacles) {
         this.applet = applet;

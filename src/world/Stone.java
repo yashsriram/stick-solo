@@ -1,10 +1,9 @@
-package World;
+package world;
 import java.util.ArrayList;
 import java.util.List;
 
 import math.Vec;
 import processing.core.PApplet;
-import processing.core.PShape;
 
 public class Stone {
 	Vec position;

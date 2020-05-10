@@ -12,8 +12,8 @@ public class Milestone {
     public final Vec position;
     final List<Milestone> neighbours = new ArrayList<>();
     public boolean slippery = false;
-    public final float SLIPPERY_PROBABILITY = 0.1f; 
-    
+    public final float SLIPPERY_PROBABILITY = 0.1f;
+
     class SearchState {
         float distanceFromStart = 0;
         float heuristicDistanceToGoal = 0;
@@ -52,17 +52,16 @@ public class Milestone {
         this.id = id;
         this.position = new Vec(x, y);
         this.searchState = new SearchState();
-        this.slippery = (applet.random(0,1) < SLIPPERY_PROBABILITY);
+        this.slippery = (applet.random(0, 1) < SLIPPERY_PROBABILITY);
     }
 
     void draw() {
-    	applet.pushMatrix();
+        applet.pushMatrix();
         if (PRM.DRAW_MILESTONES) {
             // Milestone
-        	applet.strokeWeight(3);
             applet.stroke(searchState.color.get(0), searchState.color.get(1), searchState.color.get(2));
-            if(this.slippery) {
-            	applet.stroke(0,0,255);
+            if (this.slippery) {
+                applet.stroke(0, 0, 255);
             }
             applet.point(0, position.get(1), position.get(0));
             applet.stroke(255);

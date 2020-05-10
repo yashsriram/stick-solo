@@ -8,15 +8,14 @@ import robot.acting.NRIterativeBodyPartAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.PositionConfigurationSpace;
+import world.Stone;
+import world.Waterfall;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import World.Stone;
-import World.Waterfall;
-
-public class FourArmAgentOnPRM extends PApplet{
+public class FourArmAgentOnPRM extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -31,9 +30,9 @@ public class FourArmAgentOnPRM extends PApplet{
     private static final float MIN_EDGE_LEN = 3;
     private static final int NUM_MILESTONES = 2000;
     private static final float NECK_ARM_DIST = 8;
-    private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST-10));
+    private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST - 10));
     private static final Vec TAIL = START_POSITION.plus(new Vec(0, NECK_ARM_DIST));
-    public static final float INITIAL_ENERGY = 100f ;
+    public static final float INITIAL_ENERGY = 100f;
 
     QueasyCam cam;
     Minim minim;
@@ -44,7 +43,7 @@ public class FourArmAgentOnPRM extends PApplet{
     Waterfall waterfall;
     PRM prm;
     private boolean pathChangeProcessing = false;
-	private Drawing draw;
+    private Drawing draw;
 
 
     public void settings() {
@@ -68,7 +67,7 @@ public class FourArmAgentOnPRM extends PApplet{
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
-        NRIterativeBodyPartAgent.METHOD = NRIterativeBodyPartAgent.IKMethod.JACOBIAN_TRANSPOSE ;
+        NRIterativeBodyPartAgent.METHOD = NRIterativeBodyPartAgent.IKMethod.JACOBIAN_TRANSPOSE;
     }
 
     public void draw() {
@@ -77,12 +76,14 @@ public class FourArmAgentOnPRM extends PApplet{
 
         // Update
         for (int i = 0; i < 15; i++) {
-        	this.pathChangeProcessing = fourArmAgent.switchPath;
-        	if(!this.pathChangeProcessing) {
-        		// While it's already changing path, don't do any replanning 
-        		if(fourArmAgent.doesIntersect(cs)){replan();}
-        		checkSlippery();
-        	}
+            this.pathChangeProcessing = fourArmAgent.switchPath;
+            if (!this.pathChangeProcessing) {
+                // While it's already changing path, don't do any replanning
+                if (fourArmAgent.doesIntersect(cs)) {
+                    replan();
+                }
+                checkSlippery();
+            }
             updateGravity(0.01f);
             boolean playSound = fourArmAgent.update(0.00001f);
             if (playSound) {
@@ -96,17 +97,16 @@ public class FourArmAgentOnPRM extends PApplet{
         prm.draw();
 
         // Draw Energy bar
-        float energy = FourArmAgent.ENERGY ;
+        float energy = FourArmAgent.ENERGY;
         beginShape();
         stroke(0, 255, 0);
         fill(0, 255, 0);
-        float ht = energy/INITIAL_ENERGY;
-        vertex(0, SIZE*(0.9f-2*ht/10), SIZE*0.8f);
-        vertex(0, SIZE*(0.9f-2*ht/10), SIZE*0.9f);
-        vertex(0, SIZE*0.9f, SIZE*0.9f);
-        vertex(0, SIZE*0.9f, SIZE*0.8f);
+        float ht = energy / INITIAL_ENERGY;
+        vertex(0, SIZE * (0.9f - 2 * ht / 10), SIZE * 0.8f);
+        vertex(0, SIZE * (0.9f - 2 * ht / 10), SIZE * 0.9f);
+        vertex(0, SIZE * 0.9f, SIZE * 0.9f);
+        vertex(0, SIZE * 0.9f, SIZE * 0.8f);
         endShape();
-
 
 
         surface.setTitle("Processing:"
@@ -114,36 +114,40 @@ public class FourArmAgentOnPRM extends PApplet{
                 + " Search: " + SEARCH_ALGORITHM
         );
     }
-    
-    private void updateGravity(float dt) {
-		for(Stone stone : draw.stones) {
-			stone.update(dt);
-		}
-	}
 
-	private void checkSlippery() {
-		List<Milestone> milestones = fourArmAgent.getMilestones();
-		if(milestones.size() <= 0) { return;}
-		Milestone milestone = milestones.get(0);
-		if(milestone.slippery) {
-			spawnStones(milestone.position);
-			rocksAudio.play(10);
-			prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
-			replan();
-		}
-	}
-    
-    void spawnStones(Vec position) {
-    	draw.stones.add(new Stone(position, this));
+    private void updateGravity(float dt) {
+        for (Stone stone : draw.stones) {
+            stone.update(dt);
+        }
     }
 
-	void replan() {
-		if(pathChangeProcessing ) {return;}
-    	if(!fourArmAgent.goalReached()) {
-    		prm.removeMilestones(fourArmAgent.getMilestones());
-        	List<Milestone> path = prm.aStar(fourArmAgent.neck, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-        	fourArmAgent.setPath(path);
-    	}
+    private void checkSlippery() {
+        List<Milestone> milestones = fourArmAgent.getMilestones();
+        if (milestones.size() <= 0) {
+            return;
+        }
+        Milestone milestone = milestones.get(0);
+        if (milestone.slippery) {
+            spawnStones(milestone.position);
+            rocksAudio.play(10);
+            prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
+            replan();
+        }
+    }
+
+    void spawnStones(Vec position) {
+        draw.stones.add(new Stone(position, this));
+    }
+
+    void replan() {
+        if (pathChangeProcessing) {
+            return;
+        }
+        if (!fourArmAgent.goalReached()) {
+            prm.removeMilestones(fourArmAgent.getMilestones());
+            List<Milestone> path = prm.aStar(fourArmAgent.neck, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            fourArmAgent.setPath(path);
+        }
     }
 
     @Override

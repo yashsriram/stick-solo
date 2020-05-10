@@ -1,4 +1,4 @@
-package World;
+package world;
 
 import math.Vec;
 import processing.core.PApplet;

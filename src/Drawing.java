@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import World.Stone;
+import world.Stone;
 import math.Vec;
 import processing.core.PApplet;
 import processing.core.PImage;

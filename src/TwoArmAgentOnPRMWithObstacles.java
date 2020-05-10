@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import World.Stone;
+import world.Stone;
 
 public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     public static final int WIDTH = 800;

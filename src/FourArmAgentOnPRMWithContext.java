@@ -8,12 +8,14 @@ import robot.acting.NRIterativeBodyPartAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.PositionConfigurationSpace;
+import world.Stone;
+import world.Waterfall;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FourArmAgentOnPRM extends PApplet {
+public class FourArmAgentOnPRMWithContext extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -38,8 +40,10 @@ public class FourArmAgentOnPRM extends PApplet {
     AudioPlayer rocksAudio;
     FourArmAgent fourArmAgent;
     PositionConfigurationSpace cs;
+    Waterfall waterfall;
     PRM prm;
     private boolean pathChangeProcessing = false;
+    private Drawing draw;
 
 
     public void settings() {
@@ -59,6 +63,7 @@ public class FourArmAgentOnPRM extends PApplet {
         rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
         fourArmAgent = new FourArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of());
+        draw = new Drawing(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
@@ -67,7 +72,7 @@ public class FourArmAgentOnPRM extends PApplet {
 
     public void draw() {
         // Reset
-        background(0);
+        background(Drawing.SKY_COLOR);
 
         // Update
         for (int i = 0; i < 15; i++) {
@@ -79,6 +84,7 @@ public class FourArmAgentOnPRM extends PApplet {
                 }
                 checkSlippery();
             }
+            updateGravity(0.01f);
             boolean playSound = fourArmAgent.update(0.00001f);
             if (playSound) {
                 player.play(0);
@@ -86,6 +92,7 @@ public class FourArmAgentOnPRM extends PApplet {
         }
 
         // Draw
+        draw.drawWorld();
         fourArmAgent.draw();
         prm.draw();
 
@@ -108,6 +115,12 @@ public class FourArmAgentOnPRM extends PApplet {
         );
     }
 
+    private void updateGravity(float dt) {
+        for (Stone stone : draw.stones) {
+            stone.update(dt);
+        }
+    }
+
     private void checkSlippery() {
         List<Milestone> milestones = fourArmAgent.getMilestones();
         if (milestones.size() <= 0) {
@@ -115,10 +128,15 @@ public class FourArmAgentOnPRM extends PApplet {
         }
         Milestone milestone = milestones.get(0);
         if (milestone.slippery) {
+            spawnStones(milestone.position);
             rocksAudio.play(10);
             prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
             replan();
         }
+    }
+
+    void spawnStones(Vec position) {
+        draw.stones.add(new Stone(position, this));
     }
 
     void replan() {
@@ -177,7 +195,7 @@ public class FourArmAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"FourArmAgentOnPRM"};
+        String[] appletArgs = new String[]{"FourArmAgentOnPRMWithContext"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

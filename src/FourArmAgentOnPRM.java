@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import World.Stone;
+import World.Waterfall;
 
 public class FourArmAgentOnPRM extends PApplet{
     public static final int WIDTH = 800;

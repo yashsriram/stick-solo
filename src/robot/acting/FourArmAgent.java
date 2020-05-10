@@ -9,9 +9,13 @@ import java.util.List;
 
 public class FourArmAgent {
     public static boolean DRAW_PATH = true;
+    public static float INIT_LIMB_SPEED = 0.006f;
     public static float MIN_LIMB_SPEED = 0.006f;
     public static float NECK_SPEED = 0.01f;
     public static float BODY_LENGTH ;
+    public static float ENERGY = 100f ;
+    public static float REDUCE_ENERGY = 1f ;
+    public static float REDUCE_SPEED = 0.00005f ;
     public static float NECK_SYNC_ITERATIONS = 150;
 
     public boolean isPaused = false;
@@ -44,7 +48,7 @@ public class FourArmAgent {
         this.arm4 = new NRIterativeBodyPartAgent(applet, 3, 2);
     }
 
-    public void spawn(Vec neck, Vec tail, float neckToArmDistance, List<Milestone> path, Vec armLengths) {
+    public void spawn(Vec neck, Vec tail, float neckToArmDistance, List<Milestone> path, Vec armLengths, float initial_energy) {
         this.neckArmDistance = neckToArmDistance;
         this.tailLegDistance = neckToArmDistance;
         this.neck.headSet(neck);
@@ -60,8 +64,11 @@ public class FourArmAgent {
         this.state = 0;
         this.currentlyMovingArm = arm1;
         this.currentlyMovingLeg = arm4;
-        looseLeg.headSet(new Vec(-6, 4));
+        looseLeg.headSet(new Vec(-5, 5));
         BODY_LENGTH = neck.minus(tail).norm();
+        ENERGY = initial_energy;
+        MIN_LIMB_SPEED = INIT_LIMB_SPEED;
+        isPaused = false ;
     }
 
     private void switchCurrentlyMovingLeg(){
@@ -113,6 +120,8 @@ public class FourArmAgent {
             case 1:
                 if (currentlyMovingArm.update(dt, MIN_LIMB_SPEED)) {
                     state++;
+                    ENERGY -= REDUCE_ENERGY ;
+                    MIN_LIMB_SPEED -= REDUCE_SPEED ;
                     shouldPlayClickSound = true;
                 }
                 break;
@@ -180,11 +189,16 @@ public class FourArmAgent {
             case 5:
                 if (currentlyMovingLeg.update(dt, MIN_LIMB_SPEED)) {
                     state = 0;
+                    ENERGY -= REDUCE_ENERGY ;
+                    MIN_LIMB_SPEED -= REDUCE_SPEED ;
                     shouldPlayClickSound = true;
                     switchCurrentlyMovingLeg();
                     looseLeg.headSet(-looseLeg.get(0), looseLeg.get(1));
                 }
                 break;
+        }
+        if(ENERGY <= 0){
+            isPaused = true;
         }
         return shouldPlayClickSound;
     }

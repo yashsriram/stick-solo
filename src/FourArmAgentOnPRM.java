@@ -32,6 +32,7 @@ public class FourArmAgentOnPRM extends PApplet{
     private static final float NECK_ARM_DIST = 8;
     private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST-10));
     private static final Vec TAIL = START_POSITION.plus(new Vec(0, NECK_ARM_DIST));
+    public static final float INITIAL_ENERGY = 100f ;
 
     QueasyCam cam;
     Minim minim;
@@ -93,6 +94,20 @@ public class FourArmAgentOnPRM extends PApplet{
         fourArmAgent.draw();
         prm.draw();
 
+        // Draw Energy bar
+        float energy = FourArmAgent.ENERGY ;
+        beginShape();
+        stroke(0, 255, 0);
+        fill(0, 255, 0);
+        float ht = energy/INITIAL_ENERGY;
+        vertex(0, SIZE*(0.9f-2*ht/10), SIZE*0.8f);
+        vertex(0, SIZE*(0.9f-2*ht/10), SIZE*0.9f);
+        vertex(0, SIZE*0.9f, SIZE*0.9f);
+        vertex(0, SIZE*0.9f, SIZE*0.8f);
+        endShape();
+
+
+
         surface.setTitle("Processing:"
                 + " FPS: " + (int) frameRate
                 + " Search: " + SEARCH_ALGORITHM
@@ -149,27 +164,27 @@ public class FourArmAgentOnPRM extends PApplet{
         }
         if (key == '1') {
             List<Milestone> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2));
+            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
             List<Milestone> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2));
+            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
             List<Milestone> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2));
+            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
             List<Milestone> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2));
+            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
             List<Milestone> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
-            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2));
+            fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "weighted A*";
         }
     }

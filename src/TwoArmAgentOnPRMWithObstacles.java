@@ -81,8 +81,8 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         		if(twoArmAgent.doesIntersect(cs)){replan();}
         		checkSlippery();
         	}
-            boolean playSound = twoArmAgent.update(0.00001f);
             updateGravity(0.01f);
+            boolean playSound = twoArmAgent.update(0.00001f);
             if (playSound) {
                 player.play(0);
             }

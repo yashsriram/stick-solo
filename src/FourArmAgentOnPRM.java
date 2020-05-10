@@ -9,6 +9,8 @@ import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.PositionConfigurationSpace;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FourArmAgentOnPRM extends PApplet{
@@ -35,6 +37,8 @@ public class FourArmAgentOnPRM extends PApplet{
     FourArmAgent fourArmAgent;
     PositionConfigurationSpace cs;
     PRM prm;
+    private boolean pathChangeProcessing = false;
+	private Drawing draw;
 
 
     public void settings() {
@@ -52,6 +56,7 @@ public class FourArmAgentOnPRM extends PApplet{
         player = minim.loadFile("sounds/snapping-fingers.mp3");
         fourArmAgent = new FourArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of());
+        draw = new Drawing(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
@@ -60,10 +65,17 @@ public class FourArmAgentOnPRM extends PApplet{
 
     public void draw() {
         // Reset
-        background(0);
+        background(Drawing.SKY_COLOR);
 
         // Update
         for (int i = 0; i < 15; i++) {
+        	this.pathChangeProcessing = fourArmAgent.switchPath;
+        	if(!this.pathChangeProcessing) {
+        		// While it's already changing path, don't do any replanning 
+        		if(fourArmAgent.doesIntersect(cs)){replan();}
+        		checkSlippery();
+        	}
+            updateGravity(0.01f);
             boolean playSound = fourArmAgent.update(0.00001f);
             if (playSound) {
                 player.play(0);
@@ -71,6 +83,7 @@ public class FourArmAgentOnPRM extends PApplet{
         }
 
         // Draw
+        draw.drawWorld();
         fourArmAgent.draw();
         prm.draw();
 
@@ -78,6 +91,36 @@ public class FourArmAgentOnPRM extends PApplet{
                 + " FPS: " + (int) frameRate
                 + " Search: " + SEARCH_ALGORITHM
         );
+    }
+    
+    private void updateGravity(float dt) {
+		for(Stone stone : draw.stones) {
+			stone.update(dt);
+		}
+	}
+
+	private void checkSlippery() {
+		List<Milestone> milestones = fourArmAgent.getMilestones();
+		if(milestones.size() <= 0) { return;}
+		Milestone milestone = milestones.get(0);
+		if(milestone.slippery) {
+			spawnStones(milestone.position);
+			prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
+			replan();
+		}
+	}
+    
+    void spawnStones(Vec position) {
+    	draw.stones.add(new Stone(position));
+    }
+
+	void replan() {
+		if(pathChangeProcessing ) {return;}
+    	if(!fourArmAgent.goalReached()) {
+    		prm.removeMilestones(fourArmAgent.getMilestones());
+        	List<Milestone> path = prm.aStar(fourArmAgent.neck, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+        	fourArmAgent.setPath(path);
+    	}
     }
 
     @Override

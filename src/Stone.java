@@ -1,5 +1,4 @@
 import math.Vec;
-import processing.core.PApplet;
 
 public class Stone {
 	Vec position;

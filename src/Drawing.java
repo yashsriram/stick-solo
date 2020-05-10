@@ -9,23 +9,52 @@ import robot.sensing.CircleObstacle;
 import robot.sensing.Obstacle;
 
 public class Drawing {
+	public static int SKY_COLOR = 9687551;
 	private PImage wallTexture;
 	private PApplet parent;
 	private Vec MAX_CORNER;
 	private Vec MIN_CORNER;
 	private PImage landTexture;
 	private PShape obstacleShape;
+	private PImage canyonTexture;
+	private PShape canyonShape;
 	private List<Obstacle> obstacles;
 	public List<Stone> stones = new ArrayList<>();
 	private PImage stoneTexture;
 	
 	
 	public void drawWorld() {
-    	drawWall();
+//    	drawWall();
     	drawFloor();
     	drawObstacles();
     	drawStones();
+    	drawCanyon();
     }
+	
+	private void drawCanyon() {
+		parent.pushMatrix();
+		parent.scale(40);
+		parent.rotateZ(-PApplet.PI/2);
+		parent.translate(20.5f,0.5f,0);
+		parent.noFill();
+		parent.noStroke();
+		this.canyonShape.setTexture(this.canyonTexture);
+		parent.shape(this.canyonShape);
+		parent.popMatrix();
+		
+		parent.pushMatrix();
+		parent.rotateY(PApplet.PI/2);
+		parent.rotateZ(PApplet.PI);
+		parent.scale(40);
+		parent.translate(28, -3.5f, 0);
+		parent.noFill();
+		parent.noStroke();
+		parent.shape(this.canyonShape);
+		parent.translate(-15, 0, 0);
+		parent.shape(this.canyonShape);
+		parent.popMatrix();
+		
+	}
     
     private void drawWall() {
     	parent.pushMatrix();
@@ -46,14 +75,22 @@ public class Drawing {
     private void drawFloor() {
     	parent.pushMatrix();
     	parent.rotateX(PApplet.PI/2);
-    	parent.translate(-50, 0, MIN_CORNER.get(0));
-    	parent.beginShape();
+    	parent.translate(0, 0, -150);
+    	float startX = -500, startY = -500;
+    	float sidelen = 200;
+    	parent.noStroke();
+    	parent.beginShape(PApplet.QUADS);
     	parent.textureMode(PApplet.NORMAL);
     	parent.texture(this.landTexture);
-    	parent.vertex(100, -100, 0, 0);
-    	parent.vertex(-100, -100, 1, 0);
-    	parent.vertex(-100, 100, 1, 1);
-    	parent.vertex(100, 100, 0, 1);
+    	for(int i=0; i<5; i++) {
+    		for(int j=0; j<5; j++) {
+    	    	parent.vertex(startX+i*sidelen, startY+j*sidelen, 0, 0);
+    	    	parent.vertex(startX+(i-1)*sidelen, startY+j*sidelen, 1, 0);
+    	    	parent.vertex(startX+(i-1)*sidelen, startY+(j+1)*sidelen, 1, 1);
+    	    	parent.vertex(startX+i*sidelen, startY+(j+1)*sidelen, 0, 1);
+    	    	
+    		}
+    	}
     	parent.endShape();
     	parent.popMatrix();
     }
@@ -65,6 +102,8 @@ public class Drawing {
 		this.stoneTexture = parent.loadImage("stone_texture.jpg");
 		this.landTexture = parent.loadImage("grass.png");
 		this.obstacleShape = parent.loadShape("rock1.OBJ");
+		this.canyonShape = parent.loadShape("mountain.obj");
+		this.canyonTexture = parent.loadImage("wall_texture.jpg");
 		this.obstacles = obstacles;
 	}
 	public void drawObstacles() {

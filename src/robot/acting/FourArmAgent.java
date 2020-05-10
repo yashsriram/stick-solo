@@ -3,6 +3,7 @@ package robot.acting;
 import math.Vec;
 import processing.core.PApplet;
 import robot.planning.prm.Milestone;
+import robot.sensing.PositionConfigurationSpace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class FourArmAgent {
     public float neckArmDistance = 0;
     public float tailLegDistance = 0;
 
-    private final Vec neck = new Vec(0, 0);
+    public final Vec neck = new Vec(0, 0);
     private final Vec tail = new Vec(0, 0);
     private final Vec neckGoal = new Vec(neck);
     private final Vec tailGoal = new Vec(tail);
@@ -35,6 +36,8 @@ public class FourArmAgent {
     private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 0;
     private int state = 0;
+	private ArrayList newPath;
+	public boolean switchPath;
 
     public FourArmAgent(PApplet applet) {
         this.applet = applet;
@@ -78,6 +81,31 @@ public class FourArmAgent {
         } else {
             currentlyMovingArm = arm1;
         }
+    }
+    
+    public void setPath(List<Milestone> newPath) {
+    	this.newPath = new ArrayList<>(newPath);
+    	this.switchPath  = true;
+	}
+    
+    public boolean doesIntersect(PositionConfigurationSpace cs) {
+    	if(currentlyMovingArm != null) {
+    		return currentlyMovingArm.doesIntersect(cs);
+    	}
+    	return false;
+    }
+    
+    public boolean goalReached() {
+		return (this.nextMilestone == this.path.size());
+	}
+    
+    public List<Milestone> getMilestones(){
+    	if(this.nextMilestone >= this.path.size() 
+		   || this.nextMilestone <= 0) {return new ArrayList<>();}
+    	List<Milestone> milestones = new ArrayList<>();
+    	milestones.add(this.path.get(this.nextMilestone-1));
+		milestones.add(this.path.get(this.nextMilestone));
+    	return milestones; 
     }
 
     private void cycleCurrentlyMovingArm() {

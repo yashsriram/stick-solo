@@ -20,13 +20,13 @@ public class FourArmAgentOnPRM extends PApplet{
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
     private static final Vec START_POSITION = new Vec(-SIZE * 0.9f, SIZE * 0.8f);
     private static final Vec GOAL_POSITION = new Vec(SIZE * 0.9f, -SIZE * 0.9f);
-    private static final float L1 = 18;
-    private static final float L2 = 18;
-    private static final float MAX_EDGE_LEN = 12;
-    private static final float MIN_EDGE_LEN = 8;
+    private static final float L1 = 10;
+    private static final float L2 = 10;
+    private static final float MAX_EDGE_LEN = 7;
+    private static final float MIN_EDGE_LEN = 3;
     private static final int NUM_MILESTONES = 2000;
-    private static final float NECK_ARM_DIST = 18;
-    private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST-20));
+    private static final float NECK_ARM_DIST = 8;
+    private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST-10));
     private static final Vec TAIL = START_POSITION.plus(new Vec(0, NECK_ARM_DIST));
 
     QueasyCam cam;

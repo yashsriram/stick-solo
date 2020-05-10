@@ -60,7 +60,7 @@ public class FourArmAgent {
         this.state = 0;
         this.currentlyMovingArm = arm1;
         this.currentlyMovingLeg = arm4;
-        looseLeg.headSet(new Vec(-10, 6));
+        looseLeg.headSet(new Vec(-6, 4));
         BODY_LENGTH = neck.minus(tail).norm();
     }
 

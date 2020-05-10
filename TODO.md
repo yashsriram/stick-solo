@@ -27,22 +27,24 @@
 # Humanize
 - [x] Two arm agent
 - [x] Gravity effect
-- [ ] Two arm Two leg agent
+- [x] Two arm Two leg agent
 - [ ] Energy spent in some form
+- [ ] Worm agent
 
 # Obstacles
-- [ ] Spherical obstacles, line segment obstacles
-- [ ] Slippery holds
-- [ ] Re planning on obstacle collision or slipping
+- [x] Spherical obstacles, line segment obstacles
+- [x] Slippery holds
+- [x] Re planning on obstacle collision or slipping
 
 # Effects
 - [x] Sound on pivot change
 - [ ] Rock particle effects while holding on
+- [ ] Waterfall
 - [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
-- [ ] Wind effects
+- [ ] Wind effects - both in body, particles
 
 # Rendering
-- [ ] 3D context (holds, trees, waterfall, lavafall, birds)
+- [ ] 3D context (holds, trees, waterfall, lavafall, birds) and sounds
 - [ ] 3D models for agent links (hands, legs, body and tail)?
 
 # Make a game

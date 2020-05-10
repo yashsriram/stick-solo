@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import World.Stone;
+
 public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
@@ -118,7 +120,7 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
 	}
     
     void spawnStones(Vec position) {
-    	draw.stones.add(new Stone(position));
+    	draw.stones.add(new Stone(position, this));
     }
 
 	void replan() {

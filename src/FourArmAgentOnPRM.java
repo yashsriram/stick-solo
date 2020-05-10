@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import World.Stone;
+
 public class FourArmAgentOnPRM extends PApplet{
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
@@ -34,8 +36,10 @@ public class FourArmAgentOnPRM extends PApplet{
     QueasyCam cam;
     Minim minim;
     AudioPlayer player;
+    AudioPlayer rocksAudio;
     FourArmAgent fourArmAgent;
     PositionConfigurationSpace cs;
+    Waterfall waterfall;
     PRM prm;
     private boolean pathChangeProcessing = false;
 	private Drawing draw;
@@ -51,9 +55,11 @@ public class FourArmAgentOnPRM extends PApplet{
         rectMode(CENTER);
         noStroke();
 
+        this.randomSeed(0);
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
+        rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
         fourArmAgent = new FourArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of());
         draw = new Drawing(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
@@ -105,13 +111,14 @@ public class FourArmAgentOnPRM extends PApplet{
 		Milestone milestone = milestones.get(0);
 		if(milestone.slippery) {
 			spawnStones(milestone.position);
+			rocksAudio.play(10);
 			prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
 			replan();
 		}
 	}
     
     void spawnStones(Vec position) {
-    	draw.stones.add(new Stone(position));
+    	draw.stones.add(new Stone(position, this));
     }
 
 	void replan() {

@@ -228,10 +228,10 @@ public class FourArmAgent {
             }
         }
         applet.noStroke();
-        applet.fill(1);
         for (Milestone milestone : path) {
         	Vec v = milestone.position;
             applet.pushMatrix();
+            applet.fill(1);
             applet.translate(0, v.get(1), v.get(0));
             applet.box(1);
             applet.popMatrix();
@@ -241,8 +241,8 @@ public class FourArmAgent {
         // Next milestone
         if (nextMilestone < path.size()) {
             applet.noStroke();
-            applet.fill(1, 0, 0);
             applet.pushMatrix();
+            applet.fill(1, 0, 0);
             applet.translate(0, path.get(nextMilestone).position.get(1), path.get(nextMilestone).position.get(0));
             applet.box(1);
             applet.popMatrix();
@@ -250,8 +250,8 @@ public class FourArmAgent {
 
         // Neck
         applet.noStroke();
-        applet.fill(1, 1, 0);
         applet.pushMatrix();
+        applet.fill(1, 1, 0);
         applet.translate(0, neck.get(1), neck.get(0));
         applet.box(3);
         applet.popMatrix();
@@ -264,8 +264,8 @@ public class FourArmAgent {
 
         // Tail
         applet.noStroke();
-        applet.fill(1, 1, 0);
         applet.pushMatrix();
+        applet.fill(1, 1, 0);
         applet.translate(0, tail.get(1), tail.get(0));
         applet.box(3);
         applet.popMatrix();

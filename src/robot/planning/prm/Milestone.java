@@ -56,6 +56,7 @@ public class Milestone {
     }
 
     void draw() {
+    	applet.pushMatrix();
         if (PRM.DRAW_MILESTONES) {
             // Milestone
         	applet.strokeWeight(3);
@@ -64,6 +65,7 @@ public class Milestone {
             	applet.stroke(0,0,255);
             }
             applet.point(0, position.get(1), position.get(0));
+            applet.stroke(255);
         }
         if (PRM.DRAW_EDGES) {
             // Edges
@@ -73,6 +75,7 @@ public class Milestone {
                         0, neighbour.position.get(1), neighbour.position.get(0));
             }
         }
+        applet.popMatrix();
     }
 
 }

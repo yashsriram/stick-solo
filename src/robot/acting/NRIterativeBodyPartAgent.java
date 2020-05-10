@@ -166,8 +166,8 @@ public class NRIterativeBodyPartAgent {
         if (DRAW_GOAL) {
             // Goal milestone
             applet.noStroke();
-            applet.fill(1, 0, 0);
             applet.pushMatrix();
+            applet.fill(1, 0, 0);
             applet.translate(0, goal.get(1), goal.get(0));
             applet.box(1);
             applet.popMatrix();
@@ -198,8 +198,8 @@ public class NRIterativeBodyPartAgent {
             applet.stroke(1);
             applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
             applet.noStroke();
-            applet.fill(0, 0, 1);
             applet.pushMatrix();
+            applet.fill(0, 0, 1);
             applet.translate(0, end.get(1), end.get(0));
             applet.box(1.5f);
             applet.popMatrix();

@@ -13,11 +13,12 @@ public class FourArmAgent {
     public static float INIT_LIMB_SPEED = 0.006f;
     public static float MIN_LIMB_SPEED = 0.006f;
     public static float NECK_SPEED = 0.01f;
-    public static float BODY_LENGTH ;
-    public static float ENERGY = 100f ;
-    public static float REDUCE_ENERGY = 1f ;
-    public static float REDUCE_SPEED = 0.00005f ;
+    public static float BODY_LENGTH;
+    public static float ENERGY = 100f;
+    public static float REDUCE_ENERGY = 1f;
+    public static float REDUCE_SPEED = 0.00005f;
     public static float NECK_SYNC_ITERATIONS = 150;
+    public static final Vec LEG_VECTOR = new Vec(-5, 5);
 
     public boolean isPaused = false;
 
@@ -35,13 +36,12 @@ public class FourArmAgent {
     private final Vec tailGoal = new Vec(tail);
     private NRIterativeBodyPartAgent currentlyMovingArm;
     private NRIterativeBodyPartAgent currentlyMovingLeg;
-    private final Vec looseLeg = new Vec(0, 0);
 
     private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 0;
     private int state = 0;
-	private ArrayList newPath;
-	public boolean switchPath;
+    private ArrayList newPath;
+    public boolean switchPath;
 
     public FourArmAgent(PApplet applet) {
         this.applet = applet;
@@ -60,24 +60,23 @@ public class FourArmAgent {
         this.tailGoal.headSet(tail);
         this.arm1.spawn(neck, new Vec(armLengths), new Vec(-PApplet.PI * 0.25f, -PApplet.PI * 0.25f));
         this.arm2.spawn(neck, new Vec(armLengths), new Vec(-PApplet.PI * 0.95f, PApplet.PI * 0.55f));
-        this.arm3.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI*2+PApplet.PI * 0.25f, PApplet.PI*2+PApplet.PI * 0.25f));
-        this.arm4.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI*2+PApplet.PI * 0.95f, PApplet.PI*2-PApplet.PI * 0.75f));
+        this.arm3.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI * 2 + PApplet.PI * 0.25f, PApplet.PI * 2 + PApplet.PI * 0.25f));
+        this.arm4.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI * 2 + PApplet.PI * 0.95f, PApplet.PI * 2 - PApplet.PI * 0.75f));
         this.path = new ArrayList<>(path);
         this.nextMilestone = 0;
         this.state = 0;
         this.currentlyMovingArm = arm1;
         this.currentlyMovingLeg = arm4;
-        looseLeg.headSet(new Vec(-5, 5));
         BODY_LENGTH = neck.minus(tail).norm();
         ENERGY = initial_energy;
         MIN_LIMB_SPEED = INIT_LIMB_SPEED;
-        isPaused = false ;
+        isPaused = false;
     }
 
-    private void switchCurrentlyMovingLeg(){
+    private void switchCurrentlyMovingLeg() {
         if (currentlyMovingLeg.id == arm3.id) {
             currentlyMovingLeg = arm4;
-        }else{
+        } else {
             currentlyMovingLeg = arm3;
         }
     }
@@ -89,40 +88,42 @@ public class FourArmAgent {
             currentlyMovingArm = arm1;
         }
     }
-    
+
     public void setPath(List<Milestone> newPath) {
-    	this.newPath = new ArrayList<>(newPath);
-    	this.switchPath  = true;
-	}
-    
-    public boolean doesIntersect(PositionConfigurationSpace cs) {
-    	if(currentlyMovingArm != null) {
-    		return currentlyMovingArm.doesIntersect(cs);
-    	}
-    	return false;
+        this.newPath = new ArrayList<>(newPath);
+        this.switchPath = true;
     }
-    
+
+    public boolean doesIntersect(PositionConfigurationSpace cs) {
+        if (currentlyMovingArm != null) {
+            return currentlyMovingArm.doesIntersect(cs);
+        }
+        return false;
+    }
+
     public boolean goalReached() {
-		return (this.nextMilestone == this.path.size());
-	}
-    
-    public List<Milestone> getMilestones(){
-    	if(this.nextMilestone >= this.path.size() 
-		   || this.nextMilestone <= 0) {return new ArrayList<>();}
-    	List<Milestone> milestones = new ArrayList<>();
-    	milestones.add(this.path.get(this.nextMilestone-1));
-		milestones.add(this.path.get(this.nextMilestone));
-    	return milestones; 
+        return (this.nextMilestone == this.path.size());
+    }
+
+    public List<Milestone> getMilestones() {
+        if (this.nextMilestone >= this.path.size()
+                || this.nextMilestone <= 0) {
+            return new ArrayList<>();
+        }
+        List<Milestone> milestones = new ArrayList<>();
+        milestones.add(this.path.get(this.nextMilestone - 1));
+        milestones.add(this.path.get(this.nextMilestone));
+        return milestones;
     }
 
     private void cycleCurrentlyMovingArm() {
         if (currentlyMovingArm.id == arm1.id) {
             currentlyMovingArm = arm2;
-        } else if(currentlyMovingArm.id == arm2.id){
+        } else if (currentlyMovingArm.id == arm2.id) {
             currentlyMovingArm = arm3;
-        }else if(currentlyMovingArm.id == arm3.id){
+        } else if (currentlyMovingArm.id == arm3.id) {
             currentlyMovingArm = arm4;
-        }else{
+        } else {
             currentlyMovingArm = arm1;
         }
     }
@@ -148,8 +149,8 @@ public class FourArmAgent {
             case 1:
                 if (currentlyMovingArm.update(dt, MIN_LIMB_SPEED)) {
                     state++;
-                    ENERGY -= REDUCE_ENERGY ;
-                    MIN_LIMB_SPEED -= REDUCE_SPEED ;
+                    ENERGY -= REDUCE_ENERGY;
+                    MIN_LIMB_SPEED -= REDUCE_SPEED;
                     shouldPlayClickSound = true;
                 }
                 break;
@@ -206,10 +207,10 @@ public class FourArmAgent {
                 break;
             // Set arm1 goal to next milestone or next + 1 milestone
             case 4:
-                if(!currentlyMovingLeg.isStraight()){
+                if (!currentlyMovingLeg.isStraight()) {
                     currentlyMovingLeg.switchPivot();
                 }
-                currentlyMovingLeg.setGoal(tail.plus(looseLeg));
+                currentlyMovingLeg.setGoal(tail.plus(LEG_VECTOR));
                 switchCurrentlyMovingArm();
                 state++;
                 break;
@@ -217,15 +218,15 @@ public class FourArmAgent {
             case 5:
                 if (currentlyMovingLeg.update(dt, MIN_LIMB_SPEED)) {
                     state = 0;
-                    ENERGY -= REDUCE_ENERGY ;
-                    MIN_LIMB_SPEED -= REDUCE_SPEED ;
+                    ENERGY -= REDUCE_ENERGY;
+                    MIN_LIMB_SPEED -= REDUCE_SPEED;
                     shouldPlayClickSound = true;
                     switchCurrentlyMovingLeg();
-                    looseLeg.headSet(-looseLeg.get(0), looseLeg.get(1));
+                    LEG_VECTOR.headSet(-LEG_VECTOR.get(0), LEG_VECTOR.get(1));
                 }
                 break;
         }
-        if(ENERGY <= 0){
+        if (ENERGY <= 0) {
             isPaused = true;
         }
         return shouldPlayClickSound;
@@ -243,7 +244,7 @@ public class FourArmAgent {
         }
         applet.noStroke();
         for (Milestone milestone : path) {
-        	Vec v = milestone.position;
+            Vec v = milestone.position;
             applet.pushMatrix();
             applet.fill(1);
             applet.translate(0, v.get(1), v.get(0));

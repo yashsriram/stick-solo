@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import World.Stone;
-
 public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
@@ -39,7 +37,6 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     PRM prm;
     PositionConfigurationSpace cs;
 	private boolean pathChangeProcessing = false;
-	private Drawing draw;
 
 	public void settings() {
         size(WIDTH, HEIGHT, P3D);
@@ -64,7 +61,6 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
                 new CircleObstacle(this, new Vec(0, 20), 20, new Vec(1, 0, 1)),
                 new CircleObstacle(this, new Vec(0, -20), 20, new Vec(1, 0, 1))
         ));
-        draw = new Drawing(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
         prm = new PRM(this);
         prm.margin = L1 * 1.5f;
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
@@ -83,7 +79,6 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         		if(twoArmAgent.doesIntersect(cs)){replan();}
         		checkSlippery();
         	}
-            updateGravity(0.01f);
             boolean playSound = twoArmAgent.update(0.00001f);
             if (playSound) {
                 player.play(0);
@@ -91,7 +86,6 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         }
 
         // Draw
-        draw.drawWorld();
         twoArmAgent.draw();
         prm.draw();
         cs.draw();
@@ -101,27 +95,16 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
                 + " Search: " + SEARCH_ALGORITHM
         );
     }
-    
-    private void updateGravity(float dt) {
-		for(Stone stone : draw.stones) {
-			stone.update(dt);
-		}
-	}
 
 	private void checkSlippery() {
 		List<Milestone> milestones = twoArmAgent.getMilestones();
 		if(milestones.size() <= 0) { return;}
 		Milestone milestone = milestones.get(0);
 		if(milestone.slippery) {
-			spawnStones(milestone.position);
 			prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
 			replan();
 		}
 	}
-    
-    void spawnStones(Vec position) {
-    	draw.stones.add(new Stone(position, this));
-    }
 
 	void replan() {
 		if(pathChangeProcessing ) {return;}

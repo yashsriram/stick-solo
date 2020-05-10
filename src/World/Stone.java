@@ -4,7 +4,6 @@ import java.util.List;
 
 import math.Vec;
 import processing.core.PApplet;
-import processing.core.PShape;
 
 public class Stone {
 	Vec position;
@@ -65,7 +64,7 @@ public class Stone {
 	}
 
 	public Stone(Vec position, PApplet applet) {
-		this.position = position;
+		this.position = new Vec(position);
 		this.velocity = new Vec(0,0);
 		this.acceleration = new Vec(0, 10);
 		this.applet = applet;

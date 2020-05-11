@@ -29,6 +29,7 @@ public class World {
 	private Waterfall waterfall;
 	private AudioPlayer rocksAudio;
 	private Minim minim;
+	private AudioPlayer waterAudio;
 	
 	public World(PApplet applet, Vec MIN_CORNER, Vec MAX_CORNER, List<Obstacle> obstacles) {
 		this.applet = applet;
@@ -42,10 +43,12 @@ public class World {
 		this.obstacleShape = applet.loadShape("rock1.OBJ");
 		this.obstacles = obstacles;
 		
+		this.minim = new Minim(applet);
 		this.waterTexture = applet.loadImage("water.png");
 		this.waterfall = new Waterfall(applet, new Vec(200, -40));
+		this.waterAudio = minim.loadFile("sounds/water.mp3");
+		this.waterAudio.play(1000);
 		
-		this.minim = new Minim(this);
 		this.rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
 		this.stoneTexture = applet.loadImage("stone_texture.jpg");
 //		loadStoneTexture();

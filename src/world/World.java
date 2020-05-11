@@ -1,7 +1,9 @@
+package world;
 import java.util.ArrayList;
 import java.util.List;
 
-import world.Stone;
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -9,7 +11,7 @@ import processing.core.PShape;
 import robot.sensing.CircleObstacle;
 import robot.sensing.Obstacle;
 
-public class Drawing {
+public class World {
 	public static int SKY_COLOR = 9687551;
 	private PImage wallTexture;
 	private PApplet applet;
@@ -23,15 +25,53 @@ public class Drawing {
 	public List<Stone> stones = new ArrayList<>();
 	private PImage stoneTexture;
 	private PShape stoneShape;
+	private PImage waterTexture;
+	private Waterfall waterfall;
+	private AudioPlayer rocksAudio;
+	private Minim minim;
 	
+	public World(PApplet applet, Vec MIN_CORNER, Vec MAX_CORNER, List<Obstacle> obstacles) {
+		this.applet = applet;
+		this.MAX_CORNER = MAX_CORNER;
+		this.MIN_CORNER = MIN_CORNER;
+		
+		this.canyonShape = applet.loadShape("mountain.obj");
+		this.canyonTexture = applet.loadImage("wall_texture.jpg");
+		this.landTexture = applet.loadImage("grass.png");
+		
+		this.obstacleShape = applet.loadShape("rock1.OBJ");
+		this.obstacles = obstacles;
+		
+		this.waterTexture = applet.loadImage("water.png");
+		this.waterfall = new Waterfall(applet, new Vec(200, -40));
+		
+		this.minim = new Minim(this);
+		this.rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
+		this.stoneTexture = applet.loadImage("stone_texture.jpg");
+//		loadStoneTexture();
+	}
 	
-	public void drawWorld() {
-//    	drawWall();
+	public void update(float dt) {
+        for (Stone stone : stones) {
+            stone.update(dt);
+        }
+        
+        this.waterfall.update(dt);
+    }
+	
+	public void draw() {
     	drawFloor();
     	drawObstacles();
     	drawStones();
     	drawCanyon();
-    	drawTracer();
+//    	drawTracer();
+    	drawWaterfall();
+    }
+	
+	public void spawnStones(Vec position) {
+        stones.add(new Stone(position, applet));
+        rocksAudio.play(1);
+        return;
     }
 	
 	private void drawTracer() {
@@ -68,22 +108,6 @@ public class Drawing {
 		
 	}
     
-    private void drawWall() {
-    	applet.pushMatrix();
-    	applet.noStroke();
-    	applet.rotateY(-PApplet.PI/2);
-    	applet.beginShape();
-    	applet.textureMode(PApplet.NORMAL);
-    	applet.texture(this.wallTexture);
-    	applet.vertex(MAX_CORNER.get(0), MIN_CORNER.get(1), 0, 0);
-    	applet.vertex(MIN_CORNER.get(0), MIN_CORNER.get(1), 1, 0);
-    	applet.vertex(MIN_CORNER.get(0), MAX_CORNER.get(1), 1, 1);
-    	applet.vertex(MAX_CORNER.get(0), MAX_CORNER.get(1), 0, 1);
-    	applet.endShape();
-    	applet.popMatrix();
-    	
-    }
-    
     private void drawFloor() {
     	applet.pushMatrix();
     	applet.rotateX(PApplet.PI/2);
@@ -106,26 +130,17 @@ public class Drawing {
     	applet.endShape();
     	applet.popMatrix();
     }
-	public Drawing(PApplet applet, Vec MIN_CORNER, Vec MAX_CORNER, List<Obstacle> obstacles) {
-		this.applet = applet;
-		this.MAX_CORNER = MAX_CORNER;
-		this.MIN_CORNER = MIN_CORNER;
-		this.wallTexture = applet.loadImage("wall_texture.jpg");
-		this.stoneTexture = applet.loadImage("stone_texture.jpg");
-		this.landTexture = applet.loadImage("grass.png");
-		this.obstacleShape = applet.loadShape("rock1.OBJ");
-		this.canyonShape = applet.loadShape("mountain.obj");
-		this.canyonTexture = applet.loadImage("wall_texture.jpg");
-		this.obstacles = obstacles;
-//		loadStoneTexture();
-	}
-	
+    
 	private void loadStoneTexture() {
 		applet.fill(255,255,255,255);
 		applet.noStroke();
 		applet.noFill();
 		stoneShape = applet.createShape(PApplet.SPHERE, 3);
 		stoneShape.setTexture(this.stoneTexture);
+	}
+	
+	private void drawWaterfall() {
+		this.waterfall.draw(waterTexture);
 	}
 	
 	public void drawObstacles() {

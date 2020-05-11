@@ -8,7 +8,7 @@ public class Particle {
     Vec velocity;
     Vec acceleration;
     float lifetime;
-    private PApplet applet;
+    protected PApplet applet;
 
     public Particle(Vec position, PApplet applet) {
         this.applet = applet;
@@ -21,6 +21,11 @@ public class Particle {
     }
 
     public void update(float dt) {
+    	if(position.get(1) > 150) {
+    		position.set(1, 150);
+    		velocity.set(1, -0.5f * velocity.get(1));
+    		return;
+    	}
         velocity.plusInPlace(acceleration.scale(dt));
         position.plusInPlace(velocity.scale(dt));
         lifetime -= 0.5f;

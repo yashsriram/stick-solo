@@ -3,13 +3,13 @@ import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
+import processing.core.PImage;
 import robot.acting.FourArmAgent;
 import robot.acting.NRIterativeBodyPartAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.PositionConfigurationSpace;
-import world.Stone;
-import world.Waterfall;
+import world.World;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,13 +37,11 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
     QueasyCam cam;
     Minim minim;
     AudioPlayer player;
-    AudioPlayer rocksAudio;
     FourArmAgent fourArmAgent;
     PositionConfigurationSpace cs;
-    Waterfall waterfall;
     PRM prm;
     private boolean pathChangeProcessing = false;
-    private Drawing draw;
+    private World world;
 
 
     public void settings() {
@@ -60,10 +58,9 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
-        rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
         fourArmAgent = new FourArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of());
-        draw = new Drawing(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
+        world = new World(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
@@ -72,7 +69,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
 
     public void draw() {
         // Reset
-        background(Drawing.SKY_COLOR);
+        background(World.SKY_COLOR);
 
         // Update
         for (int i = 0; i < 15; i++) {
@@ -84,7 +81,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
                 }
                 checkSlippery();
             }
-            updateGravity(0.01f);
+            world.update(0.01f);
             boolean playSound = fourArmAgent.update(0.00001f);
             if (playSound) {
                 player.play(0);
@@ -92,7 +89,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         }
 
         // Draw
-        draw.drawWorld();
+        world.draw();
         fourArmAgent.draw();
         prm.draw();
 
@@ -115,11 +112,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         );
     }
 
-    private void updateGravity(float dt) {
-        for (Stone stone : draw.stones) {
-            stone.update(dt);
-        }
-    }
+    
 
     private void checkSlippery() {
         List<Milestone> milestones = fourArmAgent.getMilestones();
@@ -128,17 +121,12 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         }
         Milestone milestone = milestones.get(0);
         if (milestone.slippery) {
-            spawnStones(milestone.position);
-            rocksAudio.play(10);
+            world.spawnStones(milestone.position);
             prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
             replan();
         }
     }
-
-    void spawnStones(Vec position) {
-        draw.stones.add(new Stone(position, this));
-    }
-
+    
     void replan() {
         if (pathChangeProcessing) {
             return;

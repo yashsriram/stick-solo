@@ -1,7 +1,4 @@
 package world;
-import java.util.ArrayList;
-import java.util.List;
-
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
 import math.Vec;
@@ -10,6 +7,9 @@ import processing.core.PImage;
 import processing.core.PShape;
 import robot.sensing.CircleObstacle;
 import robot.sensing.Obstacle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class World {
 	public static int SKY_COLOR = 9687551;
@@ -28,6 +28,7 @@ public class World {
 	private PImage waterTexture;
 	private Waterfall waterfall;
 	private AudioPlayer rocksAudio;
+	private AudioPlayer wind;
 	private Minim minim;
 	private AudioPlayer waterAudio;
 	
@@ -52,6 +53,9 @@ public class World {
 		this.rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
 		this.stoneTexture = applet.loadImage("stone_texture.jpg");
 //		loadStoneTexture();
+
+		this.wind = minim.loadFile("sounds/wind01.mp3");
+		this.wind.loop();
 	}
 	
 	public void update(float dt) {

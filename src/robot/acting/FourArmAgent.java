@@ -20,6 +20,7 @@ public class FourArmAgent {
     public static float REDUCE_SPEED = 0.00005f;
     public static float RECOVERY_RATE = 0.01f ;
     public static float NECK_SYNC_ITERATIONS = 150;
+    public static float WIND_FORCE_COEFFICIENT = 0.01f;
     public static final Vec LEG_VECTOR = new Vec(-5, 5);
 
     public boolean isPaused = false;
@@ -133,7 +134,12 @@ public class FourArmAgent {
         }
     }
 
-    public boolean update(float dt) {
+    public boolean update(float dt){
+        Vec w = new Vec(0,0);
+        return update(dt, w);
+    }
+
+    public boolean update(float dt, Vec wind) {
         if (isPaused) {
             return false;
         }
@@ -185,6 +191,7 @@ public class FourArmAgent {
                     arm2.switchPivot();
                 }
                 Vec tailToBelowNeck = new Vec(neckGoal.get(0), neckGoal.get(1) + BODY_LENGTH);
+                tailToBelowNeck.plusInPlace(wind.scale(WIND_FORCE_COEFFICIENT));
                 tailGoal.headSet(tailToBelowNeck);
                 if (arm3.isStraight()) {
                     arm3.switchPivot();

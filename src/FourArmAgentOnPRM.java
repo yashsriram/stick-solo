@@ -31,7 +31,7 @@ public class FourArmAgentOnPRM extends PApplet {
     private static final float NECK_ARM_DIST = 8;
     private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST));
     private static final Vec TAIL = START_POSITION.plus(new Vec(0, NECK_ARM_DIST + 10));
-    public static final float WIND_SPEED = 30f;
+    public static final Vec WIND = new Vec(30, 4);
     public static final float INITIAL_ENERGY = 50f;
 
     QueasyCam cam;
@@ -71,7 +71,7 @@ public class FourArmAgentOnPRM extends PApplet {
         leaves = new ArrayList<>();
         for(int i = 0 ; i < 50 ; i++){
             Vec p = new Vec(SIZE*random(-1, 0), SIZE*random(-1, 0));
-            Vec v = new Vec(WIND_SPEED, random(5, 10));
+            Vec v = new Vec(random(0, 1), random(2, 4));
             float l = random(500, 1000) ;
             leaves.add(new Leaf(p,v,5, l, this));
         }
@@ -92,14 +92,14 @@ public class FourArmAgentOnPRM extends PApplet {
                 }
                 checkSlippery();
             }
-            boolean playSound = fourArmAgent.update(0.00001f);
+            boolean playSound = fourArmAgent.update(0.00001f, WIND);
             if (playSound) {
                 player.play(0);
             }
         }
 
         for(Leaf l : leaves){
-            l.update(0.1f, SIZE);
+            l.update(0.1f, SIZE, WIND);
         }
 
         // Draw
@@ -195,6 +195,12 @@ public class FourArmAgentOnPRM extends PApplet {
             List<Milestone> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
             fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "weighted A*";
+        }
+        if (key == 'x'){
+            WIND.headSet(WIND.get(0)+10f, WIND.get(1));
+        }
+        if (key == 'v'){
+            WIND.headSet(WIND.get(0)-10f, WIND.get(1));
         }
     }
 

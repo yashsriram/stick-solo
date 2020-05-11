@@ -22,12 +22,15 @@ public class Leaf {
         this.texture = pApplet.loadImage("leaf1.png");
     }
 
-    public void update(float dt, float size){
+    public boolean update(float dt, float size, Vec wind){
+        this.velocity.plusInPlace(wind.scale(0.01f));
         if(lifetime > 0){
             this.position.plusInPlace(this.velocity.scale(dt));
             this.lifetime -= 1 ;
+            return true ;
         }else{
             revive(size);
+            return false ;
         }
     }
 
@@ -51,6 +54,6 @@ public class Leaf {
     public void revive(float size){
         lifetime = pApplet.random(500, 1000) ;
         this.position = new Vec(size*pApplet.random(-2, -1f), size*pApplet.random(-1, 0f));
-
+        this.velocity = new Vec(pApplet.random(0, 1), pApplet.random(2, 4));
     }
 }

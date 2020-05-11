@@ -14,9 +14,11 @@ public class FourArmAgent {
     public static float MIN_LIMB_SPEED = 0.006f;
     public static float NECK_SPEED = 0.01f;
     public static float BODY_LENGTH;
-    public static float ENERGY = 100f;
+    public static float INITIAL_ENERGY ;
+    public static float ENERGY ;
     public static float REDUCE_ENERGY = 1f;
     public static float REDUCE_SPEED = 0.00005f;
+    public static float RECOVERY_RATE = 0.01f ;
     public static float NECK_SYNC_ITERATIONS = 150;
     public static final Vec LEG_VECTOR = new Vec(-5, 5);
 
@@ -41,6 +43,7 @@ public class FourArmAgent {
     private int nextMilestone = 0;
     private int state = 0;
     private ArrayList newPath;
+    private boolean isRecharging;
     public boolean switchPath;
 
     public FourArmAgent(PApplet applet) {
@@ -68,9 +71,11 @@ public class FourArmAgent {
         this.currentlyMovingArm = arm1;
         this.currentlyMovingLeg = arm4;
         BODY_LENGTH = neck.minus(tail).norm();
+        INITIAL_ENERGY = initial_energy;
         ENERGY = initial_energy;
         MIN_LIMB_SPEED = INIT_LIMB_SPEED;
         isPaused = false;
+        this.isRecharging = false;
     }
 
     private void switchCurrentlyMovingLeg() {
@@ -134,6 +139,19 @@ public class FourArmAgent {
         }
         if (nextMilestone >= path.size()) {
             return false;
+        }
+        if (ENERGY <= 0) {
+            isRecharging = true ;
+        }
+        if(isRecharging){
+            if(ENERGY < INITIAL_ENERGY){
+                ENERGY += RECOVERY_RATE ;
+                MIN_LIMB_SPEED = INIT_LIMB_SPEED;
+                return false;
+            }else{
+                isRecharging = false ;
+                return false;
+            }
         }
         boolean shouldPlayClickSound = false;
         switch (state) {
@@ -225,9 +243,6 @@ public class FourArmAgent {
                     LEG_VECTOR.headSet(-LEG_VECTOR.get(0), LEG_VECTOR.get(1));
                 }
                 break;
-        }
-        if (ENERGY <= 0) {
-            isPaused = true;
         }
         return shouldPlayClickSound;
     }

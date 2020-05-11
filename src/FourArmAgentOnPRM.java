@@ -8,6 +8,7 @@ import robot.acting.NRIterativeBodyPartAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.PositionConfigurationSpace;
+import world.Leaf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,15 +31,18 @@ public class FourArmAgentOnPRM extends PApplet {
     private static final float NECK_ARM_DIST = 8;
     private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST));
     private static final Vec TAIL = START_POSITION.plus(new Vec(0, NECK_ARM_DIST + 10));
-    public static final float INITIAL_ENERGY = 100f;
+    public static final float WIND_SPEED = 30f;
+    public static final float INITIAL_ENERGY = 50f;
 
     QueasyCam cam;
     Minim minim;
     AudioPlayer player;
     AudioPlayer rocksAudio;
+    AudioPlayer wind;
     FourArmAgent fourArmAgent;
     PositionConfigurationSpace cs;
     PRM prm;
+    List<Leaf> leaves ;
     private boolean pathChangeProcessing = false;
 
 
@@ -57,12 +61,21 @@ public class FourArmAgentOnPRM extends PApplet {
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
         rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
+        wind = minim.loadFile("sounds/wind01.mp3");
         fourArmAgent = new FourArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of());
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
         NRIterativeBodyPartAgent.METHOD = NRIterativeBodyPartAgent.IKMethod.JACOBIAN_TRANSPOSE;
+        leaves = new ArrayList<>();
+        for(int i = 0 ; i < 50 ; i++){
+            Vec p = new Vec(SIZE*random(-1, 0), SIZE*random(-1, 0));
+            Vec v = new Vec(WIND_SPEED, random(5, 10));
+            float l = random(500, 1000) ;
+            leaves.add(new Leaf(p,v,5, l, this));
+        }
+        wind.loop();
     }
 
     public void draw() {
@@ -85,6 +98,10 @@ public class FourArmAgentOnPRM extends PApplet {
             }
         }
 
+        for(Leaf l : leaves){
+            l.update(0.1f, SIZE);
+        }
+
         // Draw
         fourArmAgent.draw();
         prm.draw();
@@ -100,6 +117,11 @@ public class FourArmAgentOnPRM extends PApplet {
         vertex(0, SIZE * 0.9f, SIZE * 0.9f);
         vertex(0, SIZE * 0.9f, SIZE * 0.8f);
         endShape();
+
+        // Draw leaves
+        for(Leaf l : leaves){
+            l.draw();
+        }
 
 
         surface.setTitle("Processing:"

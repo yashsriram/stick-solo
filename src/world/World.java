@@ -37,8 +37,12 @@ public class World {
 		this.MAX_CORNER = MAX_CORNER;
 		this.MIN_CORNER = MIN_CORNER;
 		
-		this.canyonShape = applet.loadShape("mountain.obj");
+		this.canyonShape = applet.loadShape("mountain_low.obj");
 		this.canyonTexture = applet.loadImage("wall_texture.jpg");
+		applet.noFill(); 
+		applet.noStroke();
+		this.canyonShape.setTexture(this.canyonTexture);
+		this.canyonShape.scale(40.0f);
 		this.landTexture = applet.loadImage("grass.png");
 		
 		this.obstacleShape = applet.loadShape("rock1.OBJ");
@@ -92,24 +96,17 @@ public class World {
 
 	private void drawCanyon() {
 		applet.pushMatrix();
-		applet.scale(40);
 		applet.rotateZ(-PApplet.PI/2);
-		applet.translate(20.5f,0.5f,0);
-		applet.noFill();
-		applet.noStroke();
-		this.canyonShape.setTexture(this.canyonTexture);
+		applet.translate(820,20,0);
 		applet.shape(this.canyonShape);
 		applet.popMatrix();
 		
 		applet.pushMatrix();
 		applet.rotateY(PApplet.PI/2);
 		applet.rotateZ(PApplet.PI);
-		applet.scale(40);
-		applet.translate(28, -3.5f, 0);
-		applet.noFill();
-		applet.noStroke();
+		applet.translate(1120, -140, 0);
 		applet.shape(this.canyonShape);
-		applet.translate(-15, 0, 0);
+		applet.translate(-600, 0, 0);
 		applet.shape(this.canyonShape);
 		applet.popMatrix();
 		

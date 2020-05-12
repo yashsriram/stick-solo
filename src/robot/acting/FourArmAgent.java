@@ -20,7 +20,9 @@ public class FourArmAgent {
     public static float REDUCE_SPEED = 0.00005f;
     public static float RECOVERY_RATE = 0.01f ;
     public static float NECK_SYNC_ITERATIONS = 150;
-    public static final Vec LEG_VECTOR = new Vec(-5, 5);
+    public static float WIND_FORCE_COEFFICIENT = 0.01f;
+    public static final Vec INIT_LEG_VECTOR = new Vec(-5, 5);
+    public static final Vec LEG_VECTOR = new Vec(-6, 3);
 
     public boolean isPaused = false;
 
@@ -63,8 +65,8 @@ public class FourArmAgent {
         this.tailGoal.headSet(tail);
         this.arm1.spawn(neck, new Vec(armLengths), new Vec(-PApplet.PI * 0.25f, -PApplet.PI * 0.25f));
         this.arm2.spawn(neck, new Vec(armLengths), new Vec(-PApplet.PI * 0.95f, PApplet.PI * 0.55f));
-        this.arm3.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI * 2 + PApplet.PI * 0.25f, PApplet.PI * 2 + PApplet.PI * 0.25f));
-        this.arm4.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI * 2 + PApplet.PI * 0.95f, PApplet.PI * 2 - PApplet.PI * 0.75f));
+        this.arm3.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI * 2 + PApplet.PI * 0.05f, PApplet.PI * 2 + PApplet.PI * 0.55f));
+        this.arm4.spawn(tail, new Vec(armLengths), new Vec(PApplet.PI * 2 + PApplet.PI * 0.95f, PApplet.PI * 2 - PApplet.PI * 0.55f));
         this.path = new ArrayList<>(path);
         this.nextMilestone = 0;
         this.state = 0;
@@ -76,6 +78,7 @@ public class FourArmAgent {
         MIN_LIMB_SPEED = INIT_LIMB_SPEED;
         isPaused = false;
         this.isRecharging = false;
+        LEG_VECTOR.headSet(INIT_LEG_VECTOR);
     }
 
     private void switchCurrentlyMovingLeg() {
@@ -133,14 +136,19 @@ public class FourArmAgent {
         }
     }
 
-    public boolean update(float dt) {
+    public boolean update(float dt){
+        Vec w = new Vec(0,0);
+        return update(dt, w);
+    }
+
+    public boolean update(float dt, Vec wind) {
         if (isPaused) {
             return false;
         }
         if (nextMilestone >= path.size()) {
             return false;
         }
-        if (ENERGY <= 0) {
+        if (ENERGY <= 5f) {
             isRecharging = true ;
         }
         if(isRecharging){
@@ -154,6 +162,7 @@ public class FourArmAgent {
             }
         }
         boolean shouldPlayClickSound = false;
+        REDUCE_ENERGY = 0.05f*ENERGY;
         switch (state) {
             // Set arm1 goal to next milestone or next + 1 milestone
             case 0:
@@ -184,6 +193,7 @@ public class FourArmAgent {
                     arm2.switchPivot();
                 }
                 Vec tailToBelowNeck = new Vec(neckGoal.get(0), neckGoal.get(1) + BODY_LENGTH);
+                tailToBelowNeck.plusInPlace(wind.scale(WIND_FORCE_COEFFICIENT));
                 tailGoal.headSet(tailToBelowNeck);
                 if (arm3.isStraight()) {
                     arm3.switchPivot();

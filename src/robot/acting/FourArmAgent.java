@@ -21,7 +21,8 @@ public class FourArmAgent {
     public static float RECOVERY_RATE = 0.01f ;
     public static float NECK_SYNC_ITERATIONS = 150;
     public static float WIND_FORCE_COEFFICIENT = 0.01f;
-    public static final Vec LEG_VECTOR = new Vec(-5, 5);
+    public static final Vec INIT_LEG_VECTOR = new Vec(-5, 5);
+    public static final Vec LEG_VECTOR = new Vec(-6, 3);
 
     public boolean isPaused = false;
 
@@ -77,6 +78,7 @@ public class FourArmAgent {
         MIN_LIMB_SPEED = INIT_LIMB_SPEED;
         isPaused = false;
         this.isRecharging = false;
+        LEG_VECTOR.headSet(INIT_LEG_VECTOR);
     }
 
     private void switchCurrentlyMovingLeg() {

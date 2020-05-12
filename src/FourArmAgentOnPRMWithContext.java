@@ -70,7 +70,8 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
     public void draw() {
         // Reset
         background(World.SKY_COLOR);
-
+        
+        float startTime = millis();
         // Update
         for (int i = 0; i < 15; i++) {
             this.pathChangeProcessing = fourArmAgent.switchPath;
@@ -87,11 +88,14 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
                 player.play(0);
             }
         }
+        float updateTime = millis();
 
         // Draw
         world.draw();
         fourArmAgent.draw();
         prm.draw();
+        
+        float drawTime = millis();
 
         // Draw Energy bar
         float energy = FourArmAgent.ENERGY;
@@ -110,6 +114,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
                 + " FPS: " + (int) frameRate
                 + " Search: " + SEARCH_ALGORITHM
         );
+        print("FPS:"+frameRate+" Update time:"+(updateTime-startTime)+" Draw time:"+(drawTime-updateTime)+"\n");
     }
 
     

@@ -28,28 +28,27 @@
 - [x] Two arm agent
 - [x] Gravity effect
 - [x] Two arm Two leg agent
-- [ ] Energy spent in some form
-- [ ] Worm agent
+- [x] Energy spent in some form
 
 # Obstacles
 - [x] Spherical obstacles, line segment obstacles
-- [x] Slippery holds
+- [x] Slippery holds and rock particle effects
 - [x] Re planning on obstacle collision or slipping
 
 # Effects
 - [x] Sound on pivot change
-- [ ] Rock particle effects while holding on
-- [ ] Waterfall
-- [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
-- [ ] Wind effects - both in body, particles
+- [x] Waterfall
+- [x] Wind effects - both in body, particles
 
 # Rendering
-- [ ] 3D context (holds, trees, waterfall, lavafall, birds) and sounds
-- [ ] 3D models for agent links (hands, legs, body and tail)?
+- [x] 3D context (holds, trees, waterfall, lavafall, birds) and sounds
 
 # Make a game
-- [ ] Multiple such agents trying to catch player
-- [ ] Shoot down agent from ground
+- [ ] Color according to energy
+- [ ] Competition b/w agents with slippery holds
+- [ ] 3D models for agent links (hands, legs, body and tail)?
+- [ ] Worm agent
+- [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 
 # Demos
 - [ ] Better path creations

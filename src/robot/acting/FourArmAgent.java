@@ -64,17 +64,9 @@ public class FourArmAgent {
     private PShape load(String shapeName) {
     	PShape shape = applet.loadShape("stickman/"+shapeName+".obj");
     	shape.scale(5);
-//    	if(shapeName.contains("leg")) {
-//    		shape.rotateX(PApplet.PI);
-//    		shape.rotateY(-PApplet.HALF_PI);
-//    		return shape;
-//    	}
     	if(shapeName.contains("arm") || shapeName.contains("hand")) {
     		shape.rotateY(PApplet.HALF_PI);
     	}
-//    	if(shapeName.contains("left_hand")) {
-//    		shape.rotateX(PApplet.PI);
-//    	}
     	return shape;
     }
 
@@ -323,11 +315,11 @@ public class FourArmAgent {
         applet.stroke(1);
 //        applet.strokeWeight(4);
 //        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
+        Vec color = new Vec(1-(ENERGY/INITIAL_ENERGY),(ENERGY/INITIAL_ENERGY),(ENERGY/INITIAL_ENERGY));
         applet.pushMatrix();
         applet.translate(0, tail.get(1), tail.get(0));
         applet.rotateX(PApplet.PI);
         applet.rotateY(PApplet.PI/2);
-//        applet.rotateZ(PApplet.atan2(neck.get(1)-tail.get(1), neck.get(0)-tail.get(0)));
         applet.shape(this.bodyShape);
         applet.popMatrix();
         applet.strokeWeight(1);
@@ -340,9 +332,9 @@ public class FourArmAgent {
         applet.box(3);
         applet.popMatrix();
 
-        arm1.draw();
-        arm2.draw();
-        arm3.draw();
-        arm4.draw();
+        arm1.draw(color);
+        arm2.draw(color);
+        arm3.draw(color);
+        arm4.draw(color);
     }
 }

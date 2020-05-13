@@ -50,14 +50,15 @@
 - [x] Competition b/w agents with slippery holds
 - [x] Tune params for Four arm agent demos
 
-- [ ] Change ground doesn't go with everything else; make it seem like agent is high above the ground
-- [ ] Improve colors of water and sky
-- [ ] Add obstacles
-- [ ] Add birds in sky from HW3
-- [ ] Improve agent rendering, 3D models for agent links (hands, legs, body and tail)?
+- [x] Change ground doesn't go with everything else; make it seem like agent is high above the ground
+- [x] Add obstacles
+- [x] Improve agent rendering, 3D models for agent links (hands, legs, body and tail)?
 
 - [x] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [x] Worm agent
+
+- [ ] Add birds in sky from HW3
+- [ ] Improve colors of water and sky
 
 # Demos
 - [ ] Better paths

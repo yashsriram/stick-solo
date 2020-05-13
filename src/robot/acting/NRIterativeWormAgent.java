@@ -278,10 +278,10 @@ public class NRIterativeWormAgent {
             applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
             applet.noStroke();
             applet.fill(0, 0, 1);
-            applet.pushMatrix();
-            applet.translate(0, end.get(1), end.get(0));
-            applet.box(1.5f);
-            applet.popMatrix();
+//            applet.pushMatrix();
+//            applet.translate(0, end.get(1), end.get(0));
+//            applet.box(1.5f);
+//            applet.popMatrix();
             start = end;
         }
         applet.strokeWeight(1);

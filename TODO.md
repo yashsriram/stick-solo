@@ -57,7 +57,7 @@
 - [ ] Improve agent rendering, 3D models for agent links (hands, legs, body and tail)?
 
 - [x] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
-- [ ] Worm agent
+- [x] Worm agent
 
 # Demos
 - [ ] Better paths

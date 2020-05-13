@@ -1,3 +1,5 @@
+package demos.fourarms;
+
 import camera.QueasyCam;
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
@@ -217,7 +219,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"FourArmAgentOnPRMWithContext"};
+        String[] appletArgs = new String[]{"demos.fourarms.FourArmAgentOnPRMWithContext"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

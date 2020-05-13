@@ -1,3 +1,5 @@
+package demos;
+
 import camera.QueasyCam;
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
@@ -10,7 +12,7 @@ import robot.sensing.PositionConfigurationSpace;
 
 import java.util.List;
 
-public class RRIterativeAgentOnPRM extends PApplet {
+public class WormAgentOnPRM extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
     private static final int SIZE = 100;
@@ -20,18 +22,21 @@ public class RRIterativeAgentOnPRM extends PApplet {
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
     private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
     private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
-    private static final float L1 = 10;
-    private static final float L2 = 5;
-    private static final float MAX_EDGE_LEN = L1 + L2;
-    private static final float MIN_EDGE_LEN = L1 - L2;
+    private static final float L1 = 5;
+    private static final float L2 = 10;
+    private static final float L3 = 5;
+    private static final float L4 = 10;
+    private static final float MAX_EDGE_LEN = L1 + L2 + L3 + L4 - 5;
+    private static final float MIN_EDGE_LEN = 0;
     private static final int NUM_MILESTONES = 500;
 
     QueasyCam cam;
+
     Minim minim;
     AudioPlayer player;
+    NRIterativeAgent nrIterativeAgent;
     PositionConfigurationSpace cs;
     PRM prm;
-    NRIterativeAgent nrIterativeAgent;
 
     public void settings() {
         size(WIDTH, HEIGHT, P3D);
@@ -46,7 +51,7 @@ public class RRIterativeAgentOnPRM extends PApplet {
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
-        nrIterativeAgent = new NRIterativeAgent(this, 2);
+        nrIterativeAgent = new NRIterativeAgent(this, 4);
         cs = new PositionConfigurationSpace(this, List.of());
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
@@ -58,8 +63,8 @@ public class RRIterativeAgentOnPRM extends PApplet {
         background(0);
 
         // Update
-        for(int i = 0 ; i < 10; i++){
-            boolean isPivotSwitched = nrIterativeAgent.update(0.0001f);
+        for (int i = 0; i < 15; i++) {
+            boolean isPivotSwitched = nrIterativeAgent.update(0.00001f);
             if (isPivotSwitched) {
                 player.play(0);
             }
@@ -91,33 +96,33 @@ public class RRIterativeAgentOnPRM extends PApplet {
         }
         if (key == '1') {
             List<Milestone> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
             List<Milestone> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
             List<Milestone> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
             List<Milestone> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
             List<Milestone> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2), new Vec(0, 0));
+            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
             SEARCH_ALGORITHM = "weighted A*";
         }
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"RRIterativeAgentOnPRM"};
+        String[] appletArgs = new String[]{"demos.WormAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

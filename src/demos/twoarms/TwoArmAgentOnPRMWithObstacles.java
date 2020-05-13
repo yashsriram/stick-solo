@@ -1,3 +1,5 @@
+package demos.twoarms;
+
 import camera.QueasyCam;
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
@@ -164,7 +166,7 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"TwoArmAgentOnPRMWithObstacles"};
+        String[] appletArgs = new String[]{"demos.twoarms.TwoArmAgentOnPRMWithObstacles"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

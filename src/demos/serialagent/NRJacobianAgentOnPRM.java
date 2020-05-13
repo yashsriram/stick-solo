@@ -1,3 +1,5 @@
+package demos.serialagent;
+
 import camera.QueasyCam;
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
@@ -120,7 +122,7 @@ public class NRJacobianAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"NRJacobianAgentOnPRM"};
+        String[] appletArgs = new String[]{"serialagentdemos.NRJacobianAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

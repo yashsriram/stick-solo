@@ -1,3 +1,5 @@
+package demos;
+
 import camera.QueasyCam;
 import math.Vec;
 import processing.core.PApplet;
@@ -99,7 +101,7 @@ public class CircularAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"CircularAgentOnPRM"};
+        String[] appletArgs = new String[]{"demos.CircularAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

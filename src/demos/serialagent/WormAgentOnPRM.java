@@ -71,7 +71,7 @@ public class WormAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-            boolean isPivotSwitched = nrIterativeWormAgent.update(0.0003f);
+            boolean isPivotSwitched = nrIterativeWormAgent.update(0.00003f);
             if (isPivotSwitched) {
                 player.play(0);
             }

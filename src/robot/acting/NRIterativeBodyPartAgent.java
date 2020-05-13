@@ -194,10 +194,10 @@ public class NRIterativeBodyPartAgent {
         applet.translate(0, pivot.get(1), pivot.get(0));
         applet.box(1.5f);
         applet.popMatrix();
-        
+
         if(this.shape1 != null && this.shape2 != null) {
-        	drawLimb();
-        	return;
+            drawLimb(color);
+            return;
         }
 
         // Links
@@ -214,7 +214,7 @@ public class NRIterativeBodyPartAgent {
             float length = lengths.get(i);
             Vec end = start.plus(direction.scale(length));
             // Draw link
-            applet.stroke(color.get(0), color.get(1), color.get(2));
+            applet.stroke(1);
             applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
             applet.noStroke();
             applet.pushMatrix();
@@ -277,6 +277,39 @@ public class NRIterativeBodyPartAgent {
             start = end;
         }
         applet.strokeWeight(1);
+    }
+
+    private void drawLimb(Vec color) {
+        List<Vec> ends = getLinkEnds();
+        boolean changeShape = this.isStraight;
+        this.shape1.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
+        this.shape2.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
+        for (int i = 0; i < ends.size()-1; i++) {
+            Vec start;
+            Vec end;
+            if(this.isStraight) {
+                start = ends.get(i);
+                end = ends.get(i+1);
+            }else {
+                start = ends.get(i+1);
+                end = ends.get(i);
+            }
+            applet.stroke(1);
+            applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
+            float theta = PApplet.atan2(end.get(1)-start.get(1), end.get(0)-start.get(0));
+            PShape shape;
+            if(changeShape) {shape = shape1;} else { shape = shape2;}
+            applet.pushMatrix();
+//            applet.translate( 0, (start.get(1)+end.get(1))/2, (start.get(0)+end.get(0))/2);
+            applet.translate( 0, end.get(1), end.get(0));
+//            applet.rotateX(PApplet.PI);
+//            applet.rotateY(PApplet.PI/2);
+            applet.rotateX(-theta);
+            applet.shape(shape);
+            applet.popMatrix();
+            changeShape = !changeShape;
+            start = end;
+        }
     }
 
 	private void drawLimb() {

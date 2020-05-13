@@ -110,7 +110,7 @@ public class FourArmAgentOnPRM extends PApplet {
         prm.draw();
 
         // Draw Energy bar
-        float energy = FourArmAgent.ENERGY;
+        float energy = fourArmAgent.energy;
         beginShape();
         stroke(0, 255, 0);
         fill(0, 255, 0);

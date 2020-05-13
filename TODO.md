@@ -45,7 +45,7 @@
 - [x] 3D context (holds, trees, waterfall, lavafall, birds) and sounds
 
 # Polishing
-- [ ] Improve leaf effects especially in with context demo
+- [x] Improve leaf effects especially in with context demo
 - [ ] Color according to energy, remove energy bar
 - [ ] Competition b/w agents with slippery holds
 - [ ] Tune params for Four arm agent demos

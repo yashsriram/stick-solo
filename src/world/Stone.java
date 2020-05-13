@@ -13,6 +13,7 @@ public class Stone {
 	List<Particle> dust;
 	boolean dustEnded = false;
 	private PApplet applet;
+	boolean isDead = false;
 	
 	public void update(float dt) {
 		if(position.get(1) < 150) {

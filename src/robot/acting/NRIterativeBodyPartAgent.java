@@ -3,6 +3,7 @@ package robot.acting;
 import math.Angle;
 import math.Vec;
 import processing.core.PApplet;
+import processing.core.PShape;
 import robot.planning.ik.NRIKSolver;
 import robot.sensing.PositionConfigurationSpace;
 
@@ -29,6 +30,19 @@ public class NRIterativeBodyPartAgent {
     private final Vec jointTuple;
     private final Vec goal = new Vec(0, 0);
 
+	private PShape shape1;
+	private PShape shape2;
+
+    public NRIterativeBodyPartAgent(PApplet applet, int id, int N, PShape shape1, PShape shape2) {
+        this.applet = applet;
+        this.id = id;
+        this.N = N;
+        this.lengths = new Vec(new float[N]);
+        this.jointTuple = new Vec(new float[N]);
+        this.shape1 = shape1;
+        this.shape2 = shape2;
+    }
+    
     public NRIterativeBodyPartAgent(PApplet applet, int id, int N) {
         this.applet = applet;
         this.id = id;
@@ -180,6 +194,11 @@ public class NRIterativeBodyPartAgent {
         applet.translate(0, pivot.get(1), pivot.get(0));
         applet.box(1.5f);
         applet.popMatrix();
+        
+        if(this.shape1 != null && this.shape2 != null) {
+        	drawLimb();
+        	return;
+        }
 
         // Links
         Vec start = new Vec(pivot);
@@ -207,5 +226,36 @@ public class NRIterativeBodyPartAgent {
         }
         applet.strokeWeight(1);
     }
+
+	private void drawLimb() {
+        List<Vec> ends = getLinkEnds();
+        boolean changeShape = this.isStraight;
+        for (int i = 0; i < ends.size()-1; i++) {
+            Vec start;
+            Vec end;
+            if(this.isStraight) {
+            	start = ends.get(i);
+            	end = ends.get(i+1);
+            }else {
+            	start = ends.get(i+1);
+            	end = ends.get(i);
+            }
+            applet.stroke(1);
+            applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
+            float theta = PApplet.atan2(end.get(1)-start.get(1), end.get(0)-start.get(0));
+            PShape shape;
+            if(changeShape) {shape = shape1;} else { shape = shape2;}
+            applet.pushMatrix();
+//            applet.translate( 0, (start.get(1)+end.get(1))/2, (start.get(0)+end.get(0))/2);
+            applet.translate( 0, end.get(1), end.get(0));
+//            applet.rotateX(PApplet.PI);
+//            applet.rotateY(PApplet.PI/2);
+            applet.rotateX(-theta);
+            applet.shape(shape);
+            applet.popMatrix();
+            changeShape = !changeShape;
+            start = end;
+        }
+    }	
 
 }

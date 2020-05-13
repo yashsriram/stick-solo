@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class World {
-	public static int SKY_COLOR = 9687551;
+	public static int SKY_COLOR = 0;//9687551;
 	private PImage wallTexture;
 	private PApplet applet;
 	private Vec MAX_CORNER;
@@ -64,7 +64,7 @@ public class World {
 	
 	public void update(float dt) {
         for (Stone stone : stones) {
-            stone.update(dt);
+        	stone.update(dt);
         }
         
         this.waterfall.update(dt);

@@ -2,6 +2,7 @@ package robot.acting;
 
 import math.Vec;
 import processing.core.PApplet;
+import processing.core.PShape;
 import robot.planning.prm.Milestone;
 import robot.sensing.PositionConfigurationSpace;
 
@@ -47,13 +48,34 @@ public class FourArmAgent {
     private ArrayList newPath;
     private boolean isRecharging;
     public boolean switchPath;
+	private PShape neckShape;
+	private PShape bodyShape;
 
     public FourArmAgent(PApplet applet) {
         this.applet = applet;
-        this.arm1 = new NRIterativeBodyPartAgent(applet, 0, 2);
-        this.arm2 = new NRIterativeBodyPartAgent(applet, 1, 2);
-        this.arm3 = new NRIterativeBodyPartAgent(applet, 2, 2);
-        this.arm4 = new NRIterativeBodyPartAgent(applet, 3, 2);
+        this.arm1 = new NRIterativeBodyPartAgent(applet, 0, 2, load("right_arm"), load("right_hand"));
+        this.arm2 = new NRIterativeBodyPartAgent(applet, 1, 2, load("left_arm"), load("left_hand"));
+        this.arm3 = new NRIterativeBodyPartAgent(applet, 2, 2, load("left_thigh"), load("left_leg"));
+        this.arm4 = new NRIterativeBodyPartAgent(applet, 3, 2, load("right_thigh"), load("right_leg"));
+//        this.neckShape = load("neck");
+        this.bodyShape = load("body");
+    }
+    
+    private PShape load(String shapeName) {
+    	PShape shape = applet.loadShape("stickman/"+shapeName+".obj");
+    	shape.scale(5);
+//    	if(shapeName.contains("leg")) {
+//    		shape.rotateX(PApplet.PI);
+//    		shape.rotateY(-PApplet.HALF_PI);
+//    		return shape;
+//    	}
+    	if(shapeName.contains("arm") || shapeName.contains("hand")) {
+    		shape.rotateY(PApplet.HALF_PI);
+    	}
+//    	if(shapeName.contains("left_hand")) {
+//    		shape.rotateX(PApplet.PI);
+//    	}
+    	return shape;
     }
 
     public void spawn(Vec neck, Vec tail, float neckToArmDistance, List<Milestone> path, Vec armLengths, float initial_energy) {
@@ -291,15 +313,23 @@ public class FourArmAgent {
         // Neck
         applet.noStroke();
         applet.pushMatrix();
-        applet.fill(1, 1, 0);
         applet.translate(0, neck.get(1), neck.get(0));
-        applet.box(3);
+        applet.rotateX(PApplet.PI);
+        applet.rotateY(PApplet.PI/2);
+//        applet.shape(this.neckShape);
         applet.popMatrix();
 
         // Body
         applet.stroke(1);
-        applet.strokeWeight(4);
-        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
+//        applet.strokeWeight(4);
+//        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
+        applet.pushMatrix();
+        applet.translate(0, tail.get(1), tail.get(0));
+        applet.rotateX(PApplet.PI);
+        applet.rotateY(PApplet.PI/2);
+//        applet.rotateZ(PApplet.atan2(neck.get(1)-tail.get(1), neck.get(0)-tail.get(0)));
+        applet.shape(this.bodyShape);
+        applet.popMatrix();
         applet.strokeWeight(1);
 
         // Tail

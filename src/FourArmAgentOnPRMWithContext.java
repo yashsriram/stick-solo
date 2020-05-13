@@ -79,6 +79,8 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
     public void draw() {
         // Reset
         background(World.SKY_COLOR);
+    	lights();
+        directionalLight(1f,1f,1f, 1, 1, 0);   // light from above
         
         float startTime = millis();
         // Update

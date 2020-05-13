@@ -327,12 +327,12 @@ public class FourArmAgent {
         applet.strokeWeight(1);
 
         // Tail
-        applet.noStroke();
-        applet.pushMatrix();
-        applet.fill(1, 1, 0);
-        applet.translate(0, tail.get(1), tail.get(0));
-        applet.box(3);
-        applet.popMatrix();
+//        applet.noStroke();
+//        applet.pushMatrix();
+//        applet.fill(1, 1, 0);
+//        applet.translate(0, tail.get(1), tail.get(0));
+//        applet.box(3);
+//        applet.popMatrix();
 
         arm1.draw(color);
         arm2.draw(color);

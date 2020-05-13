@@ -46,9 +46,9 @@
 
 # Polishing
 - [x] Improve leaf effects especially in with context demo
-- [ ] Color according to energy, remove energy bar
-- [ ] Competition b/w agents with slippery holds
-- [ ] Tune params for Four arm agent demos
+- [x] Color according to energy, remove energy bar
+- [x] Competition b/w agents with slippery holds
+- [x] Tune params for Four arm agent demos
 
 - [ ] Change ground doesn't go with everything else; make it seem like agent is high above the ground
 - [ ] Improve colors of water and sky

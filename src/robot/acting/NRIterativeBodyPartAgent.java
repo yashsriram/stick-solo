@@ -162,6 +162,53 @@ public class NRIterativeBodyPartAgent {
         return false;
     }
 
+    public void draw(Vec color){
+        if (DRAW_GOAL) {
+            // Goal milestone
+            applet.noStroke();
+            applet.pushMatrix();
+            applet.fill(1, 0, 0);
+            applet.translate(0, goal.get(1), goal.get(0));
+            applet.box(1);
+            applet.popMatrix();
+        }
+
+        // Pivot
+        applet.pushMatrix();
+        applet.noStroke();
+        applet.fill(0, 1, 0);
+        applet.translate(0, pivot.get(1), pivot.get(0));
+        applet.box(1.5f);
+        applet.popMatrix();
+
+        // Links
+        Vec start = new Vec(pivot);
+        Vec direction = new Vec(1f, 0f);
+        applet.noFill();
+        applet.stroke(1);
+        applet.strokeWeight(4);
+        for (int i = 0; i < jointTuple.getNumElements(); i++) {
+            // Rotate
+            float theta = jointTuple.get(i);
+            direction = RotMat.of(theta).mult(direction);
+            // Translate
+            float length = lengths.get(i);
+            Vec end = start.plus(direction.scale(length));
+            // Draw link
+            applet.stroke(color.get(0), color.get(1), color.get(2));
+            applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
+            applet.noStroke();
+            applet.pushMatrix();
+            applet.fill(0, 0, 1);
+            applet.translate(0, end.get(1), end.get(0));
+            applet.box(1.5f);
+            applet.popMatrix();
+            start = end;
+        }
+        applet.strokeWeight(1);
+
+    }
+
     public void draw() {
         if (DRAW_GOAL) {
             // Goal milestone

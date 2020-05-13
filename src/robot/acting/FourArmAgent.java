@@ -297,7 +297,8 @@ public class FourArmAgent {
         applet.popMatrix();
 
         // Body
-        applet.stroke(1);
+        Vec color = new Vec(1-(ENERGY/INITIAL_ENERGY),(ENERGY/INITIAL_ENERGY),(ENERGY/INITIAL_ENERGY));
+        applet.stroke(color.get(0), color.get(1), color.get(2));
         applet.strokeWeight(4);
         applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
         applet.strokeWeight(1);
@@ -310,9 +311,9 @@ public class FourArmAgent {
         applet.box(3);
         applet.popMatrix();
 
-        arm1.draw();
-        arm2.draw();
-        arm3.draw();
-        arm4.draw();
+        arm1.draw(color);
+        arm2.draw(color);
+        arm3.draw(color);
+        arm4.draw(color);
     }
 }

@@ -9,6 +9,7 @@ import robot.acting.FourArmAgent;
 import robot.acting.NRIterativeBodyPartAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
+import robot.sensing.CircleObstacle;
 import robot.sensing.PositionConfigurationSpace;
 import world.Leaf;
 import world.World;
@@ -64,9 +65,12 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
         fourArmAgent = new FourArmAgent(this);
-        cs = new PositionConfigurationSpace(this, List.of());
+        cs = new PositionConfigurationSpace(this, List.of(
+                new CircleObstacle(this, new Vec(-10, -20), 15, new Vec(1, 0, 1))
+        ));
         world = new World(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
         prm = new PRM(this);
+        prm.margin = 5;
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
         NRIterativeBodyPartAgent.METHOD = NRIterativeBodyPartAgent.IKMethod.JACOBIAN_TRANSPOSE;
@@ -181,26 +185,31 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         }
         if (key == '1') {
             List<Milestone> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            path.get(path.size()/2).slippery = true;
             fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
             List<Milestone> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            path.get(path.size()/2).slippery = true;
             fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
             List<Milestone> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            path.get(path.size()/2).slippery = true;
             fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
             List<Milestone> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            path.get(path.size()/2).slippery = true;
             fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
             List<Milestone> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
+            path.get(path.size()/2).slippery = true;
             fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "weighted A*";
         }

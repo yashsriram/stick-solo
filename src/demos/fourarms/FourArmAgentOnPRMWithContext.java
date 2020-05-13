@@ -90,16 +90,16 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         directionalLight(1f,1f,1f, 1, 1, 0);   // light from above
         
         float startTime = millis();
+        if (!this.pathChangeProcessing) {
+            // While it's already changing path, don't do any replanning
+            if (fourArmAgent.doesIntersect(cs)) {
+                replan();
+            }
+            checkSlippery();
+        }
         // Update
         for (int i = 0; i < 15; i++) {
             this.pathChangeProcessing = fourArmAgent.switchPath;
-            if (!this.pathChangeProcessing) {
-                // While it's already changing path, don't do any replanning
-                if (fourArmAgent.doesIntersect(cs)) {
-                    replan();
-                }
-                checkSlippery();
-            }
             world.update(0.01f);
             boolean playSound = fourArmAgent.update(0.001f);
             if (playSound) {

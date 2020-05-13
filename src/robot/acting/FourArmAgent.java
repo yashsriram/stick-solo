@@ -176,6 +176,11 @@ public class FourArmAgent {
         switch (state) {
             // Set arm1 goal to next milestone or next + 1 milestone
             case 0:
+            	if(this.switchPath) {
+            		this.path = new ArrayList<>(newPath);
+                	this.nextMilestone = 0;
+                	this.switchPath = false;
+            	}
                 if (!currentlyMovingArm.isStraight()) {
                     currentlyMovingArm.switchPivot();
                 }

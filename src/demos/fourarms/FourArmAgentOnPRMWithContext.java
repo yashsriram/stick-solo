@@ -115,18 +115,6 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         
         float drawTime = millis();
 
-        // Draw Energy bar
-        float energy = fourArmAgent.energy;
-        beginShape();
-        stroke(0, 255, 0);
-        fill(0, 255, 0);
-        float ht = energy / INITIAL_ENERGY;
-        vertex(0, SIZE * (0.9f - 2 * ht / 10), SIZE * 0.8f);
-        vertex(0, SIZE * (0.9f - 2 * ht / 10), SIZE * 0.9f);
-        vertex(0, SIZE * 0.9f, SIZE * 0.9f);
-        vertex(0, SIZE * 0.9f, SIZE * 0.8f);
-        endShape();
-
         // Draw leaves
         for(Leaf l : leaves){
             l.draw();

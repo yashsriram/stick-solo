@@ -25,6 +25,7 @@ public class NRIterativeAgent {
     private final Vec pivotPosition = new Vec(0f, 0f);
     private final Vec lengths;
     private final Vec jointTuple;
+    private final List<Vec> freeEndPath = new ArrayList<>();
 
     private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 1;
@@ -100,6 +101,7 @@ public class NRIterativeAgent {
         for (int i = lengthsCopy.getNumElements() - 1; i >= 0; i--) {
             lengths.set(lengthsCopy.getNumElements() - 1 - i, lengthsCopy.get(i));
         }
+        freeEndPath.clear();
     }
 
     public boolean update(float dt) {
@@ -108,7 +110,9 @@ public class NRIterativeAgent {
         }
         if (nextMilestone < path.size()) {
             // Reached next milestone
-            if (Vec.dist(getFreeEnd(), path.get(nextMilestone).position) < MILESTONE_REACHED_SLACK) {
+            Vec freeEnd = getFreeEnd();
+            freeEndPath.add(new Vec(freeEnd));
+            if (Vec.dist(freeEnd, path.get(nextMilestone).position) < MILESTONE_REACHED_SLACK) {
                 switchPivot();
                 nextMilestone++;
                 isMinSpeedLimitCalculated = false;
@@ -143,7 +147,7 @@ public class NRIterativeAgent {
     }
 
     public void draw() {
-        // path
+        // Path
         applet.stroke(1);
         for (int i = 0; i < path.size() - 1; i++) {
             Vec v1 = path.get(i).position;
@@ -153,11 +157,20 @@ public class NRIterativeAgent {
         applet.noStroke();
         applet.fill(1);
         for (Milestone milestone : path) {
-        	Vec v  = milestone.position;
+            Vec v = milestone.position;
             applet.pushMatrix();
             applet.translate(0, v.get(1), v.get(0));
             applet.box(1);
             applet.popMatrix();
+        }
+        applet.noStroke();
+
+        // Free end path
+        applet.stroke(1, 1, 0);
+        for (int i = 0; i < freeEndPath.size() - 1; i++) {
+            Vec v1 = freeEndPath.get(i);
+            Vec v2 = freeEndPath.get(i + 1);
+            applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
         }
         applet.noStroke();
 

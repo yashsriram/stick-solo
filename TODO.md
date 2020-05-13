@@ -56,7 +56,7 @@
 - [ ] Add birds in sky from HW3
 - [ ] Improve agent rendering, 3D models for agent links (hands, legs, body and tail)?
 
-- [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
+- [x] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [ ] Worm agent
 
 # Demos

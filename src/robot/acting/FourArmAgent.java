@@ -11,13 +11,14 @@ import java.util.List;
 
 public class FourArmAgent {
     public static boolean DRAW_PATH = true;
+    public static boolean DRAW_BODY = false;
     public static float INIT_LIMB_SPEED = 0.006f;
     public static float NECK_SPEED = 0.01f;
     public static float BODY_LENGTH;
-    public static float INITIAL_ENERGY ;
+    public static float INITIAL_ENERGY;
     public static float REDUCE_ENERGY = 1f;
     public static float REDUCE_SPEED = 0.00005f;
-    public static float RECOVERY_RATE = 0.05f ;
+    public static float RECOVERY_RATE = 0.05f;
     public static float NECK_SYNC_ITERATIONS = 150;
     public static float WIND_FORCE_COEFFICIENT = 0.01f;
     public static final Vec INIT_LEG_VECTOR = new Vec(-5, 5);
@@ -39,9 +40,9 @@ public class FourArmAgent {
     private final Vec tailGoal = new Vec(tail);
     private NRIterativeBodyPartAgent currentlyMovingArm;
     private NRIterativeBodyPartAgent currentlyMovingLeg;
-    private Vec legVector = new Vec(0, 0) ;
-    public float energy ;
-    public float min_limb_speed ;
+    private Vec legVector = new Vec(0, 0);
+    public float energy;
+    public float min_limb_speed;
 
     private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 0;
@@ -49,8 +50,8 @@ public class FourArmAgent {
     private ArrayList newPath;
     private boolean isRecharging;
     public boolean switchPath;
-	private PShape neckShape;
-	private PShape bodyShape;
+    private PShape neckShape;
+    private PShape bodyShape;
 
     public FourArmAgent(PApplet applet) {
         this.applet = applet;
@@ -61,14 +62,14 @@ public class FourArmAgent {
 //        this.neckShape = load("neck");
         this.bodyShape = load("body");
     }
-    
+
     private PShape load(String shapeName) {
-    	PShape shape = applet.loadShape("stickman/"+shapeName+".obj");
-    	shape.scale(5);
-    	if(shapeName.contains("arm") || shapeName.contains("hand")) {
-    		shape.rotateY(PApplet.HALF_PI);
-    	}
-    	return shape;
+        PShape shape = applet.loadShape("stickman/" + shapeName + ".obj");
+        shape.scale(5);
+        if (shapeName.contains("arm") || shapeName.contains("hand")) {
+            shape.rotateY(PApplet.HALF_PI);
+        }
+        return shape;
     }
 
     public void spawn(Vec neck, Vec tail, float neckToArmDistance, List<Milestone> path, Vec armLengths, float initial_energy) {
@@ -140,13 +141,13 @@ public class FourArmAgent {
         return milestones;
     }
 
-    public boolean update(float dt){
-        Vec w = new Vec(0,0);
+    public boolean update(float dt) {
+        Vec w = new Vec(0, 0);
         return update(dt, w);
     }
 
-    public Vec getGoal(){
-        Milestone m = this.path.get(this.path.size()-1);
+    public Vec getGoal() {
+        Milestone m = this.path.get(this.path.size() - 1);
         return m.position;
     }
 
@@ -158,20 +159,20 @@ public class FourArmAgent {
             return false;
         }
         if (this.energy <= 5f) {
-            isRecharging = true ;
+            isRecharging = true;
         }
-        if(isRecharging){
-            if(this.energy < INITIAL_ENERGY){
-                this.energy += RECOVERY_RATE ;
+        if (isRecharging) {
+            if (this.energy < INITIAL_ENERGY) {
+                this.energy += RECOVERY_RATE;
                 this.min_limb_speed = INIT_LIMB_SPEED;
                 return false;
-            }else{
-                isRecharging = false ;
+            } else {
+                isRecharging = false;
                 return false;
             }
         }
         boolean shouldPlayClickSound = false;
-        REDUCE_ENERGY = 0.05f*this.energy;
+        REDUCE_ENERGY = 0.05f * this.energy;
         switch (state) {
             // Set arm1 goal to next milestone or next + 1 milestone
             case 0:
@@ -257,7 +258,6 @@ public class FourArmAgent {
                     state = 0;
                     this.energy -= REDUCE_ENERGY;
                     this.min_limb_speed -= REDUCE_SPEED;
-                    shouldPlayClickSound = true;
                     switchCurrentlyMovingLeg();
                     this.legVector.headSet(-this.legVector.get(0), this.legVector.get(1));
                 }
@@ -287,44 +287,54 @@ public class FourArmAgent {
         }
         applet.noStroke();
 
-        // Next milestone
-        if (nextMilestone < path.size()) {
+        // Body
+//        applet.strokeWeight(4);
+//        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
+        if (DRAW_BODY) {
+            Vec color = new Vec(1 - (this.energy / INITIAL_ENERGY), 0, (this.energy / INITIAL_ENERGY));
+            this.bodyShape.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
+            applet.pushMatrix();
+            applet.translate(0, tail.get(1), tail.get(0));
+            applet.rotateX(PApplet.PI);
+            applet.rotateY(PApplet.PI / 2);
+            applet.shape(this.bodyShape);
+            applet.popMatrix();
+//
+            arm1.draw(color);
+            arm2.draw(color);
+            arm3.draw(color);
+            arm4.draw(color);
+        } else {
+            // Next milestone
+            if (nextMilestone < path.size()) {
+                applet.noStroke();
+                applet.pushMatrix();
+                applet.fill(1, 0, 0);
+                applet.translate(0, path.get(nextMilestone).position.get(1), path.get(nextMilestone).position.get(0));
+                applet.box(1);
+                applet.popMatrix();
+            }
+
+            // Neck
             applet.noStroke();
             applet.pushMatrix();
-            applet.fill(1, 0, 0);
-            applet.translate(0, path.get(nextMilestone).position.get(1), path.get(nextMilestone).position.get(0));
-            applet.box(1);
-            applet.popMatrix();
-        }
-
-        // Neck
-        applet.noStroke();
-        applet.pushMatrix();
-        applet.translate(0, neck.get(1), neck.get(0));
-        applet.rotateX(PApplet.PI);
-        applet.rotateY(PApplet.PI/2);
+            applet.translate(0, neck.get(1), neck.get(0));
+            applet.rotateX(PApplet.PI);
+            applet.rotateY(PApplet.PI / 2);
 //        applet.shape(this.neckShape);
-        applet.popMatrix();
+            applet.popMatrix();
+            applet.stroke(1);
+            Vec color = new Vec(1 - (this.energy / INITIAL_ENERGY), (this.energy / INITIAL_ENERGY), (this.energy / INITIAL_ENERGY));
+            applet.stroke(color.get(0), color.get(1), color.get(2));
+            applet.strokeWeight(4);
+            applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
+            applet.strokeWeight(1);
 
-        // Body
-        applet.stroke(1);
-//        applet.strokeWeight(4);
-//        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
-        Vec color = new Vec(1-(this.energy/INITIAL_ENERGY),0,(this.energy/INITIAL_ENERGY));
-        this.bodyShape.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
-        applet.pushMatrix();
-        applet.translate(0, tail.get(1), tail.get(0));
-        applet.rotateX(PApplet.PI);
-        applet.rotateY(PApplet.PI/2);
-        applet.shape(this.bodyShape);
-        applet.popMatrix();
-
-//        Vec color = new Vec(1-(this.energy/INITIAL_ENERGY),(this.energy/INITIAL_ENERGY),(this.energy/INITIAL_ENERGY));
-//        applet.stroke(color.get(0), color.get(1), color.get(2));
-//        applet.strokeWeight(4);
-//        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
-
-        applet.strokeWeight(1);
+            arm1.draw(color);
+            arm2.draw(color);
+            arm3.draw(color);
+            arm4.draw(color);
+        }
 
         // Tail
 //        applet.noStroke();
@@ -333,10 +343,5 @@ public class FourArmAgent {
 //        applet.translate(0, tail.get(1), tail.get(0));
 //        applet.box(3);
 //        applet.popMatrix();
-
-        arm1.draw(color);
-        arm2.draw(color);
-        arm3.draw(color);
-        arm4.draw(color);
     }
 }

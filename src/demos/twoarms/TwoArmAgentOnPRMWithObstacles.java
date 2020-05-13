@@ -38,9 +38,9 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
     TwoArmAgent twoArmAgent;
     PRM prm;
     PositionConfigurationSpace cs;
-	private boolean pathChangeProcessing = false;
+    private boolean pathChangeProcessing = false;
 
-	public void settings() {
+    public void settings() {
         size(WIDTH, HEIGHT, P3D);
     }
 
@@ -56,12 +56,10 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         this.randomSeed(0);
         twoArmAgent = new TwoArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of(
-                new LineSegmentObstacle(this, new Vec(-20, -20), new Vec(20, -20), new Vec(1, 0, 1)),
-                new LineSegmentObstacle(this, new Vec(-20, 20), new Vec(20, 20), new Vec(1, 0, 1)),
-                new LineSegmentObstacle(this, new Vec(-20, -20), new Vec(-20, 20), new Vec(1, 0, 1)),
-                new LineSegmentObstacle(this, new Vec(20, -20), new Vec(20, 20), new Vec(1, 0, 1)),
-                new CircleObstacle(this, new Vec(0, 20), 20, new Vec(1, 0, 1)),
-                new CircleObstacle(this, new Vec(0, -20), 20, new Vec(1, 0, 1))
+                new LineSegmentObstacle(this, new Vec(0, -SIZE), new Vec(0, -40), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(0, 40), new Vec(0, SIZE), new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(0, -40), 15, new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(0, 40), 15, new Vec(1, 0, 1))
         ));
         prm = new PRM(this);
         prm.margin = L1 * 1.5f;
@@ -75,12 +73,12 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-        	this.pathChangeProcessing = twoArmAgent.switchPath;
-        	if(!this.pathChangeProcessing) {
-        		// While it's already changing path, don't do any replanning 
-        		if(twoArmAgent.doesIntersect(cs)){replan();}
-        		checkSlippery();
-        	}
+//        	this.pathChangeProcessing = twoArmAgent.switchPath;
+//        	if(!this.pathChangeProcessing) {
+//        		// While it's already changing path, don't do any replanning
+//        		if(twoArmAgent.doesIntersect(cs)){replan();}
+//        		checkSlippery();
+//        	}
             boolean playSound = twoArmAgent.update(0.00001f);
             if (playSound) {
                 player.play(0);
@@ -98,23 +96,27 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         );
     }
 
-	private void checkSlippery() {
-		List<Milestone> milestones = twoArmAgent.getMilestones();
-		if(milestones.size() <= 0) { return;}
-		Milestone milestone = milestones.get(0);
-		if(milestone.slippery) {
-			prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
-			replan();
-		}
-	}
+    private void checkSlippery() {
+        List<Milestone> milestones = twoArmAgent.getMilestones();
+        if (milestones.size() <= 0) {
+            return;
+        }
+        Milestone milestone = milestones.get(0);
+        if (milestone.slippery) {
+            prm.removeMilestones(new ArrayList<>(Arrays.asList(milestone)));
+            replan();
+        }
+    }
 
-	void replan() {
-		if(pathChangeProcessing ) {return;}
-    	if(!twoArmAgent.goalReached()) {
-    		prm.removeMilestones(twoArmAgent.getMilestones());
-        	List<Milestone> path = prm.aStar(twoArmAgent.neck, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-        	twoArmAgent.setPath(path);
-    	}
+    void replan() {
+        if (pathChangeProcessing) {
+            return;
+        }
+        if (!twoArmAgent.goalReached()) {
+            prm.removeMilestones(twoArmAgent.getMilestones());
+            List<Milestone> path = prm.aStar(twoArmAgent.neck, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+            twoArmAgent.setPath(path);
+        }
     }
 
     @Override
@@ -135,9 +137,9 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
             TwoArmAgent.DRAW_PATH = !TwoArmAgent.DRAW_PATH;
         }
         if (key == 'r') {
-        	this.replan();
+            this.replan();
         }
-        
+
         if (key == '1') {
             List<Milestone> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
             twoArmAgent.spawn(START_POSITION.plus(new Vec(0, NECK_ARM_DIST)), NECK_ARM_DIST, path, new Vec(L1, L2));

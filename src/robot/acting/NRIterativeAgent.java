@@ -55,6 +55,7 @@ public class NRIterativeAgent {
         this.jointTuple.headSet(jointTuple);
         this.path = new ArrayList<>(path);
         this.nextMilestone = 1;
+        this.freeEndPath.clear();
     }
 
     private List<Vec> getLinkEnds() {

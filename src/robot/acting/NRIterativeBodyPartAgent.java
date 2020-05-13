@@ -16,6 +16,7 @@ public class NRIterativeBodyPartAgent {
 
     public final int id;
 
+    public static boolean DRAW_LIMBS = false;
     public static boolean DRAW_GOAL = false;
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;
@@ -30,8 +31,8 @@ public class NRIterativeBodyPartAgent {
     private final Vec jointTuple;
     private final Vec goal = new Vec(0, 0);
 
-	private PShape shape1;
-	private PShape shape2;
+    private PShape shape1;
+    private PShape shape2;
 
     public NRIterativeBodyPartAgent(PApplet applet, int id, int N, PShape shape1, PShape shape2) {
         this.applet = applet;
@@ -42,7 +43,7 @@ public class NRIterativeBodyPartAgent {
         this.shape1 = shape1;
         this.shape2 = shape2;
     }
-    
+
     public NRIterativeBodyPartAgent(PApplet applet, int id, int N) {
         this.applet = applet;
         this.id = id;
@@ -102,19 +103,23 @@ public class NRIterativeBodyPartAgent {
         }
         return ends;
     }
-    
+
     public boolean doesIntersect(PositionConfigurationSpace cs) {
-    	List<Vec> points = this.getLinkEnds();
-    	boolean intersect = false;
-    	for(int i=0; i<points.size()-1; i++) {
-    		intersect = intersect || cs.doesIntersect(points.get(i), 5);
-    		if(intersect) {return true;}
-    	}
-    	for(int i=0; i<points.size()-1; i++) {
-    		intersect = intersect || cs.doesIntersect(points.get(i), points.get(i+1));
-    		if(intersect) {return true;}
-    	}
-    	return intersect;
+        List<Vec> points = this.getLinkEnds();
+        boolean intersect = false;
+        for (int i = 0; i < points.size() - 1; i++) {
+            intersect = intersect || cs.doesIntersect(points.get(i), 5);
+            if (intersect) {
+                return true;
+            }
+        }
+        for (int i = 0; i < points.size() - 1; i++) {
+            intersect = intersect || cs.doesIntersect(points.get(i), points.get(i + 1));
+            if (intersect) {
+                return true;
+            }
+        }
+        return intersect;
     }
 
     public void switchPivot() {
@@ -176,7 +181,7 @@ public class NRIterativeBodyPartAgent {
         return false;
     }
 
-    public void draw(Vec color){
+    public void draw(Vec color) {
         if (DRAW_GOAL) {
             // Goal milestone
             applet.noStroke();
@@ -187,6 +192,11 @@ public class NRIterativeBodyPartAgent {
             applet.popMatrix();
         }
 
+        if (DRAW_LIMBS && this.shape1 != null && this.shape2 != null) {
+            drawLimb(color);
+            return;
+        }
+
         // Pivot
         applet.pushMatrix();
         applet.noStroke();
@@ -194,11 +204,6 @@ public class NRIterativeBodyPartAgent {
         applet.translate(0, pivot.get(1), pivot.get(0));
         applet.box(1.5f);
         applet.popMatrix();
-
-        if(this.shape1 != null && this.shape2 != null) {
-            drawLimb(color);
-            return;
-        }
 
         // Links
         Vec start = new Vec(pivot);
@@ -246,10 +251,10 @@ public class NRIterativeBodyPartAgent {
         applet.translate(0, pivot.get(1), pivot.get(0));
         applet.box(1.5f);
         applet.popMatrix();
-        
-        if(this.shape1 != null && this.shape2 != null) {
-        	drawLimb();
-        	return;
+
+        if (DRAW_LIMBS && this.shape1 != null && this.shape2 != null) {
+            drawLimb();
+            return;
         }
 
         // Links
@@ -284,24 +289,26 @@ public class NRIterativeBodyPartAgent {
         boolean changeShape = this.isStraight;
         this.shape1.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
         this.shape2.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
-        for (int i = 0; i < ends.size()-1; i++) {
+        for (int i = 0; i < ends.size() - 1; i++) {
             Vec start;
             Vec end;
-            if(this.isStraight) {
+            if (this.isStraight) {
                 start = ends.get(i);
-                end = ends.get(i+1);
-            }else {
-                start = ends.get(i+1);
+                end = ends.get(i + 1);
+            } else {
+                start = ends.get(i + 1);
                 end = ends.get(i);
             }
-            applet.stroke(1);
-            applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
-            float theta = PApplet.atan2(end.get(1)-start.get(1), end.get(0)-start.get(0));
+            float theta = PApplet.atan2(end.get(1) - start.get(1), end.get(0) - start.get(0));
             PShape shape;
-            if(changeShape) {shape = shape1;} else { shape = shape2;}
+            if (changeShape) {
+                shape = shape1;
+            } else {
+                shape = shape2;
+            }
             applet.pushMatrix();
 //            applet.translate( 0, (start.get(1)+end.get(1))/2, (start.get(0)+end.get(0))/2);
-            applet.translate( 0, end.get(1), end.get(0));
+            applet.translate(0, end.get(1), end.get(0));
 //            applet.rotateX(PApplet.PI);
 //            applet.rotateY(PApplet.PI/2);
             applet.rotateX(-theta);
@@ -312,27 +319,29 @@ public class NRIterativeBodyPartAgent {
         }
     }
 
-	private void drawLimb() {
+    private void drawLimb() {
         List<Vec> ends = getLinkEnds();
         boolean changeShape = this.isStraight;
-        for (int i = 0; i < ends.size()-1; i++) {
+        for (int i = 0; i < ends.size() - 1; i++) {
             Vec start;
             Vec end;
-            if(this.isStraight) {
-            	start = ends.get(i);
-            	end = ends.get(i+1);
-            }else {
-            	start = ends.get(i+1);
-            	end = ends.get(i);
+            if (this.isStraight) {
+                start = ends.get(i);
+                end = ends.get(i + 1);
+            } else {
+                start = ends.get(i + 1);
+                end = ends.get(i);
             }
-            applet.stroke(1);
-            applet.line(0, start.get(1), start.get(0), 0, end.get(1), end.get(0));
-            float theta = PApplet.atan2(end.get(1)-start.get(1), end.get(0)-start.get(0));
+            float theta = PApplet.atan2(end.get(1) - start.get(1), end.get(0) - start.get(0));
             PShape shape;
-            if(changeShape) {shape = shape1;} else { shape = shape2;}
+            if (changeShape) {
+                shape = shape1;
+            } else {
+                shape = shape2;
+            }
             applet.pushMatrix();
 //            applet.translate( 0, (start.get(1)+end.get(1))/2, (start.get(0)+end.get(0))/2);
-            applet.translate( 0, end.get(1), end.get(0));
+            applet.translate(0, end.get(1), end.get(0));
 //            applet.rotateX(PApplet.PI);
 //            applet.rotateY(PApplet.PI/2);
             applet.rotateX(-theta);
@@ -341,6 +350,6 @@ public class NRIterativeBodyPartAgent {
             changeShape = !changeShape;
             start = end;
         }
-    }	
+    }
 
 }

@@ -64,7 +64,7 @@ public class NRPseudoInverseAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-            boolean isPivotSwitched = nrIterativeAgent.update(0.001f);
+            boolean isPivotSwitched = nrIterativeAgent.update(0.002f);
             if (isPivotSwitched) {
                 player.play(0);
             }

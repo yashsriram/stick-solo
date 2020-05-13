@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Race extends PApplet{
+public class Race extends PApplet {
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
-    private static final int SIZE = 100;
+    private static final int SIZE = 80;
     private static String SEARCH_ALGORITHM = "";
     private static final Vec MIN_CORNER = new Vec(-SIZE, -SIZE);
     private static final Vec MAX_CORNER = new Vec(SIZE, SIZE);
@@ -40,10 +40,10 @@ public class Race extends PApplet{
     AudioPlayer player;
     AudioPlayer rocksAudio;
     AudioPlayer wind;
-    List<FourArmAgent> agents ;
+    List<FourArmAgent> agents;
     PositionConfigurationSpace cs;
     PRM prm;
-    List<Leaf> leaves ;
+    List<Leaf> leaves;
     private boolean pathChangeProcessing = false;
 
 
@@ -61,10 +61,10 @@ public class Race extends PApplet{
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
-        rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
-        wind = minim.loadFile("sounds/wind01.mp3");
-        agents = new ArrayList<>() ;
-        for(int i =0 ; i < NUM_AGENTS; i++){
+//        rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
+//        wind = minim.loadFile("sounds/wind01.mp3");
+        agents = new ArrayList<>();
+        for (int i = 0; i < NUM_AGENTS; i++) {
             agents.add(new FourArmAgent(this));
         }
         List<Obstacle> obs = getLineObstacle();
@@ -73,24 +73,33 @@ public class Race extends PApplet{
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
         NRIterativeBodyPartAgent.METHOD = NRIterativeBodyPartAgent.IKMethod.JACOBIAN_TRANSPOSE;
-        leaves = new ArrayList<>();
-        for(int i = 0 ; i < 20 ; i++){
-            Vec p = new Vec(SIZE*random(-1, 0), SIZE*random(-1, 0));
-            Vec v = new Vec(random(0, 1), random(2, 4));
-            float l = random(500, 1000) ;
-            leaves.add(new Leaf(p,v,5, l, this));
-        }
-        wind.loop();
+//        leaves = new ArrayList<>();
+//        for (int i = 0; i < 20; i++) {
+//            Vec p = new Vec(SIZE * random(-1, 0), SIZE * random(-1, 0));
+//            Vec v = new Vec(random(0, 1), random(2, 4));
+//            float l = random(500, 1000);
+//            leaves.add(new Leaf(p, v, 5, l, this));
+//        }
+//        wind.loop();
+        FourArmAgent.RECOVERY_RATE = 0.03f;
+        prm.margin = 10;
     }
 
     private List<Obstacle> getLineObstacle() {
-        float partition_size = 2f/(float)NUM_AGENTS;
+        float partition_size = 2f / (float) NUM_AGENTS;
         List<Obstacle> obs = new ArrayList<>();
-        for(int i = NUM_AGENTS-1 ; i >= 0 ; i--){
-            System.out.println((i+1)*partition_size);
-            LineSegmentObstacle ls = new LineSegmentObstacle(this, new Vec(SIZE *(1-(i+1)*partition_size) , SIZE * 0.8f), new Vec(SIZE * (1-(i+1)*partition_size), -SIZE * 0.9f), new Vec(1, 0, 1));
-            obs.add(ls);
-            System.out.println(ls.e1);
+        for (int i = NUM_AGENTS - 1; i >= 0; i--) {
+            System.out.println((i + 1) * partition_size);
+            LineSegmentObstacle ls1 = new LineSegmentObstacle(this,
+                    new Vec(SIZE * (1 - (i + 1) * partition_size), SIZE),
+                    new Vec(SIZE * (1 - (i + 1) * partition_size), -SIZE),
+                    new Vec(1, 0, 1));
+            LineSegmentObstacle ls2 = new LineSegmentObstacle(this,
+                    new Vec(SIZE * (1 - (i) * partition_size), SIZE),
+                    new Vec(SIZE * (1 - (i) * partition_size), -SIZE),
+                    new Vec(1, 0, 1));
+            obs.add(ls1);
+            obs.add(ls2);
         }
         return obs;
     }
@@ -111,7 +120,7 @@ public class Race extends PApplet{
                     }
 //                    checkSlippery();
                 }
-                boolean playSound = fourArmAgent.update(0.00001f, WIND);
+                boolean playSound = fourArmAgent.update(0.0003f, WIND);
                 if (playSound) {
                     player.play(0);
                 }
@@ -119,25 +128,26 @@ public class Race extends PApplet{
             }
         }
 
-        for(Leaf l : leaves){
-            l.update(0.1f, SIZE, WIND);
-        }
+//        for(Leaf l : leaves){
+//            l.update(0.1f, SIZE, WIND);
+//        }
 
         // Draw
-        int k = 0 ;
-        for(FourArmAgent agent : agents){ ;
+        int k = 0;
+        for (FourArmAgent agent : agents) {
+            ;
             agent.draw();
         }
         prm.draw();
         cs.draw();
 
         // Draw leaves
-        for(Leaf l : leaves){
-            l.draw();
-        }
+//        for(Leaf l : leaves){
+//            l.draw();
+//        }
 
-        for(FourArmAgent agent :agents){
-            if(agent.goalReached()){
+        for (FourArmAgent agent : agents) {
+            if (agent.goalReached()) {
                 pauseAll();
             }
         }
@@ -150,13 +160,13 @@ public class Race extends PApplet{
     }
 
     private void pauseAll() {
-        for(FourArmAgent agent: agents){
+        for (FourArmAgent agent : agents) {
             agent.isPaused = true;
         }
     }
 
     private void checkSlippery() {
-        for(FourArmAgent agent : agents){
+        for (FourArmAgent agent : agents) {
             List<Milestone> milestones = agent.getMilestones();
             if (milestones.size() <= 0) {
                 return;
@@ -187,7 +197,7 @@ public class Race extends PApplet{
             cam.controllable = !cam.controllable;
         }
         if (key == 'p') {
-            for(FourArmAgent agent : agents){
+            for (FourArmAgent agent : agents) {
                 agent.isPaused = !agent.isPaused;
             }
         }
@@ -201,11 +211,11 @@ public class Race extends PApplet{
             FourArmAgent.DRAW_PATH = !FourArmAgent.DRAW_PATH;
         }
         if (key == '1') {
-            for(int j = 0 ; j < agents.size(); j++){
-                FourArmAgent agent = agents.get(j) ;
-                List<Vec> pos = getStartPositions(agents.size(), j) ;
+            for (int j = 0; j < agents.size(); j++) {
+                FourArmAgent agent = agents.get(j);
+                List<Vec> pos = getStartPositions(agents.size(), j);
                 Vec start = pos.get(0);
-                Vec neck =  start.plus(new Vec(0, NECK_ARM_DIST));
+                Vec neck = start.plus(new Vec(0, NECK_ARM_DIST));
                 Vec tail = start.plus(new Vec(0, NECK_ARM_DIST + 10));
                 List<Milestone> path = prm.dfs(start, pos.get(1), MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
                 agent.spawn(neck, tail, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
@@ -213,11 +223,11 @@ public class Race extends PApplet{
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
-            for(int j = 0 ; j < agents.size(); j++){
-                FourArmAgent agent = agents.get(j) ;
-                List<Vec> pos = getStartPositions(agents.size(), j) ;
+            for (int j = 0; j < agents.size(); j++) {
+                FourArmAgent agent = agents.get(j);
+                List<Vec> pos = getStartPositions(agents.size(), j);
                 Vec start = pos.get(0);
-                Vec neck =  start.plus(new Vec(0, NECK_ARM_DIST));
+                Vec neck = start.plus(new Vec(0, NECK_ARM_DIST));
                 Vec tail = start.plus(new Vec(0, NECK_ARM_DIST + 10));
                 List<Milestone> path = prm.bfs(start, pos.get(1), MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
                 agent.spawn(neck, tail, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
@@ -225,11 +235,11 @@ public class Race extends PApplet{
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
-            for(int j = 0 ; j < agents.size(); j++){
-                FourArmAgent agent = agents.get(j) ;
-                List<Vec> pos = getStartPositions(agents.size(), j) ;
+            for (int j = 0; j < agents.size(); j++) {
+                FourArmAgent agent = agents.get(j);
+                List<Vec> pos = getStartPositions(agents.size(), j);
                 Vec start = pos.get(0);
-                Vec neck =  start.plus(new Vec(0, NECK_ARM_DIST));
+                Vec neck = start.plus(new Vec(0, NECK_ARM_DIST));
                 Vec tail = start.plus(new Vec(0, NECK_ARM_DIST + 10));
                 List<Milestone> path = prm.ucs(start, pos.get(1), MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
                 agent.spawn(neck, tail, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
@@ -237,11 +247,11 @@ public class Race extends PApplet{
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
-            for(int j = 0 ; j < agents.size(); j++){
-                FourArmAgent agent = agents.get(j) ;
-                List<Vec> pos = getStartPositions(agents.size(), j) ;
+            for (int j = 0; j < agents.size(); j++) {
+                FourArmAgent agent = agents.get(j);
+                List<Vec> pos = getStartPositions(agents.size(), j);
                 Vec start = pos.get(0);
-                Vec neck =  start.plus(new Vec(0, NECK_ARM_DIST));
+                Vec neck = start.plus(new Vec(0, NECK_ARM_DIST));
                 Vec tail = start.plus(new Vec(0, NECK_ARM_DIST + 10));
                 List<Milestone> path = prm.aStar(start, pos.get(1), MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
                 agent.spawn(neck, tail, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
@@ -249,29 +259,35 @@ public class Race extends PApplet{
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
-            for(int j = 0 ; j < agents.size(); j++){
-                FourArmAgent agent = agents.get(j) ;
-                List<Vec> pos = getStartPositions(agents.size(), j) ;
+            for (int j = 0; j < agents.size(); j++) {
+                FourArmAgent agent = agents.get(j);
+                List<Vec> pos = getStartPositions(agents.size(), j);
                 Vec start = pos.get(0);
-                Vec neck =  start.plus(new Vec(0, NECK_ARM_DIST));
+                Vec neck = start.plus(new Vec(0, NECK_ARM_DIST));
                 Vec tail = start.plus(new Vec(0, NECK_ARM_DIST + 10));
                 List<Milestone> path = prm.weightedAStar(start, pos.get(1), MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
                 agent.spawn(neck, tail, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             }
             SEARCH_ALGORITHM = "weighted A*";
         }
-        if (key == 'x'){
-            WIND.headSet(WIND.get(0)+10f, WIND.get(1));
+        if (key == 'x') {
+            WIND.headSet(WIND.get(0) + 10f, WIND.get(1));
         }
-        if (key == 'v'){
-            WIND.headSet(WIND.get(0)-10f, WIND.get(1));
+        if (key == 'v') {
+            WIND.headSet(WIND.get(0) - 10f, WIND.get(1));
+        }
+        if (key == 'i') {
+            NRIterativeBodyPartAgent.DRAW_LIMBS = !NRIterativeBodyPartAgent.DRAW_LIMBS;
+        }
+        if (key == 'o') {
+            FourArmAgent.DRAW_BODY = !FourArmAgent.DRAW_BODY;
         }
     }
 
     private List<Vec> getStartPositions(int size, int j) {
-        float partition_size = 2f/(float)size ;
-        Vec start = new Vec(SIZE*(-1 + j*partition_size + random(0, partition_size/2)), SIZE * 0.8f) ;
-        Vec goal = new Vec(SIZE *(-1 + j*partition_size + random(0, partition_size/2)), -SIZE * 0.9f);
+        float partition_size = 2f / (float) size;
+        Vec start = new Vec(SIZE * (-1 + j * partition_size + random(0, partition_size / 2)), SIZE * 0.8f);
+        Vec goal = new Vec(SIZE * (-1 + j * partition_size + random(0, partition_size / 2)), -SIZE * 0.9f);
         List<Vec> pos = new ArrayList<>();
         pos.add(start);
         pos.add(goal);

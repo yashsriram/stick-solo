@@ -45,7 +45,5 @@ public class CircleObstacle implements Obstacle {
     public void draw() {
         applet.noFill();
         Processing.circleYZ(applet, center.get(0), center.get(1), radius, 40);
-        applet.fill(255, 255, 255);
-        applet.stroke(255, 255, 255);
     }
 }

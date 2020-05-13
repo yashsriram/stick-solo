@@ -64,7 +64,7 @@ public class NRJacobianAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-            boolean isPivotSwitched = nrIterativeAgent.update(0.00001f);
+            boolean isPivotSwitched = nrIterativeAgent.update(0.00002f);
             if (isPivotSwitched) {
                 player.play(0);
             }

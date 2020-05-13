@@ -12,7 +12,7 @@ public class Milestone {
     public final Vec position;
     final List<Milestone> neighbours = new ArrayList<>();
     public boolean slippery = false;
-    public final float SLIPPERY_PROBABILITY = 0.2f;
+    public final float SLIPPERY_PROBABILITY = 0.0f;
 
     class SearchState {
         float distanceFromStart = 0;

@@ -154,12 +154,10 @@ public class World {
 				applet.pushMatrix();
 				applet.shapeMode(PApplet.CENTER);
 				applet.translate(-35, position.get(1)+32, position.get(0)-17);
-				applet.noStroke();
-				applet.noFill();
-				this.obstacleShape.setTexture(this.wallTexture);
 				applet.rotateZ(PApplet.PI/2);
 				applet.scale(5.25f);
 				applet.shape(this.obstacleShape);
+				applet.shapeMode(PApplet.CORNER);
 				applet.popMatrix();
 			}
 		}

@@ -12,8 +12,6 @@
 - Always one pivot end and one free end
 
 # Basics
-- [ ] 2D PRM/A*
-    - [ ] Avoid duplication of same start and finish
 - [x] Spherical agent translating on 2D PRM/A* generated path
 - [x] RR agent milestone hopping on 2D PRM/A* generated path
     - [x] min/max bounds on PRM neighbours
@@ -56,10 +54,10 @@
 - [ ] Improve colors of water and sky
 - [ ] Add obstacles
 - [ ] Add birds in sky from HW3
+- [ ] Improve agent rendering, 3D models for agent links (hands, legs, body and tail)?
 
 - [ ] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [ ] Worm agent
-- [ ] Improve agent rendering, 3D models for agent links (hands, legs, body and tail)?
 
 # Demos
 - [ ] Better paths
@@ -74,6 +72,8 @@
 - [ ] A demo containing everything
 
 # Future work
+- [ ] 2D PRM/A*
+    - [ ] Avoid duplication of same start and finish
 - [ ] Belay rope
 - [ ] Prismatic joints
 - [ ] Angle bound obstacles, replanning in known environment

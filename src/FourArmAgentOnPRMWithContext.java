@@ -95,7 +95,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
                 checkSlippery();
             }
             world.update(0.01f);
-            boolean playSound = fourArmAgent.update(0.00001f);
+            boolean playSound = fourArmAgent.update(0.001f);
             if (playSound) {
                 player.play(0);
             }

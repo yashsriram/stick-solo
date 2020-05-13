@@ -24,6 +24,7 @@ public class FourArmAgent {
     public static float WIND_FORCE_COEFFICIENT = 0.01f;
     public static final Vec INIT_LEG_VECTOR = new Vec(-5, 5);
     public static final Vec LEG_VECTOR = new Vec(-6, 3);
+    public static final float COLLISION_RADIUS = 10 ;
 
     public boolean isPaused = false;
 
@@ -41,6 +42,8 @@ public class FourArmAgent {
     private final Vec tailGoal = new Vec(tail);
     private NRIterativeBodyPartAgent currentlyMovingArm;
     private NRIterativeBodyPartAgent currentlyMovingLeg;
+    private Vec legVector = new Vec(0, 0) ;
+    private float energy ;
 
     private List<Milestone> path = new ArrayList<>();
     private int nextMilestone = 0;
@@ -89,9 +92,11 @@ public class FourArmAgent {
         BODY_LENGTH = neck.minus(tail).norm();
         INITIAL_ENERGY = initial_energy;
         ENERGY = initial_energy;
+        this.energy = initial_energy;
         MIN_LIMB_SPEED = INIT_LIMB_SPEED;
         isPaused = false;
         this.isRecharging = false;
+        legVector.headSet(INIT_LEG_VECTOR);
         LEG_VECTOR.headSet(INIT_LEG_VECTOR);
     }
 
@@ -138,18 +143,6 @@ public class FourArmAgent {
         return milestones;
     }
 
-    private void cycleCurrentlyMovingArm() {
-        if (currentlyMovingArm.id == arm1.id) {
-            currentlyMovingArm = arm2;
-        } else if (currentlyMovingArm.id == arm2.id) {
-            currentlyMovingArm = arm3;
-        } else if (currentlyMovingArm.id == arm3.id) {
-            currentlyMovingArm = arm4;
-        } else {
-            currentlyMovingArm = arm1;
-        }
-    }
-
     public boolean update(float dt){
         Vec w = new Vec(0,0);
         return update(dt, w);
@@ -162,11 +155,12 @@ public class FourArmAgent {
         if (nextMilestone >= path.size()) {
             return false;
         }
-        if (ENERGY <= 5f) {
+        if (this.energy <= 5f) {
             isRecharging = true ;
         }
         if(isRecharging){
-            if(ENERGY < INITIAL_ENERGY){
+            if(this.energy < INITIAL_ENERGY){
+                this.energy += RECOVERY_RATE ;
                 ENERGY += RECOVERY_RATE ;
                 MIN_LIMB_SPEED = INIT_LIMB_SPEED;
                 return false;
@@ -176,7 +170,7 @@ public class FourArmAgent {
             }
         }
         boolean shouldPlayClickSound = false;
-        REDUCE_ENERGY = 0.05f*ENERGY;
+        REDUCE_ENERGY = 0.05f*this.energy;
         switch (state) {
             // Set arm1 goal to next milestone or next + 1 milestone
             case 0:
@@ -191,6 +185,7 @@ public class FourArmAgent {
                 if (currentlyMovingArm.update(dt, MIN_LIMB_SPEED)) {
                     state++;
                     ENERGY -= REDUCE_ENERGY;
+                    this.energy -= REDUCE_ENERGY;
                     MIN_LIMB_SPEED -= REDUCE_SPEED;
                     shouldPlayClickSound = true;
                 }
@@ -252,7 +247,7 @@ public class FourArmAgent {
                 if (!currentlyMovingLeg.isStraight()) {
                     currentlyMovingLeg.switchPivot();
                 }
-                currentlyMovingLeg.setGoal(tail.plus(LEG_VECTOR));
+                currentlyMovingLeg.setGoal(tail.plus(this.legVector));
                 switchCurrentlyMovingArm();
                 state++;
                 break;
@@ -261,10 +256,11 @@ public class FourArmAgent {
                 if (currentlyMovingLeg.update(dt, MIN_LIMB_SPEED)) {
                     state = 0;
                     ENERGY -= REDUCE_ENERGY;
+                    this.energy -= REDUCE_ENERGY;
                     MIN_LIMB_SPEED -= REDUCE_SPEED;
                     shouldPlayClickSound = true;
                     switchCurrentlyMovingLeg();
-                    LEG_VECTOR.headSet(-LEG_VECTOR.get(0), LEG_VECTOR.get(1));
+                    this.legVector.headSet(-this.legVector.get(0), this.legVector.get(1));
                 }
                 break;
         }
@@ -322,6 +318,12 @@ public class FourArmAgent {
         applet.rotateY(PApplet.PI/2);
         applet.shape(this.bodyShape);
         applet.popMatrix();
+
+//        Vec color = new Vec(1-(this.energy/INITIAL_ENERGY),(this.energy/INITIAL_ENERGY),(this.energy/INITIAL_ENERGY));
+//        applet.stroke(color.get(0), color.get(1), color.get(2));
+//        applet.strokeWeight(4);
+//        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
+
         applet.strokeWeight(1);
 
         // Tail
@@ -336,5 +338,9 @@ public class FourArmAgent {
         arm2.draw(color);
         arm3.draw(color);
         arm4.draw(color);
+    }
+
+    public void checkCollisionWithAgent(List<FourArmAgent> agents) {
+
     }
 }

@@ -39,8 +39,8 @@ public class Leaf {
         pApplet.translate(0, this.position.get(1), this.position.get(0));
         pApplet.rotateY(pApplet.PI/2);
         pApplet.beginShape();
-        pApplet.fill(0);
-        pApplet.stroke(0);
+        pApplet.noFill();
+        pApplet.noStroke();
         pApplet.textureMode(PConstants.NORMAL);
         pApplet.texture(this.texture);
         pApplet.vertex(0, 0, 0, 0);
@@ -53,7 +53,14 @@ public class Leaf {
 
     public void revive(float size){
         lifetime = pApplet.random(500, 1000) ;
-        this.position = new Vec(size*pApplet.random(-2, -1f), size*pApplet.random(-1, 0f));
+        float side = pApplet.random(-0.5f, 0.5f);
+        if(side > 0){
+            side = pApplet.random(6f, 7f) ;
+        }
+        else
+            side = pApplet.random(-6f, -5f) ;
+        this.position = new Vec(size*side, size*pApplet.random(-1, 0f));
         this.velocity = new Vec(pApplet.random(0, 1), pApplet.random(2, 4));
+        this.lifetime = pApplet.random(800, 1200);
     }
 }

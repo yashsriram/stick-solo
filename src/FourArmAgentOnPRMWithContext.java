@@ -33,7 +33,8 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
     private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST));
     private static final Vec TAIL = START_POSITION.plus(new Vec(0, NECK_ARM_DIST + 10));
     public static final float INITIAL_ENERGY = 100f;
-    public static final Vec WIND = new Vec(30, 4);
+    public static final Vec WIND = new Vec(30, 0);
+    public static final int NUM_LEAVES = 400 ;
 
     QueasyCam cam;
     Minim minim;
@@ -70,7 +71,7 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         leaves = new ArrayList<>();
         for(int i = 0 ; i < 50 ; i++){
             Vec p = new Vec(SIZE*random(-1, 0), SIZE*random(-1, 0));
-            Vec v = new Vec(random(0, 1), random(2, 4));
+            Vec v = new Vec(random(0, 1), random(1, 2));
             float l = random(500, 1000) ;
             leaves.add(new Leaf(p,v,5, l, this));
         }
@@ -127,6 +128,15 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         // Draw leaves
         for(Leaf l : leaves){
             l.draw();
+        }
+
+        if(leaves.size() < NUM_LEAVES){
+            for(int i = 0 ; i < 10 ; i++){
+                Vec p = new Vec(SIZE*random(-2, -1), SIZE*random(-1, 0));
+                Vec v = new Vec(random(0, 1), random(0, 1));
+                float l = random(200, 300) ;
+                leaves.add(new Leaf(p,v,5, l, this));
+            }
         }
 
         surface.setTitle("Processing:"

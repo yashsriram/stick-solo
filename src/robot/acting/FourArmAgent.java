@@ -11,7 +11,7 @@ import java.util.List;
 
 public class FourArmAgent {
     public static boolean DRAW_PATH = true;
-    public static boolean DRAW_BODY = false;
+    public static boolean DRAW_BODY = true;
     public static float INIT_LIMB_SPEED = 0.006f;
     public static float NECK_SPEED = 0.01f;
     public static float BODY_LENGTH;
@@ -274,7 +274,7 @@ public class FourArmAgent {
     public void draw() {
         // path
         if (DRAW_PATH) {
-            applet.stroke(0.3f);
+            applet.stroke(0.6f);
             for (int i = 0; i < path.size() - 1; i++) {
                 Vec v1 = path.get(i).position;
                 Vec v2 = path.get(i + 1).position;
@@ -285,7 +285,7 @@ public class FourArmAgent {
         for (Milestone milestone : path) {
             Vec v = milestone.position;
             applet.pushMatrix();
-            applet.fill(0.3f);
+            applet.fill(0.6f);
             applet.translate(0, v.get(1), v.get(0));
             applet.box(1);
             applet.popMatrix();
@@ -296,7 +296,8 @@ public class FourArmAgent {
 //        applet.strokeWeight(4);
 //        applet.line(0, neck.get(1), neck.get(0), 0, tail.get(1), tail.get(0));
         if (DRAW_BODY) {
-            Vec color = new Vec(1 - (this.energy / INITIAL_ENERGY), 0, (this.energy / INITIAL_ENERGY));
+            Vec color = new Vec((this.energy / INITIAL_ENERGY), 0, 1 - (this.energy / INITIAL_ENERGY));
+            this.bodyShape.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
             this.bodyShape.setFill(applet.color(color.get(0), color.get(1), color.get(2)));
             applet.pushMatrix();
             applet.translate(0, tail.get(1), tail.get(0));

@@ -5,6 +5,7 @@ import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
+import robot.acting.FourArmAgent;
 import robot.acting.TwoArmAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
@@ -64,6 +65,8 @@ public class TwoArmAgentOnPRMWithObstacles extends PApplet {
         prm = new PRM(this);
         prm.margin = L1 * 1.5f;
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
+        FourArmAgent.REDUCE_ENERGY = 0.1f;
+        FourArmAgent.RECOVERY_RATE = 0.8f;
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
     }
 

@@ -66,7 +66,9 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         player = minim.loadFile("sounds/snapping-fingers.mp3");
         fourArmAgent = new FourArmAgent(this);
         cs = new PositionConfigurationSpace(this, List.of(
-                new CircleObstacle(this, new Vec(-10, -20), 15, new Vec(1, 0, 1))
+                new CircleObstacle(this, new Vec(0, 10), 15, new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(-20, -20), 15, new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(20, -20), 15, new Vec(1, 0, 1))
         ));
         world = new World(this, MIN_CORNER, MAX_CORNER, cs.obstacles);
         prm = new PRM(this);
@@ -92,16 +94,16 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
         float startTime = millis();
         if (!this.pathChangeProcessing) {
             // While it's already changing path, don't do any replanning
-            if (fourArmAgent.doesIntersect(cs)) {
-                replan();
-            }
+//            if (fourArmAgent.doesIntersect(cs)) {
+//                replan();
+//            }
             checkSlippery();
         }
         // Update
         for (int i = 0; i < 15; i++) {
             this.pathChangeProcessing = fourArmAgent.switchPath;
             world.update(0.01f);
-            boolean playSound = fourArmAgent.update(0.001f);
+            boolean playSound = fourArmAgent.update(0.003f);
             if (playSound) {
                 player.play(0);
             }
@@ -137,7 +139,6 @@ public class FourArmAgentOnPRMWithContext extends PApplet {
                 + " FPS: " + (int) frameRate
                 + " Search: " + SEARCH_ALGORITHM
         );
-        print("FPS:"+frameRate+" Update time:"+(updateTime-startTime)+" Draw time:"+(drawTime-updateTime)+"\n");
     }
 
     

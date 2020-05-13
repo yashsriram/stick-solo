@@ -16,7 +16,7 @@ public class NRIterativeBodyPartAgent {
 
     public final int id;
 
-    public static boolean DRAW_LIMBS = false;
+    public static boolean DRAW_LIMBS = true;
     public static boolean DRAW_GOAL = false;
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;

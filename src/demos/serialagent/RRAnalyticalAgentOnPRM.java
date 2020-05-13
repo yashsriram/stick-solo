@@ -120,7 +120,7 @@ public class RRAnalyticalAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"serialagentdemos.RRAnalyticalAgentOnPRM"};
+        String[] appletArgs = new String[]{"demos.serialagent.RRAnalyticalAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

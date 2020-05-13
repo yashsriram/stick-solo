@@ -118,7 +118,7 @@ public class RIterativeAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"serialagentdemos.RIterativeAgentOnPRM"};
+        String[] appletArgs = new String[]{"demos.serialagent.RIterativeAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

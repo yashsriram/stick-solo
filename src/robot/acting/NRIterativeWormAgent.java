@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class NRIterativeAgent {
+public class NRIterativeWormAgent {
     public enum IKMethod {JACOBIAN_TRANSPOSE, PSEUDO_INVERSE}
 
+    public static boolean DRAW_PATH = true;
     public static float MILESTONE_REACHED_SLACK = 1f;
     public static float JERK_THRESHOLD = 1e-6f;
     public static IKMethod METHOD = IKMethod.JACOBIAN_TRANSPOSE;
@@ -22,25 +23,27 @@ public class NRIterativeAgent {
     private final PApplet applet;
     private final int N;
 
+    private boolean isStraight = true;
     private final Vec pivotPosition = new Vec(0f, 0f);
     private final Vec lengths;
     private final Vec jointTuple;
     private final List<Vec> freeEndPath = new ArrayList<>();
 
     private List<Milestone> path = new ArrayList<>();
-    private int nextMilestone = 1;
+    private int leadNextMilestone = 1;
+    private int followNextMilestone = 1;
 
     private float minSpeedLimit = 0;
     private boolean isMinSpeedLimitCalculated = false;
 
-    public NRIterativeAgent(PApplet applet, int N) {
+    public NRIterativeWormAgent(PApplet applet, int N) {
         this.applet = applet;
         this.N = N;
         this.lengths = new Vec(new float[N]);
         this.jointTuple = new Vec(new float[N]);
     }
 
-    public void spawn(List<Milestone> path, Vec lengths, Vec jointTuple) {
+    public void spawn(List<Milestone> path, Vec lengths, Vec jointTuple, int leadNextMilestone, int followNextMilestone) {
         if (lengths.getNumElements() != N || jointTuple.getNumElements() != N) {
             PApplet.println("Invalid spawn parameters");
             return;
@@ -54,7 +57,9 @@ public class NRIterativeAgent {
         this.lengths.headSet(lengths);
         this.jointTuple.headSet(jointTuple);
         this.path = new ArrayList<>(path);
-        this.nextMilestone = 1;
+        this.leadNextMilestone = leadNextMilestone;
+        this.followNextMilestone = followNextMilestone;
+        this.isStraight = true;
     }
 
     private List<Vec> getLinkEnds() {
@@ -102,28 +107,82 @@ public class NRIterativeAgent {
             lengths.set(lengthsCopy.getNumElements() - 1 - i, lengthsCopy.get(i));
         }
         freeEndPath.clear();
+        isStraight = !isStraight;
     }
 
     public boolean update(float dt) {
         if (isPaused) {
             return false;
         }
-        if (nextMilestone < path.size()) {
+        if (isStraight) {
+            return leadUpdate(dt);
+        } else {
+            return followUpdate(dt);
+        }
+    }
+
+    private boolean leadUpdate(float dt) {
+        if (isPaused) {
+            return false;
+        }
+        if (leadNextMilestone < path.size()) {
             // Reached next milestone
             Vec freeEnd = getFreeEnd();
             freeEndPath.add(new Vec(freeEnd));
-            if (Vec.dist(freeEnd, path.get(nextMilestone).position) < MILESTONE_REACHED_SLACK) {
+            if (Vec.dist(freeEnd, path.get(leadNextMilestone).position) < MILESTONE_REACHED_SLACK) {
                 switchPivot();
-                nextMilestone++;
+                leadNextMilestone++;
                 isMinSpeedLimitCalculated = false;
                 return true;
             }
             // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
             Vec deltaJointTupleUnscaled;
             if (METHOD == IKMethod.PSEUDO_INVERSE) {
-                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(getLinkEnds(), jointTuple, path.get(nextMilestone).position);
+                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(getLinkEnds(), jointTuple, path.get(leadNextMilestone).position);
             } else {
-                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(getLinkEnds(), jointTuple, path.get(nextMilestone).position);
+                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(getLinkEnds(), jointTuple, path.get(leadNextMilestone).position);
+            }
+            // Scale the delta
+            Vec deltaJointTuple = deltaJointTupleUnscaled.scaleInPlace(dt);
+            // If stuck in a singular configuration the give a little jerk
+            if (deltaJointTuple.norm() < JERK_THRESHOLD) {
+                for (int i = 0; i < jointTuple.getNumElements(); i++) {
+                    deltaJointTuple.set(i, deltaJointTuple.get(i) + applet.random(1f / (jointTuple.getNumElements() + 1)));
+                }
+            }
+            // If too speed is too low, increase it to a minimum
+            if (!isMinSpeedLimitCalculated) {
+                minSpeedLimit = deltaJointTuple.norm();
+                isMinSpeedLimitCalculated = true;
+            }
+            if (deltaJointTuple.norm() < minSpeedLimit) {
+                deltaJointTuple.normalizeInPlace().scaleInPlace(minSpeedLimit);
+            }
+            jointTuple.plusInPlace(deltaJointTuple);
+        }
+        return false;
+    }
+
+    public boolean followUpdate(float dt) {
+        if (isPaused) {
+            return false;
+        }
+        if (followNextMilestone < path.size()) {
+            // Reached next milestone
+            Vec freeEnd = getFreeEnd();
+            freeEndPath.add(new Vec(freeEnd));
+            if (Vec.dist(freeEnd, path.get(followNextMilestone).position) < MILESTONE_REACHED_SLACK) {
+                switchPivot();
+                followNextMilestone++;
+                isMinSpeedLimitCalculated = false;
+                return true;
+            }
+            // Distance from next milestone is significant => Update all joint variables such that free end moves to next milestone
+            Vec deltaJointTupleUnscaled;
+            if (METHOD == IKMethod.PSEUDO_INVERSE) {
+                deltaJointTupleUnscaled = NRIKSolver.pseudoInverseStep(getLinkEnds(), jointTuple, path.get(followNextMilestone).position);
+            } else {
+                deltaJointTupleUnscaled = NRIKSolver.jacobianTransposeStep(getLinkEnds(), jointTuple, path.get(followNextMilestone).position);
             }
             // Scale the delta
             Vec deltaJointTuple = deltaJointTupleUnscaled.scaleInPlace(dt);
@@ -147,23 +206,25 @@ public class NRIterativeAgent {
     }
 
     public void draw() {
-        // Path
-        applet.stroke(0.3f);
-        for (int i = 0; i < path.size() - 1; i++) {
-            Vec v1 = path.get(i).position;
-            Vec v2 = path.get(i + 1).position;
-            applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
+        if (DRAW_PATH) {
+            // Path
+            applet.stroke(0.3f);
+            for (int i = 0; i < path.size() - 1; i++) {
+                Vec v1 = path.get(i).position;
+                Vec v2 = path.get(i + 1).position;
+                applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
+            }
+            applet.noStroke();
+            applet.fill(0.3f);
+            for (Milestone milestone : path) {
+                Vec v = milestone.position;
+                applet.pushMatrix();
+                applet.translate(0, v.get(1), v.get(0));
+                applet.box(1);
+                applet.popMatrix();
+            }
+            applet.noStroke();
         }
-        applet.noStroke();
-        applet.fill(0.3f);
-        for (Milestone milestone : path) {
-            Vec v = milestone.position;
-            applet.pushMatrix();
-            applet.translate(0, v.get(1), v.get(0));
-            applet.box(1);
-            applet.popMatrix();
-        }
-        applet.noStroke();
 
         // Free end path
         applet.stroke(1, 1, 0);
@@ -174,11 +235,19 @@ public class NRIterativeAgent {
         }
         applet.noStroke();
 
-        // Goal milestone
-        if (nextMilestone < path.size()) {
+        // Lead local goal
+        if (isStraight && leadNextMilestone < path.size()) {
             applet.fill(1, 0, 0);
             applet.pushMatrix();
-            applet.translate(0, path.get(nextMilestone).position.get(1), path.get(nextMilestone).position.get(0));
+            applet.translate(0, path.get(leadNextMilestone).position.get(1), path.get(leadNextMilestone).position.get(0));
+            applet.box(1);
+            applet.popMatrix();
+        }
+        // Follow local goal
+        if (!isStraight && followNextMilestone < path.size()) {
+            applet.fill(1, 0, 0);
+            applet.pushMatrix();
+            applet.translate(0, path.get(followNextMilestone).position.get(1), path.get(followNextMilestone).position.get(0));
             applet.box(1);
             applet.popMatrix();
         }

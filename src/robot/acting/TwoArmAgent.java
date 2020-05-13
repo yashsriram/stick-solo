@@ -149,7 +149,7 @@ public class TwoArmAgent {
     public void draw() {
         // path
         if (DRAW_PATH) {
-            applet.stroke(1);
+            applet.stroke(0.3f);
             for (int i = 0; i < path.size() - 1; i++) {
                 Vec v1 = path.get(i).position;
                 Vec v2 = path.get(i + 1).position;
@@ -157,7 +157,7 @@ public class TwoArmAgent {
             }
         }
         applet.noStroke();
-        applet.fill(1);
+        applet.fill(0.3f);
         for (Milestone milestone : path) {
         	Vec v = milestone.position;
             applet.pushMatrix();

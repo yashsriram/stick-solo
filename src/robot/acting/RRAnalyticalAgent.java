@@ -117,14 +117,14 @@ public class RRAnalyticalAgent {
 
     public void draw() {
         // path
-        applet.stroke(1);
+        applet.stroke(0.3f);
         for (int i = 0; i < path.size() - 1; i++) {
             Vec v1 = path.get(i).position;
             Vec v2 = path.get(i + 1).position;
             applet.line(0, v1.get(1), v1.get(0), 0, v2.get(1), v2.get(0));
         }
         applet.noStroke();
-        applet.fill(1);
+        applet.fill(0.3f);
         for (Milestone milestone : path) {
         	Vec v = milestone.position;
             applet.pushMatrix();
@@ -197,7 +197,7 @@ public class RRAnalyticalAgent {
         applet.translate(0, -jointTuple.get(1) * scale, jointTuple.get(0) * scale);
         applet.box(2);
         applet.popMatrix();
-        applet.fill(0, 1, 0);
+        applet.fill(1, 0, 0);
         applet.pushMatrix();
         applet.translate(0, -goalJointTuple.get(1) * scale, goalJointTuple.get(0) * scale);
         applet.box(2);

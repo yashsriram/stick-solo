@@ -122,7 +122,7 @@ public class NRPseudoInverseAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"serialagentdemos.NRPseudoInverseAgentOnPRM"};
+        String[] appletArgs = new String[]{"demos.serialagent.NRPseudoInverseAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

@@ -122,7 +122,7 @@ public class NRJacobianAgentOnPRM extends PApplet {
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"serialagentdemos.NRJacobianAgentOnPRM"};
+        String[] appletArgs = new String[]{"demos.serialagent.NRJacobianAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

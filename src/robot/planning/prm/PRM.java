@@ -7,7 +7,7 @@ import robot.sensing.PositionConfigurationSpace;
 import java.util.*;
 
 public class PRM {
-    public static boolean DRAW_MILESTONES = true;
+    public static boolean DRAW_MILESTONES = false;
     public static boolean DRAW_EDGES = false;
     public float margin = 0;
 

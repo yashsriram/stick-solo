@@ -1,11 +1,11 @@
-package demos;
+package demos.serialagent;
 
 import camera.QueasyCam;
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
 import math.Vec;
 import processing.core.PApplet;
-import robot.acting.NRIterativeAgent;
+import robot.acting.NRIterativeWormAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
 import robot.sensing.PositionConfigurationSpace;
@@ -23,18 +23,19 @@ public class WormAgentOnPRM extends PApplet {
     private static final Vec START_POSITION = new Vec(SIZE * (-9f / 10), SIZE * (9f / 10));
     private static final Vec GOAL_POSITION = new Vec(SIZE * (9f / 10), SIZE * (-9f / 10));
     private static final float L1 = 5;
-    private static final float L2 = 10;
+    private static final float L2 = 5;
     private static final float L3 = 5;
-    private static final float L4 = 10;
-    private static final float MAX_EDGE_LEN = L1 + L2 + L3 + L4 - 5;
+    private static final float L4 = 5;
+    private static final float L5 = 5;
+    private static final float MAX_EDGE_LEN = (L1 + L2 + L3 + L4) / 3;
     private static final float MIN_EDGE_LEN = 0;
-    private static final int NUM_MILESTONES = 500;
+    private static final int NUM_MILESTONES = 4000;
 
     QueasyCam cam;
 
     Minim minim;
     AudioPlayer player;
-    NRIterativeAgent nrIterativeAgent;
+    NRIterativeWormAgent nrIterativeWormAgent;
     PositionConfigurationSpace cs;
     PRM prm;
 
@@ -51,7 +52,7 @@ public class WormAgentOnPRM extends PApplet {
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
-        nrIterativeAgent = new NRIterativeAgent(this, 4);
+        nrIterativeWormAgent = new NRIterativeWormAgent(this, 5);
         cs = new PositionConfigurationSpace(this, List.of());
         prm = new PRM(this);
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
@@ -64,14 +65,14 @@ public class WormAgentOnPRM extends PApplet {
 
         // Update
         for (int i = 0; i < 15; i++) {
-            boolean isPivotSwitched = nrIterativeAgent.update(0.00001f);
+            boolean isPivotSwitched = nrIterativeWormAgent.update(0.0003f);
             if (isPivotSwitched) {
                 player.play(0);
             }
         }
 
         // Draw
-        nrIterativeAgent.draw();
+        nrIterativeWormAgent.draw();
         prm.draw();
 
         surface.setTitle("Processing:"
@@ -86,7 +87,7 @@ public class WormAgentOnPRM extends PApplet {
             cam.controllable = !cam.controllable;
         }
         if (key == 'p') {
-            nrIterativeAgent.isPaused = !nrIterativeAgent.isPaused;
+            nrIterativeWormAgent.isPaused = !nrIterativeWormAgent.isPaused;
         }
         if (key == 'k') {
             PRM.DRAW_MILESTONES = !PRM.DRAW_MILESTONES;
@@ -96,33 +97,33 @@ public class WormAgentOnPRM extends PApplet {
         }
         if (key == '1') {
             List<Milestone> path = prm.dfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
+            nrIterativeWormAgent.spawn(path, new Vec(L1, L2, L3, L4, L5), new Vec(0, 0, 0, 0, 0), 4, 1);
             SEARCH_ALGORITHM = "DFS";
         }
         if (key == '2') {
             List<Milestone> path = prm.bfs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
+            nrIterativeWormAgent.spawn(path, new Vec(L1, L2, L3, L4, L5), new Vec(0, 0, 0, 0, 0), 4, 1);
             SEARCH_ALGORITHM = "BFS";
         }
         if (key == '3') {
             List<Milestone> path = prm.ucs(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
+            nrIterativeWormAgent.spawn(path, new Vec(L1, L2, L3, L4, L5), new Vec(0, 0, 0, 0, 0), 4, 1);
             SEARCH_ALGORITHM = "UCS";
         }
         if (key == '4') {
             List<Milestone> path = prm.aStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
+            nrIterativeWormAgent.spawn(path, new Vec(L1, L2, L3, L4, L5), new Vec(0, 0, 0, 0, 0), 4, 1);
             SEARCH_ALGORITHM = "A*";
         }
         if (key == '5') {
             List<Milestone> path = prm.weightedAStar(START_POSITION, GOAL_POSITION, MIN_EDGE_LEN, MAX_EDGE_LEN, cs, 1.5f);
-            nrIterativeAgent.spawn(path, new Vec(L1, L2, L3, L4), new Vec(0, 0, 0, 0));
+            nrIterativeWormAgent.spawn(path, new Vec(L1, L2, L3, L4, L5), new Vec(0, 0, 0, 0, 0), 4, 1);
             SEARCH_ALGORITHM = "weighted A*";
         }
     }
 
     static public void main(String[] passedArgs) {
-        String[] appletArgs = new String[]{"demos.WormAgentOnPRM"};
+        String[] appletArgs = new String[]{"demos.serialagent.WormAgentOnPRM"};
         if (passedArgs != null) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {

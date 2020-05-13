@@ -270,7 +270,7 @@ public class FourArmAgent {
     public void draw() {
         // path
         if (DRAW_PATH) {
-            applet.stroke(1);
+            applet.stroke(0.3f);
             for (int i = 0; i < path.size() - 1; i++) {
                 Vec v1 = path.get(i).position;
                 Vec v2 = path.get(i + 1).position;
@@ -281,7 +281,7 @@ public class FourArmAgent {
         for (Milestone milestone : path) {
             Vec v = milestone.position;
             applet.pushMatrix();
-            applet.fill(1);
+            applet.fill(0.3f);
             applet.translate(0, v.get(1), v.get(0));
             applet.box(1);
             applet.popMatrix();

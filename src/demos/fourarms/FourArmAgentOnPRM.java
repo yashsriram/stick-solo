@@ -9,6 +9,8 @@ import robot.acting.FourArmAgent;
 import robot.acting.NRIterativeBodyPartAgent;
 import robot.planning.prm.Milestone;
 import robot.planning.prm.PRM;
+import robot.sensing.CircleObstacle;
+import robot.sensing.LineSegmentObstacle;
 import robot.sensing.PositionConfigurationSpace;
 import world.Leaf;
 
@@ -27,15 +29,15 @@ public class FourArmAgentOnPRM extends PApplet {
     private static final Vec GOAL_POSITION = new Vec(SIZE * 0.9f, -SIZE * 0.9f);
     private static final float L1 = 10;
     private static final float L2 = 10;
-    private static final float MAX_EDGE_LEN = 7;
+    private static final float MAX_EDGE_LEN = 4.5f;
     private static final float MIN_EDGE_LEN = 3;
-    private static final int NUM_MILESTONES = 2000;
+    private static final int NUM_MILESTONES = 5000;
     private static final float NECK_ARM_DIST = 8;
     private static final Vec NECK = START_POSITION.plus(new Vec(0, NECK_ARM_DIST));
     private static final Vec TAIL = START_POSITION.plus(new Vec(0, NECK_ARM_DIST + 10));
     public static final Vec WIND = new Vec(30, 0);
     public static final float INITIAL_ENERGY = 50f;
-    public static final int NUM_LEAVES = 200 ;
+    public static final int NUM_LEAVES = 200;
 
     QueasyCam cam;
     Minim minim;
@@ -45,7 +47,7 @@ public class FourArmAgentOnPRM extends PApplet {
     FourArmAgent fourArmAgent;
     PositionConfigurationSpace cs;
     PRM prm;
-    List<Leaf> leaves ;
+    List<Leaf> leaves;
     private boolean pathChangeProcessing = false;
 
 
@@ -63,22 +65,38 @@ public class FourArmAgentOnPRM extends PApplet {
         cam = new QueasyCam(this);
         minim = new Minim(this);
         player = minim.loadFile("sounds/snapping-fingers.mp3");
-        rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
-        wind = minim.loadFile("sounds/wind01.mp3");
+//        rocksAudio = minim.loadFile("sounds/rock-debris-fall.mp3");
+//        wind = minim.loadFile("sounds/wind01.mp3");
         fourArmAgent = new FourArmAgent(this);
-        cs = new PositionConfigurationSpace(this, List.of());
+        cs = new PositionConfigurationSpace(this, List.of(
+                new LineSegmentObstacle(this, new Vec(0, 20), new Vec(0, SIZE), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(0, 20), new Vec(-50, SIZE / 2f), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(0, SIZE), new Vec(-50, SIZE / 2f), new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(-SIZE, -20), new Vec(SIZE * 0.4f, -20), new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(SIZE * 0.4f, -20), 10, new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(-0.4f * SIZE, -60), new Vec(SIZE, -60), new Vec(1, 0, 1)),
+                new CircleObstacle(this, new Vec(-0.4f * SIZE, -60), 10, new Vec(1, 0, 1)),
+                new LineSegmentObstacle(this, new Vec(SIZE * 0.4f, 50), new Vec(SIZE * 0.4f, -20), new Vec(1, 0, 1))
+        ));
         prm = new PRM(this);
+        prm.margin = 5;
         int numEdges = prm.grow(NUM_MILESTONES, MIN_CORNER, MAX_CORNER, MIN_EDGE_LEN, MAX_EDGE_LEN, cs);
         PApplet.println("# milestones : " + NUM_MILESTONES + " # edges : " + numEdges);
         NRIterativeBodyPartAgent.METHOD = NRIterativeBodyPartAgent.IKMethod.JACOBIAN_TRANSPOSE;
-        leaves = new ArrayList<>();
-        for(int i = 0 ; i < 20 ; i++){
-            Vec p = new Vec(SIZE*random(-2, -1), SIZE*random(-1, 0));
-            Vec v = new Vec(random(0, 1), random(0, 1));
-            float l = random(200, 300) ;
-            leaves.add(new Leaf(p,v,5, l, this));
-        }
-        wind.loop();
+//        leaves = new ArrayList<>();
+//        for(int i = 0 ; i < 20 ; i++){
+//            Vec p = new Vec(SIZE*random(-2, -1), SIZE*random(-1, 0));
+//            Vec v = new Vec(random(0, 1), random(0, 1));
+//            float l = random(200, 300) ;
+//            leaves.add(new Leaf(p,v,5, l, this));
+//        }
+//        wind.loop();
+        FourArmAgent.DRAW_BODY = false;
+        NRIterativeBodyPartAgent.DRAW_LIMBS = false;
+        FourArmAgent.REDUCE_ENERGY = 0;
+        FourArmAgent.REDUCE_SPEED = 0;
+        FourArmAgent.LEG_VECTOR.headSet(-6, 12);
+        FourArmAgent.INIT_LEG_VECTOR.headSet(-6, 4);
     }
 
     public void draw() {
@@ -88,40 +106,41 @@ public class FourArmAgentOnPRM extends PApplet {
         // Update
         for (int i = 0; i < 15; i++) {
             this.pathChangeProcessing = fourArmAgent.switchPath;
-            if (!this.pathChangeProcessing) {
-                // While it's already changing path, don't do any replanning
-                if (fourArmAgent.doesIntersect(cs)) {
-                    replan();
-                }
-                checkSlippery();
-            }
+//            if (!this.pathChangeProcessing) {
+//                // While it's already changing path, don't do any replanning
+//                if (fourArmAgent.doesIntersect(cs)) {
+//                    replan();
+//                }
+//                checkSlippery();
+//            }
             boolean playSound = fourArmAgent.update(0.00001f, WIND);
             if (playSound) {
                 player.play(0);
             }
         }
 
-        for(Leaf l : leaves){
-            l.update(0.1f, SIZE, WIND);
-        }
+//        for(Leaf l : leaves){
+//            l.update(0.1f, SIZE, WIND);
+//        }
 
         // Draw
         fourArmAgent.draw();
         prm.draw();
+//        cs.draw();
 
-        // Draw leaves
-        for(Leaf l : leaves){
-            l.draw();
-        }
+//        // Draw leaves
+//        for(Leaf l : leaves){
+//            l.draw();
+//        }
 
-        if(leaves.size() < NUM_LEAVES){
-            for(int i = 0 ; i < 10 ; i++){
-                Vec p = new Vec(SIZE*random(-2, -1), SIZE*random(-1, 0));
-                Vec v = new Vec(random(0, 1), random(0, 1));
-                float l = random(200, 300) ;
-                leaves.add(new Leaf(p,v,5, l, this));
-            }
-        }
+//        if(leaves.size() < NUM_LEAVES){
+//            for(int i = 0 ; i < 10 ; i++){
+//                Vec p = new Vec(SIZE*random(-2, -1), SIZE*random(-1, 0));
+//                Vec v = new Vec(random(0, 1), random(0, 1));
+//                float l = random(200, 300) ;
+//                leaves.add(new Leaf(p,v,5, l, this));
+//            }
+//        }
 
         surface.setTitle("Processing:"
                 + " FPS: " + (int) frameRate
@@ -195,11 +214,11 @@ public class FourArmAgentOnPRM extends PApplet {
             fourArmAgent.spawn(NECK, TAIL, NECK_ARM_DIST, path, new Vec(L1, L2), INITIAL_ENERGY);
             SEARCH_ALGORITHM = "weighted A*";
         }
-        if (key == 'x'){
-            WIND.headSet(WIND.get(0)+10f, WIND.get(1));
+        if (key == 'x') {
+            WIND.headSet(WIND.get(0) + 10f, WIND.get(1));
         }
-        if (key == 'v'){
-            WIND.headSet(WIND.get(0)-10f, WIND.get(1));
+        if (key == 'v') {
+            WIND.headSet(WIND.get(0) - 10f, WIND.get(1));
         }
     }
 

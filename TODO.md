@@ -56,21 +56,18 @@
 
 - [x] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [x] Worm agent
-
-- [ ] Add birds in sky from HW3
-- [ ] Improve colors of water and sky
+- [x] Improve colors of water and sky
 
 # Demos
-- [ ] Better paths
-- [ ] RRAnalytical demo
-- [ ] NRIterative agent demos
-    - [ ] Jacobian vs Pseudo inverse
-- [ ] Two arm agent demo
-    - [ ] Climbing up-left, up-right
-    - [ ] Climbing down-left, down-right
-    - [ ] Climbing sideways
-    - [ ] Climbing all in same path
-- [ ] A demo containing everything
+- [x] RRAnalytical demo
+- [x] NRIterative agent demos
+    - [x] Jacobian vs Pseudo inverse
+- [x] Two arm agent demo
+    - [x] Climbing up-left, up-right
+    - [x] Climbing down-left, down-right
+    - [x] Climbing sideways
+    - [x] Climbing all in same path
+- [x] A demo containing everything
 
 # Future work
 - [ ] 2D PRM/A*

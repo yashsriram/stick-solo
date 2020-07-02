@@ -17,7 +17,8 @@
 - Tested on Ubuntu 18.04
     - If you use a distrubution that uses rolling release cycle (like Arch) you might have to install some older version of JRE and mesa (opensource intel openGL driver) that work with processing library.
 ## demonstration
-- Our progression from building a two-link agent to a human-like agent is illustrated below.
+### videos
+- Our progression from building a two-link agent to a human-like agent is illustrated in the following videos.
 
 [![](http://img.youtube.com/vi/bZg6pS2gGPw/0.jpg)](https://www.youtube.com/watch?v=bZg6pS2gGPw)
 
@@ -52,3 +53,27 @@
 - A 2-arm 2-leg agent in the wild (replanning on rock slip, energy depletion, wind, waterfall)
 
 [![](http://img.youtube.com/vi/NdP2i9E-D2E/0.jpg)](https://www.youtube.com/watch?v=NdP2i9E-D2E)
+### images
+- 4-link agent using jacobian-transpose
+
+![](github/jacobian-transpose.jpg)
+
+- 4-link agent using pseudo-inverse method
+
+![](github/pseudo-inverse.jpg)
+
+- Worm agent's tail moving to the red node
+
+![](github/worm.jpg)
+
+- 2-arm agent avoiding obstacles
+
+![](github/2-arm.jpg)
+
+- Simulated waterfall using a particle system
+
+![](github/waterfall.png)
+
+- Wind effects, leaves and falling stones
+
+![](github/wind.jpg)

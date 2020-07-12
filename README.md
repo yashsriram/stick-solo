@@ -19,6 +19,10 @@
 - Use `javac -Xlint:unchecked -cp "jars/processing/*:jars/ejml-v0.39-libs/*:jars/minim/*" -d build/ $(find -name "*.java")` to compile and put all output class files under `build/`.
 - Use `java -cp "build/:jars/processing/*:jars/ejml-v0.39-libs/*:jars/minim/*" <package>.<to>.<path>.<class>` to run any simulation.
     - For example `java -cp "build/:jars/processing/*:jars/ejml-v0.39-libs/*:jars/minim/*" demos.serialagent.RRAnalyticalAgentOnPRM`.
+- Common controls
+    - `w a s d` for basic camera movements.
+    - `q e` for camera up and down movements.
+    - `p` for pause/play.
 - Tested on Ubuntu 18.04
     - If you use a distrubution that uses rolling release cycle (like Arch) you might have to install some older version of JRE and mesa (opensource intel openGL driver) that work with processing library.
 ## demonstration

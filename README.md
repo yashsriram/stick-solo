@@ -9,7 +9,8 @@
 - Code is written in java, should work with JRE 8+.
     - `src/` contains all source code.
     - `jars/` contain all libraries bundled as jars.
-        - processing is used as a rendering library
+        - `processing` is used as a rendering library.
+        - `queasy cam` is used as a camera library.
     - `data/` contains resources such as images, obj, mtl files.
 ## documentation
 - For most of the code, the documentation is itself.

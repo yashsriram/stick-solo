@@ -26,6 +26,7 @@
 - Tested on Ubuntu 18.04
     - If you use a distrubution that uses rolling release cycle (like Arch) you might have to install some older version of JRE and mesa (opensource intel openGL driver) that work with processing library.
 ## demonstration
+The videos demos are compiled into a [playlist](https://www.youtube.com/playlist?list=PLrz4CUP15JSIdKflSZ2yPjDZ0NcWdOUnn).
 ### videos
 The journey from a two-link agent to a human-like agent.
 

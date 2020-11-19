@@ -1,11 +1,12 @@
+use crate::act::nr_agent::NRAgent;
+use crate::plan::ik;
 use bevy::prelude::*;
-use nalgebra::DVector;
 
 pub struct NRAgentPlugin;
 
 impl Plugin for NRAgentPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(NRAgentStateRes::new(
+        app.add_resource(NRAgent::new(
             Vec2::new(0.0, 0.0),
             vec![0.2, 0.2, 0.2, 0.2],
             vec![0.5, -0.1, -0.6, -0.1],
@@ -22,75 +23,21 @@ impl Plugin for NRAgentPlugin {
 struct GoalRes(Vec2);
 struct GoalMarkerCom;
 
-struct NRAgentStateRes {
-    n: usize,
-    origin: Vec2,
-    l: DVector<f32>,
-    q: DVector<f32>,
-    thickness: f32,
-}
-
-impl NRAgentStateRes {
-    fn new(origin: Vec2, l: Vec<f32>, q: Vec<f32>, thickness: f32) -> Self {
-        assert_eq!(
-            l.len(),
-            q.len(),
-            "Unequal number of lengths and joint angles arguments."
-        );
-        assert!(thickness > 0.0, "Non-positive thickness argument");
-        NRAgentStateRes {
-            n: l.len(),
-            origin: origin,
-            l: DVector::from_iterator(l.len(), l.into_iter()),
-            q: DVector::from_iterator(q.len(), q.into_iter()),
-            thickness: thickness,
-        }
-    }
-
-    fn pose_to_transforms(&self) -> Vec<(Vec2, f32)> {
-        let mut transforms = vec![];
-        let mut e1 = self.origin;
-        let mut cumulative_rotation = 0f32;
-        for i in 0..self.n {
-            cumulative_rotation += self.q[i];
-            let e2 =
-                e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * self.l[i];
-            let midpoint = (e1 + e2) / 2.0;
-            transforms.push((midpoint, cumulative_rotation));
-            e1 = e2;
-        }
-        transforms
-    }
-
-    fn get_vertices(&self) -> Vec<Vec2> {
-        let mut vertices = vec![self.origin];
-        let mut e1 = self.origin;
-        let mut cumulative_rotation = 0f32;
-        for i in 0..self.n {
-            cumulative_rotation += self.q[i];
-            let e2 =
-                e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * self.l[i];
-            vertices.push(e2);
-            e1 = e2;
-        }
-        vertices
-    }
-}
-
 struct Edge(usize);
 struct Vertex(usize);
 
 fn init(
     mut commands: Commands,
-    agent_state: Res<NRAgentStateRes>,
+    agent_state: Res<NRAgent>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
+    let thickness = agent_state.thickness();
     // Edges
-    for i in 0..agent_state.n {
+    for i in 0..agent_state.n() {
         commands
             .spawn(SpriteComponents {
                 sprite: Sprite {
-                    size: Vec2::new(agent_state.l[i], agent_state.thickness),
+                    size: Vec2::new(agent_state.l()[i], thickness),
                     resize_mode: SpriteResizeMode::Manual,
                 },
                 material: materials
@@ -103,17 +50,17 @@ fn init(
     commands
         .spawn(SpriteComponents {
             sprite: Sprite {
-                size: Vec2::new(agent_state.thickness * 2.0, agent_state.thickness * 2.0),
+                size: Vec2::new(thickness * 2.0, thickness * 2.0),
                 resize_mode: SpriteResizeMode::Manual,
             },
             ..Default::default()
         })
         .with(Vertex(0));
-    for i in 0..agent_state.n {
+    for i in 0..agent_state.n() {
         commands
             .spawn(SpriteComponents {
                 sprite: Sprite {
-                    size: Vec2::new(agent_state.thickness * 2.0, agent_state.thickness * 2.0),
+                    size: Vec2::new(thickness * 2.0, thickness * 2.0),
                     resize_mode: SpriteResizeMode::Manual,
                 },
                 ..Default::default()
@@ -124,7 +71,7 @@ fn init(
     commands
         .spawn(SpriteComponents {
             sprite: Sprite {
-                size: Vec2::new(agent_state.thickness * 4.0, agent_state.thickness * 4.0),
+                size: Vec2::new(thickness * 4.0, thickness * 4.0),
                 resize_mode: SpriteResizeMode::Manual,
             },
             material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
@@ -145,15 +92,15 @@ fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<GoalRe
     }
 }
 
-fn control(goal: Res<GoalRes>, mut agent_state: ResMut<NRAgentStateRes>) {
-    let mut delta_q = super::ik::jt_step(&agent_state.get_vertices(), &agent_state.q, &goal.0);
+fn control(goal: Res<GoalRes>, mut agent_state: ResMut<NRAgent>) {
+    let mut delta_q = ik::jt_step(&agent_state.get_vertices(), &agent_state.q(), &goal.0);
     delta_q *= 0.1;
-    agent_state.q += delta_q;
+    agent_state.q_pluseq(&delta_q);
 }
 
 fn flush_transforms(
     goal: Res<GoalRes>,
-    agent_state: Res<NRAgentStateRes>,
+    agent_state: Res<NRAgent>,
     mut edge_query: Query<(&Edge, &mut Transform)>,
     mut vertex_query: Query<(&Vertex, &mut Transform)>,
     mut goal_query: Query<(&GoalMarkerCom, &mut Transform)>,

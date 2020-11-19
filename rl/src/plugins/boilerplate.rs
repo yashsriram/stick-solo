@@ -1,8 +1,8 @@
 use bevy::app::{PluginGroup, PluginGroupBuilder};
 
-pub struct CustomPlugins;
+pub struct BoilerplatePlugins;
 
-impl PluginGroup for CustomPlugins {
+impl PluginGroup for BoilerplatePlugins {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
         group.add(bevy::type_registry::TypeRegistryPlugin::default());
         group.add(bevy::core::CorePlugin::default());

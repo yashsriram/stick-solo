@@ -16,6 +16,9 @@ impl NRAgent {
             q.len(),
             "Unequal number of lengths and joint angles arguments."
         );
+        for i in 0..l.len() {
+            assert!(l[i] > 0.0, "Non-zero length argument.");
+        }
         assert!(thickness > 0.0, "Non-positive thickness argument");
         NRAgent {
             n: l.len(),

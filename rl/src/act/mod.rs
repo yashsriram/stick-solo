@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use ndarray::prelude::*;
 
+#[derive(Clone)]
 pub struct Goal(pub Vec2);
 
 #[derive(Clone)]

@@ -3,11 +3,11 @@ use bevy::prelude::*;
 
 pub struct NRAgentPlugin {
     agent: NRAgent,
-    goal: Vec2,
+    goal: Goal,
 }
 
 impl NRAgentPlugin {
-    pub fn new(agent: NRAgent, goal: Vec2) -> NRAgentPlugin {
+    pub fn new(agent: NRAgent, goal: Goal) -> NRAgentPlugin {
         NRAgentPlugin { agent, goal }
     }
 }
@@ -15,17 +15,16 @@ impl NRAgentPlugin {
 impl Plugin for NRAgentPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.agent.clone())
-            .add_resource(Goal(self.goal))
+            .add_resource(self.goal.clone())
             .add_startup_system(init.system())
-            .add_system(interactive_goal.system())
+            // .add_system(interactive_goal.system())
             .add_system(flush_transforms.system());
     }
 }
 
-struct GoalMarkerCom;
-
 struct Edge(usize);
 struct Vertex(usize);
+struct GoalMarker;
 
 fn init(mut commands: Commands, agent: Res<NRAgent>, mut materials: ResMut<Assets<ColorMaterial>>) {
     let thickness = agent.thickness();
@@ -75,7 +74,7 @@ fn init(mut commands: Commands, agent: Res<NRAgent>, mut materials: ResMut<Asset
             material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
             ..Default::default()
         })
-        .with(GoalMarkerCom);
+        .with(GoalMarker);
 }
 
 fn flush_transforms(
@@ -83,7 +82,7 @@ fn flush_transforms(
     agent_state: Res<NRAgent>,
     mut edge_query: Query<(&Edge, &mut Transform)>,
     mut vertex_query: Query<(&Vertex, &mut Transform)>,
-    mut goal_query: Query<(&GoalMarkerCom, &mut Transform)>,
+    mut goal_query: Query<(&GoalMarker, &mut Transform)>,
 ) {
     let transforms = agent_state.pose_to_transforms();
     for (edge, mut transform) in edge_query.iter_mut() {
@@ -103,14 +102,14 @@ fn flush_transforms(
     }
 }
 
-fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<Goal>) {
-    if keyboard_input.pressed(KeyCode::W) {
-        goal.0[1] += 0.01;
-    } else if keyboard_input.pressed(KeyCode::S) {
-        goal.0[1] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::A) {
-        goal.0[0] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::D) {
-        goal.0[0] += 0.01;
-    }
-}
+// fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<Goal>) {
+//     if keyboard_input.pressed(KeyCode::W) {
+//         goal.0[1] += 0.01;
+//     } else if keyboard_input.pressed(KeyCode::S) {
+//         goal.0[1] -= 0.01;
+//     } else if keyboard_input.pressed(KeyCode::A) {
+//         goal.0[0] -= 0.01;
+//     } else if keyboard_input.pressed(KeyCode::D) {
+//         goal.0[0] += 0.01;
+//     }
+// }

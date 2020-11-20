@@ -15,7 +15,7 @@ fn main() {
                 &[0.5, -0.1, -0.6, -0.1],
                 0.01,
             ),
-            Vec2::new(0.5, 0.0),
+            Goal(Vec2::new(0.5, 0.0)),
         ))
         .add_plugin(fps_plugin::FPSPlugin)
         .add_system(control.system())

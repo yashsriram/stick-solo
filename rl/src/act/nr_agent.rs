@@ -1,11 +1,11 @@
 use bevy::prelude::*;
-use nalgebra::DVector;
+use ndarray::prelude::*;
 
 pub struct NRAgent {
     n: usize,
     origin: Vec2,
-    l: DVector<f32>,
-    q: DVector<f32>,
+    l: Array1<f32>,
+    q: Array1<f32>,
     thickness: f32,
 }
 
@@ -20,8 +20,8 @@ impl NRAgent {
         NRAgent {
             n: l.len(),
             origin: origin,
-            l: DVector::from_iterator(l.len(), l.into_iter()),
-            q: DVector::from_iterator(q.len(), q.into_iter()),
+            l: arr1(&l),
+            q: arr1(&q),
             thickness: thickness,
         }
     }
@@ -30,15 +30,15 @@ impl NRAgent {
         self.n
     }
 
-    pub fn l(&self) -> &DVector<f32> {
+    pub fn l(&self) -> &Array1<f32> {
         &self.l
     }
 
-    pub fn q(&self) -> &DVector<f32> {
+    pub fn q(&self) -> &Array1<f32> {
         &self.q
     }
 
-    pub fn q_pluseq(&mut self, delta_q: &DVector<f32>) {
+    pub fn q_pluseq(&mut self, delta_q: &Array1<f32>) {
         self.q += delta_q;
     }
 

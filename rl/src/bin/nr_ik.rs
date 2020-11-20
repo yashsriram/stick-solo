@@ -5,17 +5,17 @@ use bevy::{
     prelude::*,
 };
 use bevy_fly_camera::{FlyCamera, FlyCameraPlugin};
-use sticksolo::plugins;
+use sticksolo::plugins::*;
 
 fn main() {
     App::build()
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_plugins(plugins::boilerplate::BoilerplatePlugins)
+        .add_plugins(base_plugins::BasePlugins)
         .add_plugin(FrameTimeDiagnosticsPlugin)
         .add_plugin(FlyCameraPlugin)
         .add_startup_system(init_camera.system())
         .add_startup_system(init_fps.system())
-        .add_plugin(plugins::nr_agent::NRAgentPlugin)
+        .add_plugin(nr_agent_plugin::NRAgentPlugin)
         .add_system(fps_update_system.system())
         .add_system(bevy::input::system::exit_on_esc_system.system())
         .run();

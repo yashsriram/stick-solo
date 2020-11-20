@@ -1,9 +1,16 @@
+use bevy::{
+    diagnostic::{Diagnostics, FrameTimeDiagnosticsPlugin},
+    input::keyboard::KeyCode,
+    prelude::*,
+};
+use bevy_fly_camera::{FlyCamera, FlyCameraPlugin};
 use serde::{Deserialize, Serialize};
+use stick_solo::vis::*;
 
 mod ceo;
 mod fcn;
 
-extern crate sticksolo;
+extern crate stick_solo;
 
 use ceo::CEO;
 use fcn::*;
@@ -17,12 +24,12 @@ struct Experiment {
 
 fn run() -> Experiment {
     let mut fcn = FCN::new(vec![
-        (3, Activation::Linear),
+        (12, Activation::Linear),
         (5, Activation::LeakyReLu(0.1)),
         (5, Activation::LeakyReLu(0.1)),
         (5, Activation::LeakyReLu(0.1)),
         (5, Activation::LeakyReLu(0.1)),
-        (2, Activation::Linear),
+        (4, Activation::Linear),
     ]);
 
     let mut ceo = CEO::default();
@@ -78,5 +85,5 @@ fn main() {
         exp
     };
     println!("{:?}", exp);
-    // TODO Visualize
+    // Visualize
 }

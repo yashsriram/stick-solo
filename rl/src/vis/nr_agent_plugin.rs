@@ -1,43 +1,41 @@
-use crate::act::nr_agent::NRAgent;
-use crate::plan::ik;
+use crate::act::{Goal, NRAgent};
 use bevy::prelude::*;
 
-pub struct NRAgentPlugin;
+pub struct NRAgentPlugin {
+    agent: NRAgent,
+    goal: Vec2,
+}
 
-impl Plugin for NRAgentPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(NRAgent::new(
-            Vec2::new(0.0, 0.0),
-            &[0.2, 0.2, 0.2, 0.2],
-            &[0.5, -0.1, -0.6, -0.1],
-            0.01,
-        ))
-        .add_resource(GoalRes(Vec2::new(0.5, 0.0)))
-        .add_startup_system(init.system())
-        .add_system(interactive_goal.system())
-        .add_system(control.system())
-        .add_system(flush_transforms.system());
+impl NRAgentPlugin {
+    pub fn new(agent: NRAgent, goal: Vec2) -> NRAgentPlugin {
+        NRAgentPlugin { agent, goal }
     }
 }
 
-struct GoalRes(Vec2);
+impl Plugin for NRAgentPlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app.add_resource(self.agent.clone())
+            .add_resource(Goal(self.goal))
+            .add_startup_system(init.system())
+            .add_system(interactive_goal.system())
+            .add_system(flush_transforms.system());
+    }
+}
+
 struct GoalMarkerCom;
 
 struct Edge(usize);
 struct Vertex(usize);
 
-fn init(
-    mut commands: Commands,
-    agent_state: Res<NRAgent>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-) {
-    let thickness = agent_state.thickness();
+fn init(mut commands: Commands, agent: Res<NRAgent>, mut materials: ResMut<Assets<ColorMaterial>>) {
+    let thickness = agent.thickness();
+    let (n, _, ls, _) = agent.get_current_state();
     // Edges
-    for i in 0..agent_state.n() {
+    for i in 0..n {
         commands
             .spawn(SpriteComponents {
                 sprite: Sprite {
-                    size: Vec2::new(agent_state.l()[i], thickness),
+                    size: Vec2::new(ls[i], thickness),
                     resize_mode: SpriteResizeMode::Manual,
                 },
                 material: materials
@@ -56,7 +54,7 @@ fn init(
             ..Default::default()
         })
         .with(Vertex(0));
-    for i in 0..agent_state.n() {
+    for i in 0..n {
         commands
             .spawn(SpriteComponents {
                 sprite: Sprite {
@@ -80,26 +78,8 @@ fn init(
         .with(GoalMarkerCom);
 }
 
-fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<GoalRes>) {
-    if keyboard_input.pressed(KeyCode::W) {
-        goal.0[1] += 0.01;
-    } else if keyboard_input.pressed(KeyCode::S) {
-        goal.0[1] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::A) {
-        goal.0[0] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::D) {
-        goal.0[0] += 0.01;
-    }
-}
-
-fn control(goal: Res<GoalRes>, mut agent_state: ResMut<NRAgent>) {
-    let mut delta_q = ik::jt_step(&agent_state.get_vertices(), &agent_state.q(), &goal.0);
-    delta_q *= 0.1;
-    agent_state.q_pluseq(&delta_q);
-}
-
 fn flush_transforms(
-    goal: Res<GoalRes>,
+    goal: Res<Goal>,
     agent_state: Res<NRAgent>,
     mut edge_query: Query<(&Edge, &mut Transform)>,
     mut vertex_query: Query<(&Vertex, &mut Transform)>,
@@ -112,13 +92,25 @@ fn flush_transforms(
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
     }
-    let vertex_positions = agent_state.get_vertices();
-    for (vertex, mut transform) in vertex_query.iter_mut() {
-        transform.translation[0] = vertex_positions[vertex.0][0];
-        transform.translation[1] = vertex_positions[vertex.0][1];
+    let vertex_positions = agent_state.get_all_vertices();
+    for (idx, mut transform) in vertex_query.iter_mut() {
+        transform.translation[0] = vertex_positions[idx.0][0];
+        transform.translation[1] = vertex_positions[idx.0][1];
     }
     for (_, mut transform) in goal_query.iter_mut() {
         transform.translation[0] = goal.0[0];
         transform.translation[1] = goal.0[1];
+    }
+}
+
+fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<Goal>) {
+    if keyboard_input.pressed(KeyCode::W) {
+        goal.0[1] += 0.01;
+    } else if keyboard_input.pressed(KeyCode::S) {
+        goal.0[1] -= 0.01;
+    } else if keyboard_input.pressed(KeyCode::A) {
+        goal.0[0] -= 0.01;
+    } else if keyboard_input.pressed(KeyCode::D) {
+        goal.0[0] += 0.01;
     }
 }

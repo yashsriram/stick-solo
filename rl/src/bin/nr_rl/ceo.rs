@@ -1,69 +1,71 @@
 use super::fcn::*;
+use bevy::prelude::*;
 use ndarray::prelude::*;
 use ndarray::stack;
-use ndarray_rand::rand_distr::{NormalError, StandardNormal};
+use ndarray_rand::rand_distr::{NormalError, StandardNormal, Uniform};
 use ndarray_rand::RandomExt;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
+use stick_solo::act::nr_agent::NRAgent;
 
-fn reward(ls: &[f32], fcn: &FCN, params: &Array1<f32>, num_episodes: usize) -> f32 {
-    // let mut cumulative_reward = 0.0;
-    // for _ in 0..num_episodes {
-    //     // Set goal
-    //     let goal_coordinates =
-    //         Goal::in_region(self.goal_x_bounds, self.goal_y_bounds).coordinates();
-    //     // Spawn agent
-    //     let mut model = NRAgent::spawn_randomly(
-    //         self.start_x_bounds,
-    //         self.start_y_bounds,
-    //         self.start_or_bounds,
-    //         self.radius,
-    //         goal_coordinates,
-    //     );
-    //     // Start calculating reward
-    //     let mut episode_reward = 0.0;
-    //     for tick in 0..self.num_episode_ticks {
-    //         // Curr state
-    //         let (x, y, or_in_rad) = model.scaled_state();
-    //         // Control for curr state
-    //         let control = fcn.at_with(&arr1(&[x, y, or_in_rad]), params);
-    //         let (v, w) = (control[[0]], control[[1]]);
-    //         // Apply control
-    //         model.set_control(v, w);
-    //         model.update(0.1).unwrap();
-    //         // Next state
-    //         let (x, y, or_in_rad) = model.scaled_state();
-    //         // Makes agent orient towards goal
-    //         let (x_hat, y_hat) = {
-    //             let norm = (x * x + y * y).sqrt();
-    //             (x / norm, y / norm)
-    //         };
-    //         let angular_deviation = ((x_hat - or_in_rad.cos()).powf(2.0)
-    //             + (y_hat - or_in_rad.sin()).powf(2.0))
-    //         .sqrt()
-    //             * (1.0 / (1.0 + tick as f32));
-    //         episode_reward -= angular_deviation;
-    //         // Removes rotational jitter
-    //         episode_reward -= w.abs();
-    //         // Makes agent translate towards goal
-    //         let dist = (x * x + y * y).sqrt();
-    //         episode_reward -= dist * 30.0;
-    //     }
-    //     // Makes agent reach the goal at the end of episode
-    //     let (x, y, _or_in_rad) = model.scaled_state();
-    //     let final_dist = (x * x + y * y).sqrt();
-    //     episode_reward += 200.0 * (-final_dist).exp();
-    //     // Makes agent stop at the end of episode
-    //     let (v, w) = model.control();
-    //     episode_reward += 200.0 * (-v.abs()).exp() * (-final_dist).exp();
-    //     episode_reward += 200.0 * (-w.abs()).exp() * (-final_dist).exp();
+fn reward(
+    ls: &[f32],
+    fcn: &FCN,
+    params: &Array1<f32>,
+    num_episodes: usize,
+    num_episode_ticks: usize,
+) -> f32 {
+    let mut cumulative_reward = 0.0;
+    for _ in 0..num_episodes {
+        // Set goal
+        let goal = Vec2::new(0.5, 0.0);
+        // Spawn agent
+        let mut model = NRAgent::new(
+            Vec2::new(0.0, 0.0),
+            ls,
+            &Array::random(ls.len(), Uniform::new(0.0, std::f32::consts::PI * 2.0)).to_vec(),
+            1.0,
+        );
+        // Start calculating reward
+        let mut episode_reward = 0.0;
+        for _tick in 0..num_episode_ticks {
+            // Curr state
+            let (origin, ls, qs) = model.get_processed_state();
+            let mut input = vec![origin[0], origin[1]];
+            input.append(&mut ls.to_vec());
+            input.append(&mut qs.to_vec());
+            input.push(goal[0]);
+            input.push(goal[1]);
+            // Control for curr state
+            let mut delta_qs = fcn.at_with(&arr1(&input), params);
+            let mut delta_qs_norm = delta_qs.mapv(|e| e * e).sum().sqrt();
+            if delta_qs_norm > 0.1 {
+                delta_qs = delta_qs / delta_qs_norm * 0.1;
+                delta_qs_norm = 0.1;
+            }
+            // Apply control
+            model.update(delta_qs);
+            // Penalize huge controls
+            episode_reward -= delta_qs_norm;
+            // Makes agent translate towards goal
+            let last_vertex = model.get_last_vertex();
+            let dist = (last_vertex - goal).length();
+            episode_reward -= dist * 30.0;
+        }
+        // Makes agent reach the goal at the end of episode
+        let last_vertex = model.get_last_vertex();
+        let final_dist = (last_vertex - goal).length();
+        episode_reward += 200.0 * (-final_dist).exp();
+        // Makes agent stop at the end of episode
+        let delta_qs = model.get_current_control();
+        let delta_qs_norm = delta_qs.mapv(|e| e * e).sum().sqrt();
+        episode_reward += 400.0 * (-delta_qs_norm).exp() * (-final_dist).exp();
 
-    //     cumulative_reward += episode_reward;
-    // }
+        cumulative_reward += episode_reward;
+    }
 
-    // let average_reward = cumulative_reward / num_episodes as f32;
-    // average_reward
-    0.0
+    let average_reward = cumulative_reward / num_episodes as f32;
+    average_reward
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -104,7 +106,7 @@ impl CEO {
                         let scaled_randn_noise = randn_noise * &noise_std;
                         let perturbed_params = scaled_randn_noise + fcn.params();
                         (
-                            reward(ls, fcn, &perturbed_params, self.num_evalation_samples),
+                            reward(ls, fcn, &perturbed_params, self.num_evalation_samples, 500),
                             perturbed_params,
                         )
                     })
@@ -134,7 +136,7 @@ impl CEO {
                 "generation={} mean_reward={:?} reward_with_current_th={:?}, th_std_mean={:?}",
                 generation + 1,
                 mean_reward,
-                reward(ls, fcn, &fcn.params(), self.num_evalation_samples),
+                reward(ls, fcn, &fcn.params(), self.num_evalation_samples, 500),
                 noise_std.mean(),
             );
         }

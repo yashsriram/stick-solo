@@ -1,5 +1,5 @@
 [package]
-name = "sticksolo"
+name = "stick_solo"
 version = "0.0.0"
 authors = ["Yashasvi Sriram Patkuri <yash.3997@gmail.com>"]
 edition = "2018"

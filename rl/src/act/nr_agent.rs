@@ -10,7 +10,7 @@ pub struct NRAgent {
 }
 
 impl NRAgent {
-    pub fn new(origin: Vec2, l: Vec<f32>, q: Vec<f32>, thickness: f32) -> Self {
+    pub fn new(origin: Vec2, l: &[f32], q: &[f32], thickness: f32) -> Self {
         assert_eq!(
             l.len(),
             q.len(),
@@ -20,8 +20,8 @@ impl NRAgent {
         NRAgent {
             n: l.len(),
             origin: origin,
-            l: arr1(&l),
-            q: arr1(&q),
+            l: arr1(l),
+            q: arr1(q),
             thickness: thickness,
         }
     }

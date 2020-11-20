@@ -8,8 +8,8 @@ impl Plugin for NRAgentPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(NRAgent::new(
             Vec2::new(0.0, 0.0),
-            vec![0.2, 0.2, 0.2, 0.2],
-            vec![0.5, -0.1, -0.6, -0.1],
+            &[0.2, 0.2, 0.2, 0.2],
+            &[0.5, -0.1, -0.6, -0.1],
             0.01,
         ))
         .add_resource(GoalRes(Vec2::new(0.5, 0.0)))

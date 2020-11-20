@@ -6,7 +6,7 @@ use ndarray_rand::RandomExt;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
-fn reward(fcn: &FCN, params: &Array1<f32>, num_episodes: usize) -> f32 {
+fn reward(ls: &[f32], fcn: &FCN, params: &Array1<f32>, num_episodes: usize) -> f32 {
     // let mut cumulative_reward = 0.0;
     // for _ in 0..num_episodes {
     //     // Set goal
@@ -91,7 +91,7 @@ impl Default for CEO {
 }
 
 impl CEO {
-    pub fn optimize(&self, fcn: &mut FCN) -> Result<Array1<f32>, NormalError> {
+    pub fn optimize(&self, ls: &[f32], fcn: &mut FCN) -> Result<Array1<f32>, NormalError> {
         let n_elite = (self.batch_size as f32 * self.elite_frac).round().floor() as usize;
         let mut noise_std = Array::from_elem((fcn.params().len(),), self.initial_std);
         for generation in 0..self.generations {
@@ -104,7 +104,7 @@ impl CEO {
                         let scaled_randn_noise = randn_noise * &noise_std;
                         let perturbed_params = scaled_randn_noise + fcn.params();
                         (
-                            reward(fcn, &perturbed_params, self.num_evalation_samples),
+                            reward(ls, fcn, &perturbed_params, self.num_evalation_samples),
                             perturbed_params,
                         )
                     })
@@ -134,7 +134,7 @@ impl CEO {
                 "generation={} mean_reward={:?} reward_with_current_th={:?}, th_std_mean={:?}",
                 generation + 1,
                 mean_reward,
-                reward(fcn, &fcn.params(), self.num_evalation_samples),
+                reward(ls, fcn, &fcn.params(), self.num_evalation_samples),
                 noise_std.mean(),
             );
         }

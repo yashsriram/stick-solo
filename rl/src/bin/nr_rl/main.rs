@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 mod ceo;
 mod fcn;
-mod goal;
 
 extern crate sticksolo;
 
@@ -34,7 +33,9 @@ fn run() -> Experiment {
     ceo.initial_std = 3.0;
     ceo.noise_factor = 3.0;
 
-    let _th_std = ceo.optimize(&mut fcn).unwrap();
+    let ls = [0.2, 0.2, 0.2, 0.2];
+
+    let _th_std = ceo.optimize(&ls, &mut fcn).unwrap();
 
     let exp = Experiment { fcn: fcn, ceo: ceo };
 

@@ -4,13 +4,10 @@ mod ceo;
 mod fcn;
 
 use bevy::prelude::*;
-use ceo::CEO;
+use ceo::{generate_input, CEO};
 use fcn::*;
-use ndarray::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::env;
-use std::fs::File;
-use std::io::BufReader;
+use std::{env, fs::File, io::BufReader};
 use stick_solo::act::{Goal, NRAgent};
 use stick_solo::vis::*;
 
@@ -25,20 +22,21 @@ fn main() {
     let ls = [0.2, 0.2, 0.2, 0.2];
     let args = env::args();
     let exp = if args.len() == 1 {
+        // Optimize
         let mut fcn = FCN::new(vec![
-            (2 + ls.len() + ls.len() + 2, Activation::Linear),
-            (5, Activation::LeakyReLu(0.1)),
-            (5, Activation::LeakyReLu(0.1)),
-            (5, Activation::LeakyReLu(0.1)),
-            (5, Activation::LeakyReLu(0.1)),
+            (ls.len() * 2 + 2, Activation::Linear),
+            (16, Activation::LeakyReLu(0.1)),
+            (16, Activation::Sigmoid),
+            (8, Activation::LeakyReLu(0.1)),
+            (8, Activation::Sigmoid),
             (ls.len(), Activation::Linear),
         ]);
         let ceo = CEO {
             generations: 500,
-            batch_size: 100,
-            num_evalation_samples: 1,
-            num_episode_ticks: 100,
-            elite_frac: 0.25,
+            batch_size: 50,
+            num_episodes: 1,
+            num_episode_ticks: 500,
+            elite_frac: 0.1,
             initial_std: 2.0,
             noise_factor: 2.0,
             ..Default::default()
@@ -50,9 +48,9 @@ fn main() {
         let now = Utc::now();
         serde_json::to_writer(
             &File::create(format!(
-                "{}-{}:{}@{:2}.json",
-                now.day(),
+                "{}-{}:{}@{:.2}.json",
                 now.month(),
+                now.day(),
                 now.num_seconds_from_midnight(),
                 mean_reward
             ))
@@ -80,8 +78,8 @@ fn main() {
         .add_plugins(base_plugins::BasePlugins)
         .add_plugin(camera_plugin::CameraPlugin)
         .add_plugin(nr_agent_plugin::NRAgentPlugin::new(
-            NRAgent::new(Vec2::new(0.0, 0.0), &ls, &[0.5, -0.1, -0.6, -0.1], 0.01),
-            Goal(Vec2::new(0.5, 0.0)),
+            NRAgent::new(Vec2::new(0.0, 0.0), &ls, &[0.5, 0.5, 0.5, 0.5], 0.01),
+            Goal(Vec2::new(0.2, 0.0)),
         ))
         .add_plugin(status_bar_plugin::StatusBarPlugin)
         .add_system(control.system())
@@ -90,20 +88,7 @@ fn main() {
 }
 
 fn control(goal: Res<Goal>, mut agent: ResMut<NRAgent>, fcn: Res<FCN>) {
-    let (_, origin, ls, qs) = agent.get_current_state();
-    // let delta_qs = stick_solo::plan::jacobian_transpose(origin, ls, qs, &goal.0);
-    // agent.update(delta_qs);
-    let mut input = vec![origin[0], origin[1]];
-    input.append(&mut ls.to_vec());
-    input.append(&mut qs.to_vec());
-    input.push(goal.0[0]);
-    input.push(goal.0[1]);
-    // Control for curr state
-    let mut delta_qs = fcn.at(&arr1(&input));
-    let delta_qs_norm = delta_qs.mapv(|e| e * e).sum().sqrt();
-    if delta_qs_norm > 0.1 {
-        delta_qs = delta_qs / delta_qs_norm * 0.1;
-    }
-    // Apply control
+    let delta_qs = fcn.at(&generate_input(agent.get_current_state(), &goal.0));
+    println!("{:?}", delta_qs);
     agent.update(delta_qs);
 }

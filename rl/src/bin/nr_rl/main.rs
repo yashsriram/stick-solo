@@ -1,11 +1,15 @@
 extern crate stick_solo;
 
 mod ceo;
+mod encode;
 mod fcn;
+mod reward;
 
 use bevy::prelude::*;
-use ceo::{generate_input, CEO};
+use ceo::CEO;
+use encode::generate_input;
 use fcn::*;
+use reward::NRAgentReward;
 use serde::{Deserialize, Serialize};
 use std::{env, fs::File, io::BufReader};
 use stick_solo::act::{Goal, NRAgent};
@@ -16,20 +20,26 @@ use stick_solo::vis::*;
 struct Experiment {
     fcn: FCN,
     ceo: CEO,
+    reward: NRAgentReward,
 }
 
 fn main() {
-    let ls = [0.2, 0.2, 0.2, 0.2];
     let args = env::args();
     let exp = if args.len() == 1 {
         // Optimize
+        let reward = NRAgentReward {
+            origin: Vec2::zero(),
+            ls: vec![0.2, 0.2, 0.2, 0.4],
+            qs: vec![0.5, 0.5, 0.5, 0.0],
+            goal: Vec2::new(0.2, -0.5),
+        };
         let mut fcn = FCN::new(vec![
-            (ls.len() * 2 + 2, Activation::Linear),
+            (reward.qs.len() * 2 + 2, Activation::Linear),
             (16, Activation::LeakyReLu(0.1)),
             (16, Activation::Sigmoid),
             (8, Activation::LeakyReLu(0.1)),
             (8, Activation::Sigmoid),
-            (ls.len(), Activation::Linear),
+            (reward.qs.len(), Activation::Linear),
         ]);
         let ceo = CEO {
             generations: 500,
@@ -41,8 +51,12 @@ fn main() {
             noise_factor: 2.0,
             ..Default::default()
         };
-        let (mean_reward, _th_std) = ceo.optimize(&ls, &mut fcn).unwrap();
-        let exp = Experiment { fcn: fcn, ceo: ceo };
+        let (mean_reward, _th_std) = ceo.optimize(&mut fcn, &reward).unwrap();
+        let exp = Experiment {
+            fcn: fcn,
+            ceo: ceo,
+            reward: reward,
+        };
         // Save
         use chrono::{Datelike, Timelike, Utc};
         let now = Utc::now();
@@ -78,8 +92,8 @@ fn main() {
         .add_plugins(base_plugins::BasePlugins)
         .add_plugin(camera_plugin::CameraPlugin)
         .add_plugin(nr_agent_plugin::NRAgentPlugin::new(
-            NRAgent::new(Vec2::new(0.0, 0.0), &ls, &[0.5, 0.5, 0.5, 0.5], 0.01),
-            Goal(Vec2::new(0.2, 0.0)),
+            NRAgent::new(exp.reward.origin, &exp.reward.ls, &exp.reward.qs, 0.01),
+            Goal(exp.reward.goal),
         ))
         .add_plugin(status_bar_plugin::StatusBarPlugin)
         .add_system(control.system())

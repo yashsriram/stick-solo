@@ -1,45 +1,44 @@
 extern crate stick_solo;
 
-mod ceo;
 mod encode;
-mod fcn;
-mod reward;
+mod world;
 
 use bevy::prelude::*;
-use ceo::CEO;
-use encode::generate_input;
-use fcn::*;
-use reward::NRAgentReward;
+use encode::encode;
 use serde::{Deserialize, Serialize};
 use std::{env, fs::File, io::BufReader};
-use stick_solo::act::{Goal, NRAgent};
-use stick_solo::vis::*;
+use stick_solo::{
+    act::{Goal, NRAgent},
+    plan::{ceo::CEO, fcn::*},
+    vis::*,
+};
+use world::World;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Experiment {
     fcn: FCN,
     ceo: CEO,
-    reward: NRAgentReward,
+    world: World,
 }
 
 fn main() {
     let args = env::args();
     let exp = if args.len() == 1 {
         // Optimize
-        let reward = NRAgentReward {
+        let world = World {
             origin: Vec2::zero(),
             ls: vec![0.2, 0.2, 0.2, 0.4],
             qs: vec![0.5, 0.5, 0.5, 0.0],
             goal: Vec2::new(0.2, -0.5),
         };
         let mut fcn = FCN::new(vec![
-            (reward.qs.len() * 2 + 2, Activation::Linear),
+            (world.qs.len() * 2 + 2, Activation::Linear),
             (16, Activation::LeakyReLu(0.1)),
             (16, Activation::Sigmoid),
             (8, Activation::LeakyReLu(0.1)),
             (8, Activation::Sigmoid),
-            (reward.qs.len(), Activation::Linear),
+            (world.qs.len(), Activation::Linear),
         ]);
         let ceo = CEO {
             generations: 500,
@@ -51,11 +50,11 @@ fn main() {
             noise_factor: 2.0,
             ..Default::default()
         };
-        let (mean_reward, _th_std) = ceo.optimize(&mut fcn, &reward).unwrap();
+        let (mean_reward, _th_std) = ceo.optimize(&mut fcn, &world).unwrap();
         let exp = Experiment {
             fcn: fcn,
             ceo: ceo,
-            reward: reward,
+            world: world,
         };
         // Save
         use chrono::{Datelike, Timelike, Utc};
@@ -92,8 +91,8 @@ fn main() {
         .add_plugins(base_plugins::BasePlugins)
         .add_plugin(camera_plugin::CameraPlugin)
         .add_plugin(nr_agent_plugin::NRAgentPlugin::new(
-            NRAgent::new(exp.reward.origin, &exp.reward.ls, &exp.reward.qs, 0.01),
-            Goal(exp.reward.goal),
+            NRAgent::new(exp.world.origin, &exp.world.ls, &exp.world.qs, 0.01),
+            Goal(exp.world.goal),
         ))
         .add_plugin(status_bar_plugin::StatusBarPlugin)
         .add_system(control.system())
@@ -102,7 +101,7 @@ fn main() {
 }
 
 fn control(goal: Res<Goal>, mut agent: ResMut<NRAgent>, fcn: Res<FCN>) {
-    let delta_qs = fcn.at(&generate_input(agent.get_current_state(), &goal.0));
+    let delta_qs = fcn.at(&encode(agent.get_current_state(), &goal.0));
     println!("{:?}", delta_qs);
     agent.update(delta_qs);
 }

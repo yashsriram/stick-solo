@@ -8,7 +8,7 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 pub trait Reward {
-    fn at(
+    fn average_reward(
         &self,
         fcn: &FCN,
         params: &Array1<f32>,
@@ -63,7 +63,7 @@ impl CEO {
                         let scaled_randn_noise = randn_noise * &noise_std;
                         let perturbed_params = scaled_randn_noise + fcn.params();
                         (
-                            reward.at(
+                            reward.average_reward(
                                 fcn,
                                 &perturbed_params,
                                 self.num_episodes,
@@ -98,7 +98,7 @@ impl CEO {
                 "generation={} mean_reward={:?} reward_with_current_th={:?}, th_std_mean={:?}",
                 generation + 1,
                 mean_reward,
-                reward.at(
+                reward.average_reward(
                     fcn,
                     &fcn.params(),
                     self.num_episodes,

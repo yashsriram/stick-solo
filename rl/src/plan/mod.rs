@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use ndarray::prelude::*;
+pub mod ceo;
+pub mod fcn;
 
 fn get_all_vertices(origin: &Vec2, ls: &Array1<f32>, qs: &Array1<f32>) -> Vec<Vec2> {
     let mut vertices = vec![origin.clone()];

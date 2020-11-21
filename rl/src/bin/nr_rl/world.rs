@@ -1,22 +1,23 @@
-use super::ceo::Reward;
-use super::encode::generate_input;
-use super::fcn::*;
+use super::encode::encode;
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use serde::{Deserialize, Serialize};
-use stick_solo::act::NRAgent;
+use stick_solo::{
+    act::NRAgent,
+    plan::{ceo::Reward, fcn::*},
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct NRAgentReward {
+pub struct World {
     pub origin: Vec2,
     pub ls: Vec<f32>,
     pub qs: Vec<f32>,
     pub goal: Vec2,
 }
 
-impl Reward for NRAgentReward {
-    fn at(
+impl Reward for World {
+    fn average_reward(
         &self,
         fcn: &FCN,
         params: &Array1<f32>,
@@ -30,7 +31,7 @@ impl Reward for NRAgentReward {
             // Start calculating reward
             let mut episode_reward = 0.0;
             for _tick in 0..num_episode_ticks {
-                let input = generate_input(agent.get_current_state(), &self.goal);
+                let input = encode(agent.get_current_state(), &self.goal);
                 let delta_qs = fcn.at_with(&input, params);
                 let delta_qs_norm = delta_qs.mapv(|e| e * e).sum().sqrt();
                 // let prev_delta_qs = agent.get_current_control();

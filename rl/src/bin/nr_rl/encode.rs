@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 use ndarray::prelude::*;
 
-pub fn generate_input(
-    state: (usize, &Vec2, &Array1<f32>, &Array1<f32>),
-    goal: &Vec2,
-) -> Array1<f32> {
+pub fn encode(state: (usize, &Vec2, &Array1<f32>, &Array1<f32>), goal: &Vec2) -> Array1<f32> {
     let (_, origin, ls, qs) = state;
     let scale = (goal.clone() - origin.clone()).length();
     let scaled_goal = (goal.clone() - origin.clone()) / scale;

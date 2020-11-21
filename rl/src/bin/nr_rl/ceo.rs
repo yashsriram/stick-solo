@@ -6,7 +6,7 @@ use ndarray_rand::rand_distr::{NormalError, StandardNormal, Uniform};
 use ndarray_rand::RandomExt;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
-use stick_solo::act::nr_agent::NRAgent;
+use stick_solo::act::NRAgent;
 
 fn reward(
     ls: &[f32],
@@ -20,17 +20,12 @@ fn reward(
         // Set goal
         let goal = Vec2::new(0.5, 0.0);
         // Spawn agent
-        let mut model = NRAgent::new(
-            Vec2::new(0.0, 0.0),
-            ls,
-            &Array::random(ls.len(), Uniform::new(0.0, std::f32::consts::PI * 2.0)).to_vec(),
-            1.0,
-        );
+        let mut agent = NRAgent::new(Vec2::new(0.0, 0.0), ls, &[0.5, -0.1, -0.6, -0.1], 1.0);
         // Start calculating reward
         let mut episode_reward = 0.0;
         for _tick in 0..num_episode_ticks {
             // Curr state
-            let (origin, ls, qs) = model.get_processed_state();
+            let (_, origin, ls, qs) = agent.get_current_state();
             let mut input = vec![origin[0], origin[1]];
             input.append(&mut ls.to_vec());
             input.append(&mut qs.to_vec());
@@ -44,20 +39,20 @@ fn reward(
                 delta_qs_norm = 0.1;
             }
             // Apply control
-            model.update(delta_qs);
+            agent.update(delta_qs);
             // Penalize huge controls
             episode_reward -= delta_qs_norm;
             // Makes agent translate towards goal
-            let last_vertex = model.get_last_vertex();
+            let last_vertex = agent.get_last_vertex();
             let dist = (last_vertex - goal).length();
             episode_reward -= dist * 30.0;
         }
         // Makes agent reach the goal at the end of episode
-        let last_vertex = model.get_last_vertex();
+        let last_vertex = agent.get_last_vertex();
         let final_dist = (last_vertex - goal).length();
         episode_reward += 200.0 * (-final_dist).exp();
         // Makes agent stop at the end of episode
-        let delta_qs = model.get_current_control();
+        let delta_qs = agent.get_current_control();
         let delta_qs_norm = delta_qs.mapv(|e| e * e).sum().sqrt();
         episode_reward += 400.0 * (-delta_qs_norm).exp() * (-final_dist).exp();
 
@@ -74,6 +69,7 @@ pub struct CEO {
     pub generations: usize,
     pub batch_size: usize,
     pub num_evalation_samples: usize,
+    pub num_episode_ticks: usize,
     pub elite_frac: f32,
     pub initial_std: f32,
     pub noise_factor: f32,
@@ -85,6 +81,7 @@ impl Default for CEO {
             generations: 300,
             batch_size: 50,
             num_evalation_samples: 300,
+            num_episode_ticks: 500,
             elite_frac: 0.25,
             initial_std: 2.0,
             noise_factor: 2.0,
@@ -93,9 +90,10 @@ impl Default for CEO {
 }
 
 impl CEO {
-    pub fn optimize(&self, ls: &[f32], fcn: &mut FCN) -> Result<Array1<f32>, NormalError> {
+    pub fn optimize(&self, ls: &[f32], fcn: &mut FCN) -> Result<(f32, Array1<f32>), NormalError> {
         let n_elite = (self.batch_size as f32 * self.elite_frac).round().floor() as usize;
         let mut noise_std = Array::from_elem((fcn.params().len(),), self.initial_std);
+        let mut latest_mean_reward = 0.0;
         for generation in 0..self.generations {
             let (sorted_th_means, mean_reward) = {
                 let mut reward_th_mean_tuples = (0..self.batch_size)
@@ -106,7 +104,13 @@ impl CEO {
                         let scaled_randn_noise = randn_noise * &noise_std;
                         let perturbed_params = scaled_randn_noise + fcn.params();
                         (
-                            reward(ls, fcn, &perturbed_params, self.num_evalation_samples, 500),
+                            reward(
+                                ls,
+                                fcn,
+                                &perturbed_params,
+                                self.num_evalation_samples,
+                                self.num_episode_ticks,
+                            ),
                             perturbed_params,
                         )
                     })
@@ -136,10 +140,17 @@ impl CEO {
                 "generation={} mean_reward={:?} reward_with_current_th={:?}, th_std_mean={:?}",
                 generation + 1,
                 mean_reward,
-                reward(ls, fcn, &fcn.params(), self.num_evalation_samples, 500),
+                reward(
+                    ls,
+                    fcn,
+                    &fcn.params(),
+                    self.num_evalation_samples,
+                    self.num_episode_ticks
+                ),
                 noise_std.mean(),
             );
+            latest_mean_reward = mean_reward;
         }
-        Ok(noise_std)
+        Ok((latest_mean_reward, noise_std))
     }
 }

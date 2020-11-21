@@ -31,9 +31,15 @@ fn init_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn fps_update_system(diagnostics: Res<Diagnostics>, mut query: Query<&mut Text>) {
     for mut text in query.iter_mut() {
-        if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
-            if let Some(average) = fps.average() {
-                text.value = format!("FPS: {:.2}", average);
+        if let Some(fps) = diagnostics
+            .get(FrameTimeDiagnosticsPlugin::FPS)
+            .and_then(|fps| fps.average())
+        {
+            if let Some(frame_count) = diagnostics
+                .get(FrameTimeDiagnosticsPlugin::FRAME_COUNT)
+                .and_then(|frame_count| frame_count.average())
+            {
+                text.value = format!("FRAME: {}, FPS: {:.2}", frame_count, fps,);
             }
         }
     }

@@ -3,9 +3,9 @@ use bevy::{
     prelude::*,
 };
 
-pub struct FPSPlugin;
+pub struct StatusBarPlugin;
 
-impl Plugin for FPSPlugin {
+impl Plugin for StatusBarPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_plugin(FrameTimeDiagnosticsPlugin)
             .add_startup_system(init_fps.system())

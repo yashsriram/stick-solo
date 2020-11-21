@@ -83,7 +83,7 @@ fn main() {
             NRAgent::new(Vec2::new(0.0, 0.0), &ls, &[0.5, -0.1, -0.6, -0.1], 0.01),
             Goal(Vec2::new(0.5, 0.0)),
         ))
-        .add_plugin(fps_plugin::FPSPlugin)
+        .add_plugin(status_bar_plugin::StatusBarPlugin)
         .add_system(control.system())
         .add_system(bevy::input::system::exit_on_esc_system.system())
         .run();

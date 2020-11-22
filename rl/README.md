@@ -70,8 +70,6 @@
 - [x] A demo containing everything
 
 ### Future work
-- [ ] JT agent vs CEO agent
-- [ ] Constrined q: JT agent vs CEO agent
 - [ ] 2D PRM/A\*
     - [ ] Avoid duplication of same start and finish
 - [ ] Belay rope
@@ -80,3 +78,16 @@
 - [ ] Springy limbs
 - [ ] Spatial data structures
 - [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
+
+### roadmap
+- [x] NR agent, Jacobian transpose control, Arbitrary n, ls, qs, origin, goal
+- [ ] NR agent, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
+    - [x] FCN + CEO for a fixed n, ls, qs, origin, goal
+    - [ ] Randomize qs
+    - [ ] Randomize goal
+    - [ ] Randomize ls
+    - [ ] Randomize n
+- [ ] NR agent + contraints on qs, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
+- [ ] NR agent + contraints on qs + gravity reward, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
+- [ ] Two leg agent + contraints on qs + gravity reward, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
+- [ ] Two leg + Two hands + contraints on qs + gravity reward, FCN + CEO control, Arbitrary n, ls, qs, origin, goal

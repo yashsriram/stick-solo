@@ -17,7 +17,7 @@ impl Plugin for NRAgentPlugin {
         app.add_resource(self.agent.clone())
             .add_resource(self.goal.clone())
             .add_startup_system(init.system())
-            // .add_system(interactive_goal.system())
+            .add_system(interactive_goal.system())
             .add_system(flush_transforms.system());
     }
 }
@@ -102,14 +102,14 @@ fn flush_transforms(
     }
 }
 
-// fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<Goal>) {
-//     if keyboard_input.pressed(KeyCode::W) {
-//         goal.0[1] += 0.01;
-//     } else if keyboard_input.pressed(KeyCode::S) {
-//         goal.0[1] -= 0.01;
-//     } else if keyboard_input.pressed(KeyCode::A) {
-//         goal.0[0] -= 0.01;
-//     } else if keyboard_input.pressed(KeyCode::D) {
-//         goal.0[0] += 0.01;
-//     }
-// }
+fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<Goal>) {
+    if keyboard_input.pressed(KeyCode::W) {
+        goal.0[1] += 0.01;
+    } else if keyboard_input.pressed(KeyCode::S) {
+        goal.0[1] -= 0.01;
+    } else if keyboard_input.pressed(KeyCode::A) {
+        goal.0[0] -= 0.01;
+    } else if keyboard_input.pressed(KeyCode::D) {
+        goal.0[0] += 0.01;
+    }
+}

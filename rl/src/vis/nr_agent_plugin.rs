@@ -1,6 +1,8 @@
 use crate::act::{Goal, NRAgent};
 use bevy::prelude::*;
 
+pub struct Pause(pub bool);
+
 pub struct NRAgentPlugin {
     agent: NRAgent,
     goal: Goal,
@@ -16,8 +18,10 @@ impl Plugin for NRAgentPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.agent.clone())
             .add_resource(self.goal.clone())
+            .add_resource(Pause(false))
             .add_startup_system(init.system())
             .add_system(interactive_goal.system())
+            .add_system(toggle_pause.system())
             .add_system(flush_transforms.system());
     }
 }
@@ -99,6 +103,12 @@ fn flush_transforms(
     for (_, mut transform) in goal_query.iter_mut() {
         transform.translation[0] = goal.0[0];
         transform.translation[1] = goal.0[1];
+    }
+}
+
+fn toggle_pause(keyboard_input: Res<Input<KeyCode>>, mut pause: ResMut<Pause>) {
+    if keyboard_input.just_pressed(KeyCode::P) {
+        pause.0 = !pause.0;
     }
 }
 

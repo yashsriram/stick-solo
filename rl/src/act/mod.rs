@@ -40,6 +40,22 @@ impl NRAgent {
         }
     }
 
+    pub fn reset(&mut self, origin: Vec2, ls: &[f32], qs: &[f32]) {
+        assert_eq!(
+            ls.len(),
+            qs.len(),
+            "Unequal number of lengths and joint angles arguments."
+        );
+        for i in 0..ls.len() {
+            assert!(ls[i] > 0.0, "Non-positive length argument.");
+        }
+        self.n = ls.len();
+        self.origin = origin;
+        self.ls = arr1(ls);
+        self.qs = arr1(qs);
+        self.delta_qs = Array1::<f32>::zeros((qs.len(),));
+    }
+
     pub fn thickness(&self) -> f32 {
         self.thickness
     }

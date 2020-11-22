@@ -3,11 +3,14 @@ use bevy::{
     prelude::*,
 };
 
+pub struct Ticks(pub usize);
+
 pub struct StatusBarPlugin;
 
 impl Plugin for StatusBarPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_plugin(FrameTimeDiagnosticsPlugin)
+        app.add_resource(Ticks(0))
+            .add_plugin(FrameTimeDiagnosticsPlugin)
             .add_startup_system(init_fps.system())
             .add_system(fps_update_system.system());
     }
@@ -29,18 +32,17 @@ fn init_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 }
 
-fn fps_update_system(diagnostics: Res<Diagnostics>, mut query: Query<&mut Text>) {
+fn fps_update_system(
+    diagnostics: Res<Diagnostics>,
+    ticks: Res<Ticks>,
+    mut query: Query<&mut Text>,
+) {
     for mut text in query.iter_mut() {
         if let Some(fps) = diagnostics
             .get(FrameTimeDiagnosticsPlugin::FPS)
             .and_then(|fps| fps.average())
         {
-            if let Some(frame_count) = diagnostics
-                .get(FrameTimeDiagnosticsPlugin::FRAME_COUNT)
-                .and_then(|frame_count| frame_count.average())
-            {
-                text.value = format!("FRAME: {}, FPS: {:.2}", frame_count, fps,);
-            }
+            text.value = format!("TICKS: {}, FPS: {:.2}", ticks.0, fps,);
         }
     }
 }

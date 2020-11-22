@@ -1,19 +1,40 @@
 use super::encode::encode;
 use bevy::prelude::*;
 use ndarray::prelude::*;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use stick_solo::{
     act::NRAgent,
     plan::{ceo::Reward, fcn::*},
 };
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct World {
     pub origin: Vec2,
     pub ls: Vec<f32>,
-    pub qs: Vec<f32>,
-    pub goal: Vec2,
+    pub qs: Vec<(f32, f32)>,
+    pub goal: (Vec2, Vec2),
+}
+
+impl World {
+    pub fn sample_qs(&self) -> Vec<f32> {
+        let mut rng = rand::thread_rng();
+        self.qs
+            .iter()
+            .map(|(min, max)| rng.gen_range(min, max))
+            .collect()
+    }
+
+    pub fn sample_goal(&self) -> Vec2 {
+        let (min, max) = self.goal;
+        let diff = max - min;
+        let rand_diff = Vec2::new(
+            rand::random::<f32>() * diff[0],
+            rand::random::<f32>() * diff[1],
+        );
+        min + rand_diff
+    }
 }
 
 impl Reward for World {
@@ -27,11 +48,12 @@ impl Reward for World {
         let mut cumulative_reward = 0.0;
         for _ in 0..num_episodes {
             // Spawn agent
-            let mut agent = NRAgent::new(self.origin, &self.ls, &self.qs, 1.0);
+            let mut agent = NRAgent::new(self.origin, &self.ls, &self.sample_qs(), 1.0);
+            let goal = self.sample_goal();
             // Start calculating reward
             let mut episode_reward = 0.0;
             for _tick in 0..num_episode_ticks {
-                let input = encode(agent.get_current_state(), &self.goal);
+                let input = encode(agent.get_current_state(), &goal);
                 let delta_qs = fcn.at_with(&input, params);
                 let delta_qs_norm = delta_qs.mapv(|e| e * e).sum().sqrt();
                 // let prev_delta_qs = agent.get_current_control();
@@ -43,7 +65,7 @@ impl Reward for World {
                 agent.update(delta_qs);
                 // Makes agent translate towards goal
                 let last_vertex = agent.get_last_vertex();
-                let dist = (last_vertex - self.goal).length();
+                let dist = (last_vertex - goal).length();
                 episode_reward -= dist * 100.0;
                 // Penalize huge controls
                 episode_reward -= delta_qs_norm;
@@ -52,7 +74,7 @@ impl Reward for World {
             }
             // Makes agent reach the goal at the end of episode
             let last_vertex = agent.get_last_vertex();
-            let final_dist = (last_vertex - self.goal).length();
+            let final_dist = (last_vertex - goal).length();
             episode_reward += 1000.0 * (-final_dist).exp();
             // Makes agent stop at the end of episode
             let delta_qs = agent.get_current_control();

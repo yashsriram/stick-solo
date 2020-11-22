@@ -62,11 +62,14 @@
 - [x] RRAnalytical demo
 - [x] NRIterative agent demos
     - [x] Jacobian vs Pseudo inverse
+- [x] Worm
 - [x] Two arm agent demo
+- [x] Four arm agent demo
     - [x] Climbing up-left, up-right
     - [x] Climbing down-left, down-right
     - [x] Climbing sideways
     - [x] Climbing all in same path
+- [x] Four arm agent race demo
 - [x] A demo containing everything
 
 ### Future work
@@ -79,15 +82,47 @@
 - [ ] Spatial data structures
 - [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
 
-### roadmap
-- [x] NR agent, Jacobian transpose control, Arbitrary n, ls, qs, origin, goal
-- [ ] NR agent, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
-    - [x] FCN + CEO for a fixed n, ls, qs, origin, goal
-    - [ ] Randomize qs
-    - [ ] Randomize goal
-    - [ ] Randomize ls
-    - [ ] Randomize n
-- [ ] NR agent + contraints on qs, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
-- [ ] NR agent + contraints on qs + gravity reward, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
-- [ ] Two leg agent + contraints on qs + gravity reward, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
-- [ ] Two leg + Two hands + contraints on qs + gravity reward, FCN + CEO control, Arbitrary n, ls, qs, origin, goal
+### Roadmap
+- Idea for human like stick figure agent.
+    - IK for each limb.
+    - Co-ordinate among limbs
+    - With q contrains.
+    - Put center of mass over holds.
+    - Formulate and achieve relaxing poses/efficient transfers.
+    - Do what all climb cycle agent can and more (ex same hand two time transfer).
+    - High level planner.
+
+- Modeling legs.
+- Human like motion = center of mass close to leg hold vertical.
+- One side leg goal only, no cross overs.
+
+- Tools
+    - [ ] Networks; FCN, Conv, ... using Torch
+    - [ ] Optimizors; CEO, Policy gradient and extensions, Deep Q learning and extensions.
+    - [ ] Rewards; Distance to goal, Control values, Difference in control values, Gravity, Relaxedness
+    - [ ] Formulations; All joints controlled by network, Limbs controlled by IK + co-ordinated by network.
+
+- [x] NR + Fully delta\_qs control.
+    - [x] IK
+        - [x] Jacobian transpose control with Arbitrary n, ls, qs, origin, goal
+    - [ ] RL
+        - [ ] FCN + CEO for fixed n, ls, qs, origin, goal
+            - [x] ls, qs input (not as good)
+            - [x] vertices input (better than qs input)
+            - [x] Direct delta\_qs control
+            - [x] Distance to goal + control values reward
+            - [ ] Diff control values reward
+            - [ ] Gravity reward
+        - [ ] FCN + CEO for arbitrary n, ls, qs, origin, goal
+            - [ ] Randomize qs
+            - [ ] Randomize goal
+            - [ ] Randomize ls
+            - [ ] Randomize n
+        - [ ] Policy gradient for arbitrary n, ls, qs, origin, goal
+        - [ ] Port to Torch
+
+- [ ] NR dynamics + constraints on q
+- [ ] Two leg dynamics + constraints; without core joint is identical to NR dynamics + constraints
+- [ ] Two leg + core dynamics; 4R agent + core joint; Q2 + Q3 - 180 = q3
+- [ ] Two leg + Two hands dynamics
+- [ ] High level planner

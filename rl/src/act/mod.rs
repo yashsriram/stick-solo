@@ -11,6 +11,7 @@ pub struct NRAgent {
     origin: Vec2,
     ls: Array1<f32>,
     qs: Array1<f32>,
+    q_clamps: Array1<(f32, f32)>,
     // Control
     delta_qs: Array1<f32>,
     // Vis
@@ -20,14 +21,29 @@ pub struct NRAgent {
 impl NRAgent {
     const MAX_DELTA_Q: f32 = 0.02;
 
-    pub fn new(origin: Vec2, ls: &[f32], qs: &[f32], thickness: f32) -> Self {
+    pub fn new(
+        origin: Vec2,
+        ls: &[f32],
+        qs: &[f32],
+        q_clamps: &[(f32, f32)],
+        thickness: f32,
+    ) -> Self {
         assert_eq!(
             ls.len(),
             qs.len(),
             "Unequal number of lengths and joint angles arguments."
         );
+        assert_eq!(
+            ls.len(),
+            q_clamps.len(),
+            "Unequal number of lengths and joint angle clamps arguments."
+        );
         for i in 0..ls.len() {
             assert!(ls[i] > 0.0, "Non-positive length argument.");
+            assert!(
+                q_clamps[i].0 <= q_clamps[i].1,
+                format!("Invalid q clamp range argument. {:?}", q_clamps[i])
+            );
         }
         assert!(thickness > 0.0, "Non-positive thickness argument");
         NRAgent {
@@ -35,6 +51,7 @@ impl NRAgent {
             origin: origin,
             ls: arr1(ls),
             qs: arr1(qs),
+            q_clamps: arr1(q_clamps),
             delta_qs: Array1::<f32>::zeros((qs.len(),)),
             thickness: thickness,
         }
@@ -70,14 +87,22 @@ impl NRAgent {
 
     pub fn update(&mut self, control_delta_qs: Array1<f32>) {
         self.delta_qs = control_delta_qs;
-        self.delta_qs.mapv_inplace(|e| {
-            if e.abs() > Self::MAX_DELTA_Q {
-                Self::MAX_DELTA_Q * e.signum()
+        self.delta_qs.mapv_inplace(|delta_q| {
+            if delta_q.abs() > Self::MAX_DELTA_Q {
+                Self::MAX_DELTA_Q * delta_q.signum()
             } else {
-                e
+                delta_q
             }
         });
         self.qs += &self.delta_qs;
+        for i in 0..self.n {
+            let (min, max) = self.q_clamps[i];
+            if self.qs[i] < min {
+                self.qs[i] = min
+            } else if self.qs[i] > max {
+                self.qs[i] = max
+            }
+        }
     }
 
     pub fn get_last_vertex(&self) -> Vec2 {

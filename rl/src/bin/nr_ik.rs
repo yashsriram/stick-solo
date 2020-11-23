@@ -4,6 +4,7 @@ use stick_solo::act::{Goal, NRAgent};
 use stick_solo::vis::*;
 
 fn main() {
+    let pi = std::f32::consts::PI;
     App::build()
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_plugins(base_plugins::BasePlugins)
@@ -11,11 +12,19 @@ fn main() {
         .add_plugin(nr_agent_plugin::NRAgentPlugin::new(
             NRAgent::new(
                 Vec2::new(0.0, 0.0),
-                &[0.2, 0.2, 0.2, 0.2],
-                &[0.5, -0.1, -0.6, -0.1],
+                &[0.2, 0.2],
+                &[pi / 2.0, -pi / 3.0],
+                &[(pi * 1.0 / 3.0, pi * 2.0 / 3.0), (-pi / 2.0, 0.0)],
                 0.01,
             ),
-            Goal(Vec2::new(0.5, 0.0)),
+            // NRAgent::new(
+            //     Vec2::new(0.0, 0.0),
+            //     &[0.2, 0.2],
+            //     &[-pi / 2.0, 0.0],
+            //     &[(-pi * 5.0 / 12.0, pi * 1.0 / 12.0), (-pi, 0.0)],
+            //     0.01,
+            // ),
+            Goal(Vec2::new(0.1, -0.1)),
         ))
         .add_plugin(status_bar_plugin::StatusBarPlugin)
         .add_system(control.system())

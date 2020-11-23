@@ -72,29 +72,22 @@
 - [x] Four arm agent race demo
 - [x] A demo containing everything
 
-### Future work
-- [ ] 2D PRM/A\*
-    - [ ] Avoid duplication of same start and finish
-- [ ] Belay rope
-- [ ] Angle bound obstacles, replanning in known environment
-- [ ] Prismatic joints
-- [ ] Springy limbs
-- [ ] Spatial data structures
-- [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)
-
-### Roadmap
+### New ideas
 - Idea for human like stick figure agent.
-    - IK for each limb.
-    - Co-ordinate among limbs
-    - With q contrains.
-    - Put center of mass over holds.
-    - Formulate and achieve relaxing poses/efficient transfers.
-    - Do what all climb cycle agent can and more (ex same hand two time transfer).
-    - High level planner.
+    - [ ] IK for each limb.
+    - [ ] Co-ordinate among limbs.
+    - [ ] With q contrains (including one side leg goal only, no cross overs).
+    - [ ] Put center of mass over holds.
+    - [ ] Formulate and achieve relaxing poses/efficient transfers.
+    - [ ] Do what all climb cycle agent can and more (ex same hand two time transfer).
+    - [ ] High level planner.
 
-- Modeling legs.
-- Human like motion = center of mass close to leg hold vertical.
-- One side leg goal only, no cross overs.
+| act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
+| ---                | ---         | ---           | ---                      | ---            |
+| 1 NR               | done        | done          | N/A                      | N/A            |
+| 2 NR               | done        | -             | -                        | -              |
+| 2 NR + core        | done        | -             | -                        | -              |
+| 2 NR + core + 2 NR | done        | -             | -                        | -              |
 
 - Tools
     - [ ] Networks; FCN, Conv, ... using Torch
@@ -102,14 +95,15 @@
     - [ ] Rewards; Distance to goal, Control values, Difference in control values, Gravity, Relaxedness
     - [ ] Formulations; All joints controlled by network, Limbs controlled by IK + co-ordinated by network.
 
+- Tried networks
+    - [ ] NR: ls, qs, goal input -> delta_qs
+    - [ ] NR: xis, yis, goal input -> delta_qs
+
 - [x] NR + Fully delta\_qs control.
     - [x] IK
         - [x] Jacobian transpose control with Arbitrary n, ls, qs, origin, goal
     - [ ] RL
         - [ ] FCN + CEO for fixed n, ls, qs, origin, goal
-            - [x] ls, qs input (not as good)
-            - [x] vertices input (better than qs input)
-            - [x] Direct delta\_qs control
             - [x] Distance to goal + control values reward
             - [ ] Diff control values reward
             - [ ] Gravity reward
@@ -121,8 +115,12 @@
         - [ ] Policy gradient for arbitrary n, ls, qs, origin, goal
         - [ ] Port to Torch
 
-- [ ] NR dynamics + constraints on q
-- [ ] Two leg dynamics + constraints; without core joint is identical to NR dynamics + constraints
-- [ ] Two leg + core dynamics; 4R agent + core joint; Q2 + Q3 - 180 = q3
-- [ ] Two leg + Two hands dynamics
-- [ ] High level planner
+### Future work
+- [ ] 2D PRM/A\*
+    - [ ] Avoid duplication of same start and finish
+- [ ] Belay rope
+- [ ] Angle bound obstacles, replanning in known environment
+- [ ] Prismatic joints
+- [ ] Springy limbs
+- [ ] Spatial data structures
+- [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)

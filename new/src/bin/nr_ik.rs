@@ -1,7 +1,7 @@
 extern crate stick_solo;
 use bevy::prelude::*;
-use stick_solo::act::{Goal, NRAgent};
-use stick_solo::vis::{pause_plugin::Pause, status_bar_plugin::Ticks, *};
+use stick_solo::act::{Goal, NR};
+use stick_solo::game::{pause_plugin::Pause, status_bar_plugin::Ticks, *};
 
 fn main() {
     let pi = std::f32::consts::PI;
@@ -9,14 +9,14 @@ fn main() {
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_plugins(base_plugins::BasePlugins)
         .add_plugin(camera_plugin::CameraPlugin)
-        .add_plugin(nr_agent_plugin::NRAgentPlugin::new(
-            NRAgent::new(
+        .add_plugin(nr_agent_plugin::NRPlugin::new(
+            NR::new(
                 Vec2::new(0.0, 0.0),
                 &[0.2, 0.2],
                 &[pi / 2.0, -pi / 3.0],
                 &[(pi * 1.0 / 3.0, pi * 2.0 / 3.0), (-pi / 2.0, 0.0)],
                 0.01,
-            ), // NRAgent::new(
+            ), // NR::new(
                //     Vec2::new(0.0, 0.0),
                //     &[0.2, 0.2],
                //     &[-pi / 2.0, 0.0],
@@ -32,12 +32,7 @@ fn main() {
         .run();
 }
 
-fn control(
-    mut agent: ResMut<NRAgent>,
-    goal: Res<Goal>,
-    pause: Res<Pause>,
-    mut ticks: ResMut<Ticks>,
-) {
+fn control(mut agent: ResMut<NR>, goal: Res<Goal>, pause: Res<Pause>, mut ticks: ResMut<Ticks>) {
     if pause.0 {
         return;
     }

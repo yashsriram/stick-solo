@@ -1,17 +1,17 @@
-use crate::act::NRAgent;
+use crate::act::NR;
 use bevy::prelude::*;
 
-pub struct NRAgentPlugin {
-    agent: NRAgent,
+pub struct NRPlugin {
+    agent: NR,
 }
 
-impl NRAgentPlugin {
-    pub fn new(agent: NRAgent) -> NRAgentPlugin {
-        NRAgentPlugin { agent }
+impl NRPlugin {
+    pub fn new(agent: NR) -> NRPlugin {
+        NRPlugin { agent }
     }
 }
 
-impl Plugin for NRAgentPlugin {
+impl Plugin for NRPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.agent.clone())
             .add_startup_system(init.system())
@@ -22,7 +22,7 @@ impl Plugin for NRAgentPlugin {
 struct Edge(usize);
 struct Vertex(usize);
 
-fn init(mut commands: Commands, agent: Res<NRAgent>, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn init(mut commands: Commands, agent: Res<NR>, mut materials: ResMut<Assets<ColorMaterial>>) {
     let thickness = agent.thickness();
     let (n, _, ls, _) = agent.get_current_state();
     // Edges
@@ -63,7 +63,7 @@ fn init(mut commands: Commands, agent: Res<NRAgent>, mut materials: ResMut<Asset
 }
 
 fn flush_transforms(
-    agent_state: Res<NRAgent>,
+    agent_state: Res<NR>,
     mut edge_query: Query<(&Edge, &mut Transform)>,
     mut vertex_query: Query<(&Vertex, &mut Transform)>,
 ) {

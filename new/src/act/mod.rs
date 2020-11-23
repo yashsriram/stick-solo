@@ -5,7 +5,7 @@ use ndarray::prelude::*;
 pub struct Goal(pub Vec2);
 
 #[derive(Clone)]
-pub struct NRAgent {
+pub struct NR {
     // State
     n: usize,
     origin: Vec2,
@@ -18,7 +18,7 @@ pub struct NRAgent {
     thickness: f32,
 }
 
-impl NRAgent {
+impl NR {
     const MAX_DELTA_Q: f32 = 0.02;
 
     pub fn new(
@@ -46,7 +46,7 @@ impl NRAgent {
             );
         }
         assert!(thickness > 0.0, "Non-positive thickness argument");
-        NRAgent {
+        NR {
             n: ls.len(),
             origin: origin,
             ls: arr1(ls),

@@ -59,6 +59,19 @@ impl NR {
         }
     }
 
+    pub fn reset(&mut self, origin: Vec2, ls: &[f32], qs: &[f32]) {
+        assert_eq!(ls.len(), self.n, "Bad reset ls argument.");
+        assert_eq!(qs.len(), self.n, "Bad reset qs argument.");
+        for i in 0..ls.len() {
+            assert!(ls[i] > 0.0, "Non-positive length argument.");
+            assert!(self.q_clamps[i].0 <= qs[i], "Disobidient q arguement.");
+            assert!(qs[i] <= self.q_clamps[i].1, "Disobidient q arguement.");
+        }
+        self.origin = origin;
+        self.ls = arr1(ls);
+        self.qs = arr1(qs);
+        self.delta_qs = Array1::<f32>::zeros((qs.len(),));
+    }
     pub fn thickness(&self) -> f32 {
         self.thickness
     }

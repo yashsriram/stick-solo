@@ -1,12 +1,11 @@
+use super::ceo::Reward;
 use super::encode::encode;
+use super::fcn::*;
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use stick_solo::{
-    act::NRAgent,
-    plan::{ceo::Reward, fcn::*},
-};
+use stick_solo::act::NR;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
@@ -48,7 +47,18 @@ impl Reward for World {
         let mut cumulative_reward = 0.0;
         for _ in 0..num_episodes {
             // Spawn agent
-            let mut agent = NRAgent::new(self.origin, &self.ls, &self.sample_qs(), 1.0);
+            let mut agent = NR::new(
+                self.origin,
+                &self.ls,
+                &self.sample_qs(),
+                &[
+                    (-f32::INFINITY, f32::INFINITY),
+                    (-f32::INFINITY, f32::INFINITY),
+                    (-f32::INFINITY, f32::INFINITY),
+                    (-f32::INFINITY, f32::INFINITY),
+                ],
+                1.0,
+            );
             let goal = self.sample_goal();
             // Start calculating reward
             let mut episode_reward = 0.0;

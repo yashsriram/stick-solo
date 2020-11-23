@@ -9,7 +9,7 @@ fn main() {
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_plugins(base_plugins::BasePlugins)
         .add_plugin(camera_plugin::CameraPlugin)
-        .add_plugin(nr_agent_plugin::NRPlugin::new(
+        .add_plugin(nr_plugin::NRPlugin::new(
             NR::new(
                 Vec2::new(0.0, 0.0),
                 &[0.2, 0.2],

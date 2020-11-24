@@ -82,39 +82,25 @@
     - [ ] Do what all climb cycle agent can and more (ex same hand two time transfer).
     - [ ] High level planner.
 
+- Tools
+    - Networks; FCN, Conv, ... using Torch
+    - Optimizors; CEO, Policy gradient and extensions, Deep Q learning and extensions.
+    - Rewards; Distance to goal, Control values, Difference in control values, Gravity, Relaxedness
+    - Formulations; All joints controlled by network, Limbs controlled by IK + co-ordinated by network.
+
 | act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
 | ---                | ---         | ---           | ---                      | ---            |
 | 1 NR               | done        | done          | N/A                      | -              |
-| 1 NR CEO (math)    |             |               |                          |                |
 | 2 NR               | done        | -             | -                        | -              |
 | 2 NR + core        | done        | -             | -                        | -              |
 | 2 NR + core + 2 NR | done        | -             | -                        | -              |
 
-- Tools
-    - [ ] Networks; FCN, Conv, ... using Torch
-    - [ ] Optimizors; CEO, Policy gradient and extensions, Deep Q learning and extensions.
-    - [ ] Rewards; Distance to goal, Control values, Difference in control values, Gravity, Relaxedness
-    - [ ] Formulations; All joints controlled by network, Limbs controlled by IK + co-ordinated by network.
-
 - Tried networks
-    - [ ] NR: ls, qs, goal input -> delta_qs
-    - [ ] NR: xis, yis, goal input -> delta_qs
-
-- [x] NR + Fully delta\_qs control.
-    - [x] IK
-        - [x] Jacobian transpose control with Arbitrary n, ls, qs, origin, goal
-    - [ ] RL
-        - [ ] FCN + CEO for fixed n, ls, qs, origin, goal
-            - [x] Distance to goal + control values reward
-            - [ ] Diff control values reward
-            - [ ] Gravity reward
-        - [ ] FCN + CEO for arbitrary n, ls, qs, origin, goal
-            - [ ] Randomize qs
-            - [ ] Randomize goal
-            - [ ] Randomize ls
-            - [ ] Randomize n
-        - [ ] Policy gradient for arbitrary n, ls, qs, origin, goal
-        - [ ] Port to Torch
+    - [x] NR: ls, qs, goal input -> delta_qs
+    - [x] NR: xis, yis, goal input -> delta_qs
+- [ ] Understand jacobian transpose derivation properly
+- [ ] Understand neural network as an extension to jacobian transpose optimization.
+- [ ] Implement JT + COM control for 1 NR agent.
 
 ### Future work
 - [ ] 2D PRM/A\*

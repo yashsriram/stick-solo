@@ -1,8 +1,13 @@
 use bevy::prelude::*;
 use ndarray::prelude::*;
 
-fn get_all_vertices(origin: &Vec2, ls: &Array1<f32>, qs: &Array1<f32>) -> Vec<Vec2> {
-    let mut vertices = vec![origin.clone()];
+fn get_all_vertices_and_com(
+    origin: &Vec2,
+    ls: &Array1<f32>,
+    qs: &Array1<f32>,
+) -> (Vec<Vec2>, Vec2) {
+    let mut vertices = Vec::with_capacity(ls.len() + 1);
+    vertices.push(origin.clone());
     let mut e1 = origin.clone();
     let mut cumulative_rotation = 0f32;
     for i in 0..qs.len() {
@@ -11,21 +16,16 @@ fn get_all_vertices(origin: &Vec2, ls: &Array1<f32>, qs: &Array1<f32>) -> Vec<Ve
         vertices.push(e2);
         e1 = e2;
     }
-    vertices
+    (vertices, Vec2::zero())
 }
 
-pub fn jacobian_transpose(
-    origin: &Vec2,
-    ls: &Array1<f32>,
-    qs: &Array1<f32>,
-    goal: &Vec2,
-) -> Array1<f32> {
-    let a_i_0 = get_all_vertices(origin, ls, qs);
+fn jacobian_transpose(a_i_0: &Vec<Vec2>, goal: &Vec2) -> Array1<f32> {
+    let n = a_i_0.len() - 1;
     // Free end coordinates
     let a_e_0 = *a_i_0.last().unwrap();
     // Building jacobian
-    let mut jacobian = Array2::zeros((2, qs.len()));
-    for i in 0..qs.len() {
+    let mut jacobian = Array2::zeros((2, n));
+    for i in 0..n {
         let a_ie_0 = a_e_0 - a_i_0[i];
         jacobian[(0, i)] = -a_ie_0[1];
         jacobian[(1, i)] = a_ie_0[0];
@@ -34,7 +34,11 @@ pub fn jacobian_transpose(
     let delta_x = arr1(&[goal[0], goal[1]]) - arr1(&[a_e_0[0], a_e_0[1]]);
     // Jacobian transpose
     let delta_q = jacobian.t().dot(&delta_x);
-    // 2 x 1 -> 1 x 2
-    let delta_q = arr1(&delta_q.iter().map(|&e| e).collect::<Vec<f32>>());
     delta_q
+}
+
+pub fn ik(origin: &Vec2, ls: &Array1<f32>, qs: &Array1<f32>, goal: &Vec2) -> Array1<f32> {
+    let (vertices, _) = get_all_vertices_and_com(origin, ls, qs);
+    let jt_step = jacobian_transpose(&vertices, &goal);
+    jt_step
 }

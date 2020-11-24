@@ -84,7 +84,8 @@
 
 | act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
 | ---                | ---         | ---           | ---                      | ---            |
-| 1 NR               | done        | done          | N/A                      | N/A            |
+| 1 NR               | done        | done          | N/A                      | -              |
+| 1 NR CEO (math)    |             |               |                          |                |
 | 2 NR               | done        | -             | -                        | -              |
 | 2 NR + core        | done        | -             | -                        | -              |
 | 2 NR + core + 2 NR | done        | -             | -                        | -              |

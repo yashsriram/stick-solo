@@ -117,7 +117,8 @@ impl NR {
     }
 
     pub fn get_all_vertices(&self) -> Vec<Vec2> {
-        let mut vertices = vec![self.origin];
+        let mut vertices = Vec::with_capacity(self.n + 1);
+        vertices.push(self.origin);
         let mut e1 = self.origin;
         let mut cumulative_rotation = 0f32;
         for i in 0..self.n {
@@ -130,8 +131,23 @@ impl NR {
         vertices
     }
 
+    pub fn get_center_of_mass(&self) -> Vec2 {
+        let mut com = self.origin / 2.0;
+        let mut e1 = self.origin;
+        let mut cumulative_rotation = 0f32;
+        for i in 0..self.n {
+            cumulative_rotation += self.qs[i];
+            let e2 =
+                e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * self.ls[i];
+            com += e2;
+            e1 = e2;
+        }
+        com -= e1 / 2.0;
+        com / (self.n as f32)
+    }
+
     pub fn pose_to_transforms(&self) -> Vec<(Vec2, f32)> {
-        let mut transforms = vec![];
+        let mut transforms = Vec::with_capacity(self.n);
         let mut e1 = self.origin;
         let mut cumulative_rotation = 0f32;
         for i in 0..self.n {

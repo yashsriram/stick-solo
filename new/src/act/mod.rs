@@ -28,6 +28,7 @@ impl NR {
         q_clamps: &[(f32, f32)],
         thickness: f32,
     ) -> Self {
+        assert!(ls.len() > 0, "Zero links argument.");
         assert_eq!(
             ls.len(),
             qs.len(),

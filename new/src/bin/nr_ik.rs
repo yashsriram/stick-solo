@@ -40,7 +40,7 @@ fn control(mut agent: ResMut<NR>, goal: Res<Goal>, pause: Res<Pause>, mut ticks:
         return;
     }
     let (_, origin, ls, qs) = agent.get_current_state();
-    let (goal_control, comx_control) = stick_solo::plan::origin_comx_ik(origin, ls, qs, &goal.0);
+    let (goal_control, comx_control) = stick_solo::plan::midpoint_comx_ik(origin, ls, qs, &goal.0);
     agent.update(goal_control + comx_control * 0.1);
     ticks.0 += 1;
 }

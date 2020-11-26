@@ -78,6 +78,7 @@ pub fn midpoint_comx_ik(
         .iter()
         .map(|&vertex| vertex - origin)
         .collect::<Vec<Vec2>>();
+    // Set comx goal as (origin_x + goal_x) / 2
     let com = com - ((origin + goal.clone()) / 2.0);
     let comx_step = comx_step(vertices, com[0]);
     (jt_step, comx_step)
@@ -97,6 +98,7 @@ pub fn origin_comx_ik(
         .iter()
         .map(|&vertex| vertex - origin)
         .collect::<Vec<Vec2>>();
+    // Set comx goal as origin_x
     let com = com - origin;
     let comx_step = comx_step(vertices, com[0]);
     (jt_step, comx_step)

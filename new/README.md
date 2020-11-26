@@ -110,10 +110,21 @@
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 
 #### Demos
-- [ ] NR goal + com
+- [ ] NR goal
+- [ ] NR goal + origin comx
     - [ ] goal oriented (powerful)
     - [ ] com oriented (balanced)
-- [ ] worm NR goal + com
+- [ ] worm NR goal + origin comx
+- [ ] NR goal + midpoint comx
+    - [ ] goal oriented (powerful)
+    - [ ] com oriented (balanced)
+- [ ] worm NR goal + midpoint comx
+- [ ] 2 limb as 4R goal + origin comx
+    - [ ] goal oriented (powerful)
+    - [ ] com oriented (balanced)
+- [ ] 2 limb as 4R goal + midpoint comx
+    - [ ] goal oriented (powerful)
+    - [ ] com oriented (balanced)
 
 ### Future work
 - [ ] 2D PRM/A\*

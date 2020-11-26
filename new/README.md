@@ -80,7 +80,7 @@
     - [ ] Put center of mass over holds.
     - [ ] Formulate and achieve relaxing poses/efficient transfers.
     - [ ] Do what all climb cycle agent can and more (ex same hand two time transfer).
-    - [ ] High level planner.
+    - [ ] High level planner (independent of low level planner).
 
 - Tools
     - Networks; FCN, Conv, ... using Torch
@@ -98,33 +98,44 @@
 - Tried networks
     - [x] NR: ls, qs, goal input -> delta_qs
     - [x] NR: xis, yis, goal input -> delta_qs
-- [x] Implement JT + COM control for 1 NR agent.
+- [x] Implement JT + COM control for 1 NR agent. (delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c)
     - [x] Discounted com control for q_i by 1 / i
     - [x] Sending com to origin vs origin + goal / 2
     - [ ] Local maxima problem ys = 0.
     - [ ] Powerful vs balanced tuning
-    - [ ] How to use constraints well? Agents get stuck due to them even for cases where there is a solution. Local planning minumum problem.
-        - Maybe choose goal only in field of view. But that changes wildly due to com control.
-- [ ] If your right hand is free and next hold is on your left; switch hands
+    - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
+- [ ] 2 limb 4R agent
+    - [x] Reaching a hold
+    - [ ] Traversing a path
+    - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
+        - [ ] If your right hand is free and next hold is on your left; switch hands
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 
 #### Demos
-- [ ] NR goal
-- [ ] NR goal + origin comx
-    - [ ] goal oriented (powerful)
-    - [ ] com oriented (balanced)
-- [ ] worm NR goal + origin comx
-- [ ] NR goal + midpoint comx
-    - [ ] goal oriented (powerful)
-    - [ ] com oriented (balanced)
-- [ ] worm NR goal + midpoint comx
-- [ ] 2 limb as 4R goal + origin comx
-    - [ ] goal oriented (powerful)
-    - [ ] com oriented (balanced)
-- [ ] 2 limb as 4R goal + midpoint comx
-    - [ ] goal oriented (powerful)
-    - [ ] com oriented (balanced)
+- [ ] jt end_control
+- [ ] pseudo inv end_control
+- One transfer
+    - [ ] NR: end_control
+
+    - [ ] NR: end_control + origin comx_control (powerful vs powerless)
+    - [ ] worm: NR end_control + origin comx_control (powerful vs powerless)
+
+    - [ ] NR: end_control + midpoint comx_control (powerful vs balanced)
+    - [ ] worm: NR end_control + midpoint comx_control (powerful vs balanced)
+
+    - [ ] 2 limb as 4R: end_control + comx_control (powerful vs balanced)
+
+    - [ ] 2 limb as 2 2R end_control + comx_control (non-learning)
+
+    - [ ] 4 limb as 4 2R end_control + comx_control (non-learning)
+
+    - [ ] 2 limb as 2 2R end_control + comx_control (learning)
+
+- Multiple transfers
+    - [ ] 2 limb as 4R end_control + comx_control
+
+    - [ ] 2 limb as 2 2R end_control + comx_control (non-learning)
 
 ### Future work
 - [ ] 2D PRM/A\*

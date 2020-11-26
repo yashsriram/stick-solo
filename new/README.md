@@ -100,10 +100,12 @@
     - [x] NR: xis, yis, goal input -> delta_qs
 - [x] Implement JT + COM control for 1 NR agent.
     - [x] Discounted com control for q_i by 1 / i
+    - [x] Sending com to origin vs origin + goal / 2
     - [ ] Local maxima problem ys = 0.
     - [ ] Powerful vs balanced tuning
     - [ ] How to use constraints well? Agents get stuck due to them even for cases where there is a solution. Local planning minumum problem.
         - Maybe choose goal only in field of view. But that changes wildly due to com control.
+- [ ] If your right hand is free and next hold is on your left; switch hands
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

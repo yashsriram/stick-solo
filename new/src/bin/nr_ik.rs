@@ -5,6 +5,7 @@ use stick_solo::game::{pause_plugin::Pause, status_bar_plugin::Ticks, *};
 
 fn main() {
     let inf = f32::INFINITY;
+    let pi = std::f32::consts::PI;
     App::build()
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_resource(WindowDescriptor {
@@ -15,13 +16,18 @@ fn main() {
         .add_plugins(base_plugins::BasePlugins)
         .add_plugin(camera_plugin::CameraPlugin)
         .add_plugin(nr_plugin::NRPlugin::new(NR::new(
-            Vec2::new(0.3, -0.1),
-            &[0.4, 0.2, 0.1],
-            &[0.0; 3],
-            &[(-1.57, 2.0), (0.0, 2.0), (0.0, 2.0)],
+            Vec2::new(-0.5, -0.1),
+            &[0.2, 0.25, 0.25, 0.2],
+            &[-2.0, 0.0, 2.0, 0.0],
+            &[
+                (-pi * 0.75, pi * 0.75),
+                (0.0, pi * 0.5),
+                (-pi * 0.5, pi),
+                (0.0, pi * 0.5),
+            ],
             0.01,
         )))
-        .add_plugin(goal_plugin::GoalPlugin::new(Goal(Vec2::new(0.4, 0.4))))
+        .add_plugin(goal_plugin::GoalPlugin::new(Goal(Vec2::new(0.0, -0.1))))
         .add_plugin(status_bar_plugin::StatusBarPlugin)
         .add_plugin(pause_plugin::PausePlugin)
         .add_system(control.system())
@@ -34,7 +40,7 @@ fn control(mut agent: ResMut<NR>, goal: Res<Goal>, pause: Res<Pause>, mut ticks:
         return;
     }
     let (_, origin, ls, qs) = agent.get_current_state();
-    let delta_qs = stick_solo::plan::ik(origin, ls, qs, &goal.0);
-    agent.update(delta_qs);
+    let (goal_control, comx_control) = stick_solo::plan::origin_comx_ik(origin, ls, qs, &goal.0);
+    agent.update(goal_control + comx_control * 0.1);
     ticks.0 += 1;
 }

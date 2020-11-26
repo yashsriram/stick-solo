@@ -16,9 +16,9 @@ fn main() {
         .add_plugin(camera_plugin::CameraPlugin)
         .add_plugin(nr_plugin::NRPlugin::new(NR::new(
             Vec2::new(0.3, -0.1),
-            &[0.2; 2],
-            &[0.01; 2],
-            &[(-0.1, 3.14); 2],
+            &[0.4, 0.2, 0.1],
+            &[0.0; 3],
+            &[(-1.57, 2.0), (0.0, 2.0), (0.0, 2.0)],
             0.01,
         )))
         .add_plugin(goal_plugin::GoalPlugin::new(Goal(Vec2::new(0.4, 0.4))))

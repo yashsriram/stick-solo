@@ -99,6 +99,7 @@
     - [x] NR: ls, qs, goal input -> delta_qs
     - [x] NR: xis, yis, goal input -> delta_qs
 - [x] Implement JT + COM control for 1 NR agent.
+    - [x] Discounted com control for q_i by 1 / i
     - [ ] Local maxima problem ys = 0.
     - [ ] Powerful vs balanced tuning
     - [ ] How to use constraints well? Agents get stuck due to them even for cases where there is a solution. Local planning minumum problem.

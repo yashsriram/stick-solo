@@ -133,18 +133,17 @@ impl NR {
     }
 
     pub fn get_center_of_mass(&self) -> Vec2 {
-        let mut com = self.origin / 2.0;
+        let mut com = Vec2::zero();
         let mut e1 = self.origin;
         let mut cumulative_rotation = 0f32;
         for i in 0..self.n {
             cumulative_rotation += self.qs[i];
             let e2 =
                 e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * self.ls[i];
-            com += e2;
+            com += self.ls[i] * (e1 + e2) / 2.0;
             e1 = e2;
         }
-        com -= e1 / 2.0;
-        com / (self.n as f32)
+        com / self.ls.sum()
     }
 
     pub fn pose_to_transforms(&self) -> Vec<(Vec2, f32)> {

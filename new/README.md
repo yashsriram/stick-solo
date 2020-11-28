@@ -121,9 +121,10 @@
     - [ ] midpoint comx_control
 - One transfer
     - [ ] NR: end_control
+    - [ ] worm NR: end_control
 
     - [ ] NR: end_control + comx_control (2 x 2 x try various weights for controls)
-    - [ ] worm: NR end_control + comx_control (2 x 2 x try various weights for controls)
+    - [ ] worm NR: end_control + comx_control (2 x 2 x try various weights for controls)
 
     - [ ] 2 limb as 4R: end_control + comx_control (2 x 2 x try various weights for controls)
 
@@ -135,6 +136,10 @@
 
 - Multiple transfers
     - [ ] 2 limb as 4R: end_control + comx_control (2 x 2 x try various weights for controls)
+        - differs from NR iterative agent in baseline in that
+            - has comx control
+            - left hand reaches out for left semi-circle; otherwise match and switch pivot
+            - has constraints
 
     - [ ] 2 limb as 2 2R (non-learning): end_control + comx_control
 

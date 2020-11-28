@@ -113,29 +113,30 @@
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 
 #### Demos
-- [ ] jt end_control
-- [ ] pseudo inv end_control
+- end controls
+    - [ ] jt end_control
+    - [ ] pseudo inv end_control
+- comx controls
+    - [ ] origin comx_control
+    - [ ] midpoint comx_control
 - One transfer
     - [ ] NR: end_control
 
-    - [ ] NR: end_control + origin comx_control (powerful vs powerless)
-    - [ ] worm: NR end_control + origin comx_control (powerful vs powerless)
+    - [ ] NR: end_control + comx_control (2 x 2 x try various weights for controls)
+    - [ ] worm: NR end_control + comx_control (2 x 2 x try various weights for controls)
 
-    - [ ] NR: end_control + midpoint comx_control (powerful vs balanced)
-    - [ ] worm: NR end_control + midpoint comx_control (powerful vs balanced)
+    - [ ] 2 limb as 4R: end_control + comx_control (2 x 2 x try various weights for controls)
 
-    - [ ] 2 limb as 4R: end_control + comx_control (powerful vs balanced)
+    - [ ] 2 limb as 2 2R (non-learning): end_control + comx_control
 
-    - [ ] 2 limb as 2 2R end_control + comx_control (non-learning)
+    - [ ] 4 limb as 4 2R (non-learning): end_control + comx_control
 
-    - [ ] 4 limb as 4 2R end_control + comx_control (non-learning)
-
-    - [ ] 2 limb as 2 2R end_control + comx_control (learning)
+    - [ ] 2 limb as 2 2R (learning): end_control + comx_control
 
 - Multiple transfers
-    - [ ] 2 limb as 4R end_control + comx_control
+    - [ ] 2 limb as 4R: end_control + comx_control (2 x 2 x try various weights for controls)
 
-    - [ ] 2 limb as 2 2R end_control + comx_control (non-learning)
+    - [ ] 2 limb as 2 2R (non-learning): end_control + comx_control
 
 ### Future work
 - [ ] 2D PRM/A\*

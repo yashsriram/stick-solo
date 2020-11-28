@@ -98,14 +98,19 @@
 - Tried networks
     - [x] NR: ls, qs, goal input -> delta_qs
     - [x] NR: xis, yis, goal input -> delta_qs
-- [x] Implement JT + COM control for 1 NR agent. (delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c)
+- [x] JT control
+- [x] Implement COMx control.
+    - [x] delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c
     - [x] Discounted com control for q_i by 1 / i
     - [x] Sending com to origin vs origin + goal / 2
     - [ ] Local maxima problem ys = 0.
     - [ ] Powerful vs balanced tuning
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
+- [ ] COMy control. increase com downward y distance w.r.t lowest hold
 - [ ] 2 limb 4R agent
     - [x] Reaching a hold
+    - [ ] switching pivot
+        - [ ] q and q clamp assignment on switching
     - [ ] Traversing a path
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
         - [ ] If your right hand is free and next hold is on your left; switch hands
@@ -113,35 +118,34 @@
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 
 #### Demos
-- end controls
-    - [ ] jt end_control
-    - [ ] pseudo inv end_control
-- comx controls
-    - [ ] origin comx_control
-    - [ ] midpoint comx_control
-- One transfer
-    - [ ] NR: end_control
-    - [ ] worm NR: end_control
+- Possible variants
+    - (2) end controls
+        - jt end_control
+        - pseudo inv end_control
+    - (2) comx controls
+        - origin comx_control
+        - midpoint comx_control
+    - (1) comy control
 
-    - [ ] NR: end_control + comx_control (2 x 2 x try various weights for controls)
-    - [ ] worm NR: end_control + comx_control (2 x 2 x try various weights for controls)
+- [ ] NR: end_control
+- [ ] worm NR: end_control
 
-    - [ ] 2 limb as 4R: end_control + comx_control (2 x 2 x try various weights for controls)
+- [ ] NR: end_control + comx_control + comy_control (2 x 2 x 1 x try various weights for controls)
+- [ ] worm NR: end_control + comx_control + comy_control (2 x 2 x 1 x try various weights for controls)
 
-    - [ ] 2 limb as 2 2R (non-learning): end_control + comx_control
+- [ ] 2 limb as 4R: end_control + comx_control + comy_control (2 x 2 x 1 x try various weights for controls)
+    - differs from NR iterative traversing agent in baseline in that
+        - has comx control
+        - left hand reaches out for left semi-circle; otherwise match and switch pivot
+        - has constraints
+    - [ ] one transfer
+    - [ ] multiple transfers
 
-    - [ ] 4 limb as 4 2R (non-learning): end_control + comx_control
+- [ ] 2 limb as 2 2R (non-learning): end_control + comx_control + comy_control
 
-    - [ ] 2 limb as 2 2R (learning): end_control + comx_control
+- [ ] 4 limb as 4 2R (non-learning): end_control + comx_control + comy_control
 
-- Multiple transfers
-    - [ ] 2 limb as 4R: end_control + comx_control (2 x 2 x try various weights for controls)
-        - differs from NR iterative agent in baseline in that
-            - has comx control
-            - left hand reaches out for left semi-circle; otherwise match and switch pivot
-            - has constraints
-
-    - [ ] 2 limb as 2 2R (non-learning): end_control + comx_control
+- [ ] 2 limb as 2 2R (learning): end_control + comx_control + comy_control
 
 ### Future work
 - [ ] 2D PRM/A\*

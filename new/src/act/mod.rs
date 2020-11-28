@@ -43,12 +43,12 @@ impl NR {
             assert!(ls[i] > 0.0, "Non-positive length argument.");
             assert!(
                 q_clamps[i].0 <= q_clamps[i].1,
-                format!("Invalid q clamp range argument. {:?}", q_clamps[i])
+                format!("Lower clamp greater than upper clamp.")
             );
             assert!(q_clamps[i].0 <= qs[i], "Disobidient q arguement.");
             assert!(qs[i] <= q_clamps[i].1, "Disobidient q arguement.");
         }
-        assert!(thickness > 0.0, "Non-positive thickness argument");
+        assert!(thickness > 0.0, "Non-positive thickness argument.");
         NR {
             n: ls.len(),
             origin: origin,

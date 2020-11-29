@@ -103,18 +103,20 @@
     - [x] NR: ls, qs, goal input -> delta_qs
     - [x] NR: xis, yis, goal input -> delta_qs
 - [x] JT control
+- [ ] pseudo inverse control
 - [x] Implement COMx control.
     - [x] delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c
     - [x] Discounted com control for q_i by 1 / i
-    - [x] Sending com to origin vs origin + goal / 2
+    - [x] Sending com to origin vs origin + goal / 2. Can actually send anywhere.
+- [x] COMy control. push com_y downward
+- [ ] NR agent
     - [ ] Local maxima problem ys = 0.
     - [ ] Powerful vs balanced tuning
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-- [x] COMy control. push com_y downward
-- [ ] 2 limb 4R agent
+- [ ] switching NR agent (general case of 2 limb as 4R)
     - [x] Reaching a hold
-    - [ ] switching pivot
-        - [ ] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
+    - [x] switching pivot
+        - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
         - [ ] If your right hand is free and next hold is on your left; switch hands
     - [ ] Traversing a path
@@ -143,10 +145,13 @@
         - has com_y control
         - left hand reaches out for left semi-circle; otherwise match and switch pivot
         - has constraints
-    - [ ] one transfer
-    - [ ] multiple transfers
+    - [ ] reaching
+    - [ ] reaching and switching (transfer)
+    - [ ] reaching, matching (if needed) and switching (transfer)
 
 - [ ] 2 limb as 2 2R (non-learning): end_control + com_x_control + com_y_control
+
+- [ ] 2 limb as 2 2R (non-learning, two simultaneous pivots): end_control + com_x_control + com_y_control
 
 - [ ] 4 limb as 4 2R (non-learning): end_control + com_x_control + com_y_control
 

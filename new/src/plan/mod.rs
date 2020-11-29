@@ -1,6 +1,16 @@
 use bevy::prelude::*;
 use ndarray::prelude::*;
 
+pub enum EndControl {
+    JacobianTranspose,
+    PseudoInverse,
+}
+
+pub enum COMXGoalType {
+    Pivot,
+    PivotGoalMidpoint,
+}
+
 fn get_all_vertices_and_com(
     origin: &Vec2,
     ls: &Array1<f32>,
@@ -22,7 +32,7 @@ fn get_all_vertices_and_com(
     (vertices, com / ls.sum())
 }
 
-fn jacobian_transpose_step(a_i_0: &Vec<Vec2>, goal: &Vec2) -> Array1<f32> {
+fn jacobian_transpose(a_i_0: &Vec<Vec2>, goal: &Vec2) -> Array1<f32> {
     let n = a_i_0.len() - 1;
     // Free end coordinates
     let a_e_0 = *a_i_0.last().unwrap();
@@ -40,7 +50,7 @@ fn jacobian_transpose_step(a_i_0: &Vec<Vec2>, goal: &Vec2) -> Array1<f32> {
     delta_q
 }
 
-fn comx_step(vertices: Vec<Vec2>, comx: f32) -> Array1<f32> {
+fn com_x_sqr_gradient_with_qs(vertices: &Vec<Vec2>, com_x: f32) -> Array1<f32> {
     // len(vertices) = n + 1
     // Calculate y_1 + y_2 + y_3 + ... y_(n-1) + (y_n / 2); y_0 = 0 anyway so include it for cleaner code
     let sum_y_i = vertices.iter().map(|vertex| vertex[1]).sum::<f32>();
@@ -49,57 +59,77 @@ fn comx_step(vertices: Vec<Vec2>, comx: f32) -> Array1<f32> {
     // Calculate negative gradient of x_c ^ 2 w.r.t. q_i
     let n = vertices.len() - 1;
     let nf = n as f32;
-    let mut delta_q_prev = ((2.0 / nf) * comx) * second_term;
+    let mut delta_q_prev = (2.0 * com_x / nf) * second_term;
     let mut delta_q = Vec::with_capacity(n);
     delta_q.push(delta_q_prev);
     for i in 1..n {
         // Actual value
         let delta_q_curr =
-            delta_q_prev - (2.0 * comx / nf) * vertices[i][1] * (nf - (i as f32) + 0.5);
-        // Discounted responsibility for maintainin center of mass over origin
+            delta_q_prev - (2.0 * com_x / nf) * vertices[i][1] * (nf - (i as f32) + 0.5);
+        // Discounted responsibility for sending com_x to origin
         let delta_q_curr = delta_q_curr / (i as f32);
         delta_q_prev = delta_q_curr;
         delta_q.push(delta_q_prev);
     }
+    // delta_q corresponds to negative gradient, so take a negative
+    let delta_q = -arr1(&delta_q);
+    delta_q
+}
+
+fn com_y_gradient_with_qs(vertices: &Vec<Vec2>) -> Array1<f32> {
+    // len(vertices) = n + 1
+    // Calculate x_1 + x_2 + x_3 + ... x_(n-1) + (x_n / 2); x_0 = 0 anyway so include it for cleaner code
+    let sum_x_i = vertices.iter().map(|vertex| vertex[0]).sum::<f32>();
+    let last_x_i = vertices.last().unwrap()[0];
+    let second_term = sum_x_i - (last_x_i / 2.0);
+    // Calculate negative gradient of y_c w.r.t. q_i
+    let n = vertices.len() - 1;
+    let nf = n as f32;
+    let mut delta_q_prev = (1.0 / nf) * second_term;
+    let mut delta_q = Vec::with_capacity(n);
+    delta_q.push(delta_q_prev);
+    for i in 1..n {
+        // Actual value
+        let delta_q_curr = delta_q_prev - (1.0 / nf) * vertices[i][0] * (nf - (i as f32) + 0.5);
+        let delta_q_curr = delta_q_curr / (i as f32);
+        delta_q_prev = delta_q_curr;
+        delta_q.push(delta_q_prev);
+    }
+    // delta_q corresponds to positive gradient, so directly return
     arr1(&delta_q)
 }
 
-pub fn midpoint_comx_ik(
+pub fn ik(
     origin: &Vec2,
     ls: &Array1<f32>,
     qs: &Array1<f32>,
     goal: &Vec2,
-) -> (Array1<f32>, Array1<f32>) {
+    end_control: EndControl,
+    com_x_goal_type: COMXGoalType,
+) -> (Array1<f32>, Array1<f32>, Array1<f32>) {
     let (vertices, com) = get_all_vertices_and_com(origin, ls, qs);
-    let jt_step = jacobian_transpose_step(&vertices, &goal);
+    let take_end_to_given_goal = match end_control {
+        EndControl::JacobianTranspose => jacobian_transpose(&vertices, &goal),
+        EndControl::PseudoInverse => Array1::<f32>::zeros(qs.len()),
+    };
     // Shift origin to first vertex
     let origin = vertices[0];
     let vertices = vertices
         .iter()
         .map(|&vertex| vertex - origin)
         .collect::<Vec<Vec2>>();
-    // Set comx goal as (origin_x + goal_x) / 2
-    let com = com - ((origin + goal.clone()) / 2.0);
-    let comx_step = comx_step(vertices, com[0]);
-    (jt_step, comx_step)
-}
-
-pub fn origin_comx_ik(
-    origin: &Vec2,
-    ls: &Array1<f32>,
-    qs: &Array1<f32>,
-    goal: &Vec2,
-) -> (Array1<f32>, Array1<f32>) {
-    let (vertices, com) = get_all_vertices_and_com(origin, ls, qs);
-    let jt_step = jacobian_transpose_step(&vertices, &goal);
-    // Shift origin to first vertex
-    let origin = vertices[0];
-    let vertices = vertices
-        .iter()
-        .map(|&vertex| vertex - origin)
-        .collect::<Vec<Vec2>>();
-    // Set comx goal as origin_x
-    let com = com - origin;
-    let comx_step = comx_step(vertices, com[0]);
-    (jt_step, comx_step)
+    // Set com_x goal
+    let com_x = com[0];
+    let com_x_goal = match com_x_goal_type {
+        COMXGoalType::Pivot => origin[0],
+        COMXGoalType::PivotGoalMidpoint => (origin[0] + goal[0]) / 2.0,
+    };
+    let push_com_x_from_its_goal = com_x_sqr_gradient_with_qs(&vertices, com_x - com_x_goal);
+    // Make com_y go downward
+    let push_com_y_upward = com_y_gradient_with_qs(&vertices);
+    (
+        take_end_to_given_goal,
+        push_com_x_from_its_goal,
+        push_com_y_upward,
+    )
 }

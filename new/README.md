@@ -73,6 +73,10 @@
 - [x] A demo containing everything
 
 ### New ideas
+- My game my rules ----------------- Physical Simulator --------------------- Real world
+                        |
+                current project
+
 - Idea for human like stick figure agent.
     - [ ] IK for each limb.
     - [ ] Co-ordinate among limbs.
@@ -122,30 +126,31 @@
     - (2) end controls
         - jt end_control
         - pseudo inv end_control
-    - (2) comx controls
-        - origin comx_control
-        - midpoint comx_control
-    - (1) comy control
+    - (2) com_x controls
+        - origin com_x_control
+        - midpoint com_x_control
+    - (1) com_y control
 
 - [ ] NR: end_control
 - [ ] worm NR: end_control
 
-- [ ] NR: end_control + comx_control + comy_control (2 x 2 x 1 x try various weights for controls)
-- [ ] worm NR: end_control + comx_control + comy_control (2 x 2 x 1 x try various weights for controls)
+- [ ] NR: end_control + com_x_control + com_y_control (2 x 2 x 1 x try various weights for controls)
+- [ ] worm NR: end_control + com_x_control + com_y_control (2 x 2 x 1 x try various weights for controls)
 
-- [ ] 2 limb as 4R: end_control + comx_control + comy_control (2 x 2 x 1 x try various weights for controls)
+- [ ] 2 limb as 4R: end_control + com_x_control + com_y_control (2 x 2 x 1 x try various weights for controls)
     - differs from NR iterative traversing agent in baseline in that
-        - has comx control
+        - has com_x control
+        - has com_y control
         - left hand reaches out for left semi-circle; otherwise match and switch pivot
         - has constraints
     - [ ] one transfer
     - [ ] multiple transfers
 
-- [ ] 2 limb as 2 2R (non-learning): end_control + comx_control + comy_control
+- [ ] 2 limb as 2 2R (non-learning): end_control + com_x_control + com_y_control
 
-- [ ] 4 limb as 4 2R (non-learning): end_control + comx_control + comy_control
+- [ ] 4 limb as 4 2R (non-learning): end_control + com_x_control + com_y_control
 
-- [ ] 2 limb as 2 2R (learning): end_control + comx_control + comy_control
+- [ ] 2 limb as 2 2R (learning): end_control + com_x_control + com_y_control
 
 ### Future work
 - [ ] 2D PRM/A\*

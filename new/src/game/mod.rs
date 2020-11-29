@@ -4,3 +4,4 @@ pub mod goal_plugin;
 pub mod nr_plugin;
 pub mod pause_plugin;
 pub mod status_bar_plugin;
+pub mod switchable_nr_plugin;

@@ -114,10 +114,10 @@
 - [ ] 2 limb 4R agent
     - [x] Reaching a hold
     - [ ] switching pivot
-        - [ ] q and q clamp assignment on switching
-    - [ ] Traversing a path
+        - [ ] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
         - [ ] If your right hand is free and next hold is on your left; switch hands
+    - [ ] Traversing a path
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

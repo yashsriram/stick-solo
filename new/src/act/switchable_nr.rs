@@ -1,12 +1,8 @@
 use bevy::prelude::*;
 use ndarray::prelude::*;
-pub mod switchable_nr;
 
 #[derive(Clone)]
-pub struct Goal(pub Vec2);
-
-#[derive(Clone)]
-pub struct NR {
+pub struct SwitchableNR {
     // State
     n: usize,
     origin: Vec2,
@@ -19,7 +15,7 @@ pub struct NR {
     thickness: f32,
 }
 
-impl NR {
+impl SwitchableNR {
     const MAX_DELTA_Q: f32 = 0.02;
 
     pub fn new(
@@ -49,8 +45,12 @@ impl NR {
             assert!(q_clamps[i].0 <= qs[i], "Disobidient q arguement.");
             assert!(qs[i] <= q_clamps[i].1, "Disobidient q arguement.");
         }
+        assert!(
+            q_clamps[0] == (-f32::INFINITY, f32::INFINITY),
+            "First q clamp has to be (-inf, inf)."
+        );
         assert!(thickness > 0.0, "Non-positive thickness argument.");
-        NR {
+        SwitchableNR {
             n: ls.len(),
             origin: origin,
             ls: arr1(ls),
@@ -61,17 +61,34 @@ impl NR {
         }
     }
 
-    pub fn reset(&mut self, origin: Vec2, ls: &[f32], qs: &[f32]) {
-        assert_eq!(ls.len(), self.n, "Bad reset ls argument.");
-        assert_eq!(qs.len(), self.n, "Bad reset qs argument.");
-        for i in 0..ls.len() {
-            assert!(ls[i] > 0.0, "Non-positive length argument.");
-            assert!(self.q_clamps[i].0 <= qs[i], "Disobidient q arguement.");
-            assert!(qs[i] <= self.q_clamps[i].1, "Disobidient q arguement.");
-        }
-        self.origin = origin;
-        self.ls = arr1(ls);
-        self.qs = arr1(qs);
+    pub fn switch_pivot(&mut self) {
+        self.origin = self.get_last_vertex();
+        self.ls = arr1(&self.ls.to_vec().into_iter().rev().collect::<Vec<f32>>());
+        // qs
+        let qs_sum = self.qs.sum();
+        let mut last_n_1_qs = self
+            .qs
+            .to_vec()
+            .into_iter()
+            .skip(1)
+            .rev()
+            .map(|e| -e)
+            .collect::<Vec<f32>>();
+        let mut qs = vec![qs_sum - std::f32::consts::PI];
+        qs.append(&mut last_n_1_qs);
+        self.qs = arr1(&qs);
+        // q_clamps
+        let mut last_n_1_q_clamps = self
+            .q_clamps
+            .to_vec()
+            .into_iter()
+            .skip(1)
+            .rev()
+            .map(|(min, max)| (-max, -min))
+            .collect::<Vec<(f32, f32)>>();
+        let mut q_clamps = vec![(-f32::INFINITY, f32::INFINITY)];
+        q_clamps.append(&mut last_n_1_q_clamps);
+        self.q_clamps = arr1(&q_clamps);
         self.delta_qs *= 0.0;
     }
 

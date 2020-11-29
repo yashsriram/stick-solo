@@ -110,7 +110,7 @@
     - [ ] Local maxima problem ys = 0.
     - [ ] Powerful vs balanced tuning
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-- [ ] COMy control. increase com downward y distance w.r.t lowest hold
+- [x] COMy control. push com_y downward
 - [ ] 2 limb 4R agent
     - [x] Reaching a hold
     - [ ] switching pivot

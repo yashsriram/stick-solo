@@ -48,7 +48,7 @@ fn control(mut agent: ResMut<NR>, goal: Res<Goal>, pause: Res<Pause>, mut ticks:
         ls,
         qs,
         &goal.0,
-        EndControl::PseudoInverse,
+        EndControl::JacobianTranspose,
         COMXGoalType::PivotGoalMidpoint,
     );
     let com = agent.get_center_of_mass();

@@ -17,3 +17,10 @@ rayon = "1.4.0"
 serde = { version = "1.0.115", features = ["derive"] }
 serde_json = "1.0.57"
 
+[[bin]]
+name = "reaching_nr"
+path = "src/bin/two_limb_as_nr/reaching_nr.rs"
+
+[[bin]]
+name = "switching_nr"
+path = "src/bin/two_limb_as_nr/switching_nr.rs"

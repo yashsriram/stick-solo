@@ -111,17 +111,28 @@
 - [x] COMy control. push com_y downward
 - [x] NR agent
     - [x] Local maxima problem ys = 0. (very rare problem since other controls are generally involved.)
-    - [ ] Powerful vs balanced tuning
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-- [x] switching NR agent (general case of 2 limb as NR)
+    - [ ] Powerful vs balanced tuning
+- [x] 2 limb as NR (generally switching NR agent)
     - [x] Reaching a hold
     - [x] Switching pivot.
         - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
-    - [x] Matching hands. Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-        - [x] If your right hand is free and next hold is on your left; switch hands
-        - [x] using goal_reached_slack in deciding to match hands
+    - [x] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
+        - [x] Matching hands. If your right hand is free and next hold is on your left; switch hands
+        - [x] using goal_reached_slack in deciding to match hands;
+            ```rust
+            let have_to_match = match pivoting_side {
+                PivotingSide::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
+                PivotingSide::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
+            };
+            ```
+        - [x] Heuristics to reduce local minima.
+            - relaxation time (theoretically guaranteed local minima problem solve given enough relaxation time)
+        - [x] Heuristics to model overpower
+            - gaussian randomized end control (sometimes the weight is > 1 modelling overpower)
     - [x] Traversing a path
     - [ ] Powerful vs balanced tuning
+- [ ] 2 limb as 2 switching NRs
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

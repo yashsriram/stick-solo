@@ -1,6 +1,7 @@
 extern crate stick_solo;
 use bevy::prelude::*;
-use ndarray::prelude::*;
+use rand::prelude::*;
+use rand_distr::Normal;
 use std::collections::LinkedList;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
@@ -24,11 +25,12 @@ fn main() {
             height: 1000,
             ..Default::default()
         })
+        .add_resource(RestTicks(0))
         .add_plugins(BasePlugins)
         .add_plugin(CameraPlugin)
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
-            Vec2::new(-0.5, -0.1),
-            &[0.2, 0.3, 0.3, 0.2],
+            Vec2::new(0.0, -0.1),
+            &[0.2, 0.2, 0.2, 0.2],
             &[-2.0, 0.0, 2.0, 0.0],
             &[
                 (-inf, inf),
@@ -41,13 +43,31 @@ fn main() {
         )))
         .add_plugin(PathPlugin::new(Path({
             let mut path = LinkedList::new();
-            path.push_back(Vec2::new(-0.6, 0.1));
-            path.push_back(Vec2::new(-0.5, 0.1));
-            path.push_back(Vec2::new(-0.1, 0.1));
-            path.push_back(Vec2::new(0.3, 0.1));
-            path.push_back(Vec2::new(-0.1, -0.3));
-            path.push_back(Vec2::new(-0.1, -0.5));
-            path.push_back(Vec2::new(-0.1, -0.7));
+            // path.push_back(Vec2::new(-0.6, 0.1));
+            // path.push_back(Vec2::new(-0.5, 0.1));
+            // path.push_back(Vec2::new(-0.1, 0.1));
+            // path.push_back(Vec2::new(0.3, 0.1));
+            // path.push_back(Vec2::new(-0.1, -0.3));
+            // path.push_back(Vec2::new(-0.2, -0.5));
+            // path.push_back(Vec2::new(-0.3, -0.7));
+            // path.push_back(Vec2::new(-0.3, -0.9));
+            // path.push_back(Vec2::new(-0.3, -1.1));
+            // path.push_back(Vec2::new(-0.3, -1.1));
+            // path.push_back(Vec2::new(-0.2, -1.3));
+            // path.push_back(Vec2::new(0.1, -1.5));
+            // path.push_back(Vec2::new(0.5, -1.5));
+            // path.push_back(Vec2::new(0.7, -1.3));
+            // path.push_back(Vec2::new(0.7, -1.15));
+            // path.push_back(Vec2::new(0.7, -1.0));
+            let parts = 8usize;
+            for i in 0..parts {
+                let theta = 2.0 * pi * (i as f32) / (parts as f32);
+                path.push_back(Vec2::new(-1.0 + theta.cos(), theta.sin()) * 0.5);
+            }
+            for i in 0..parts {
+                let theta = 2.0 * pi * ((parts - i) as f32) / (parts as f32) + pi;
+                path.push_back(Vec2::new(1.0 + theta.cos(), theta.sin()) * 0.5);
+            }
             path
         })))
         .add_plugin(StatusBarPlugin)
@@ -57,11 +77,14 @@ fn main() {
         .run();
 }
 
+struct RestTicks(usize);
+
 fn control(
     mut agent: ResMut<SwitchableNR>,
     mut path: ResMut<Path>,
     pause: Res<Pause>,
     mut ticks: ResMut<Ticks>,
+    mut rest_ticks: ResMut<RestTicks>,
 ) {
     // Pause => pause everything
     if pause.0 {
@@ -85,6 +108,7 @@ fn control(
     if (given_goal - last).length() < SwitchableNR::GOAL_REACHED_SLACK {
         agent.switch_pivot();
         path.0.pop_front();
+        rest_ticks.0 = 0;
         return;
     }
 
@@ -96,15 +120,26 @@ fn control(
         EndControl::JacobianTranspose,
         COMXGoalType::PivotGoalMidpoint,
     );
-    let com = agent.get_center_of_mass();
-    let push_com_y_downward = if com[1] > origin[1] {
-        -push_com_y_upward
+
+    let combined_control = if rest_ticks.0 < 40 {
+        -1.0 * push_com_x_from_its_goal + -5.0 * push_com_y_upward
     } else {
-        Array1::<f32>::zeros(qs.len())
+        fn downward_push_coeff(com: &Vec2, origin: &Vec2) -> f32 {
+            let diff_y = com[1] - origin[1];
+            if diff_y < 0.0 {
+                0.0
+            } else {
+                1.0 * diff_y.abs()
+            }
+        }
+        let rnd: f32 = thread_rng().sample(Normal::new(0.0, 3.0).unwrap());
+        2.0 * rnd * rnd.signum() * take_end_to_given_goal
+            + -0.2 * push_com_x_from_its_goal
+            + -downward_push_coeff(&agent.get_center_of_mass(), origin) * push_com_y_upward
     };
-    agent.update(
-        2.0 * take_end_to_given_goal + -0.1 * push_com_x_from_its_goal + 1.0 * push_com_y_downward,
-    );
+
+    agent.update(combined_control);
 
     ticks.0 += 1;
+    rest_ticks.0 += 1;
 }

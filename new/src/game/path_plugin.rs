@@ -28,7 +28,7 @@ fn init(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Assets<Co
         commands
             .spawn(SpriteComponents {
                 sprite: Sprite {
-                    size: Vec2::new(0.04, 0.04),
+                    size: Vec2::new(0.02, 0.02),
                     resize_mode: SpriteResizeMode::Manual,
                 },
                 material: materials.add(Color::rgb(1.0, 1.0, 0.0).into()),

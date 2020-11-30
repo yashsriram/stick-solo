@@ -24,3 +24,7 @@ path = "src/bin/two_limb_as_nr/reaching_nr.rs"
 [[bin]]
 name = "switching_nr"
 path = "src/bin/two_limb_as_nr/switching_nr.rs"
+
+[[bin]]
+name = "matching_nr"
+path = "src/bin/two_limb_as_nr/matching_nr.rs"

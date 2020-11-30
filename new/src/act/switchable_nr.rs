@@ -2,6 +2,12 @@ use bevy::prelude::*;
 use ndarray::prelude::*;
 
 #[derive(Clone)]
+pub enum PivotingSide {
+    Left,
+    Right,
+}
+
+#[derive(Clone)]
 pub struct SwitchableNR {
     // State
     n: usize,
@@ -9,6 +15,7 @@ pub struct SwitchableNR {
     ls: Array1<f32>,
     qs: Array1<f32>,
     q_clamps: Array1<(f32, f32)>,
+    pivoting_side: PivotingSide,
     // Control
     delta_qs: Array1<f32>,
     // Vis
@@ -23,6 +30,7 @@ impl SwitchableNR {
         ls: &[f32],
         qs: &[f32],
         q_clamps: &[(f32, f32)],
+        pivoting_side: PivotingSide,
         thickness: f32,
     ) -> Self {
         assert!(ls.len() > 0, "Zero links argument.");
@@ -56,6 +64,7 @@ impl SwitchableNR {
             ls: arr1(ls),
             qs: arr1(qs),
             q_clamps: arr1(q_clamps),
+            pivoting_side: pivoting_side,
             delta_qs: Array1::<f32>::zeros((qs.len(),)),
             thickness: thickness,
         }
@@ -90,14 +99,25 @@ impl SwitchableNR {
         q_clamps.append(&mut last_n_1_q_clamps);
         self.q_clamps = arr1(&q_clamps);
         self.delta_qs *= 0.0;
+        // pivoting_side
+        self.pivoting_side = match self.pivoting_side {
+            PivotingSide::Left => PivotingSide::Right,
+            PivotingSide::Right => PivotingSide::Left,
+        };
     }
 
     pub fn thickness(&self) -> f32 {
         self.thickness
     }
 
-    pub fn get_current_state(&self) -> (usize, &Vec2, &Array1<f32>, &Array1<f32>) {
-        (self.n, &self.origin, &self.ls, &self.qs)
+    pub fn get_current_state(&self) -> (usize, &Vec2, &Array1<f32>, &Array1<f32>, &PivotingSide) {
+        (
+            self.n,
+            &self.origin,
+            &self.ls,
+            &self.qs,
+            &self.pivoting_side,
+        )
     }
 
     pub fn get_current_control(&self) -> &Array1<f32> {

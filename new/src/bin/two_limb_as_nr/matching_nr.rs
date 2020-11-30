@@ -1,11 +1,12 @@
 extern crate stick_solo;
 use bevy::prelude::*;
 use ndarray::prelude::*;
+use std::collections::LinkedList;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
     base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
-    goal_plugin::{Goal, GoalPlugin},
+    path_plugin::{Path, PathPlugin},
     pause_plugin::Pause,
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
@@ -38,7 +39,16 @@ fn main() {
             PivotingSide::Left,
             0.01,
         )))
-        .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.1, -0.1))))
+        .add_plugin(PathPlugin::new(Path({
+            let mut path = LinkedList::new();
+            path.push_back(Vec2::new(-0.6, 0.1));
+            path.push_back(Vec2::new(-0.5, 0.1));
+            path.push_back(Vec2::new(-0.1, 0.1));
+            path.push_back(Vec2::new(0.3, 0.1));
+            path.push_back(Vec2::new(-0.1, -0.3));
+            path.push_back(Vec2::new(-0.1, -0.5));
+            path
+        })))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(control.system())
@@ -48,20 +58,40 @@ fn main() {
 
 fn control(
     mut agent: ResMut<SwitchableNR>,
-    mut goal: ResMut<Goal>,
+    mut path: ResMut<Path>,
     pause: Res<Pause>,
     mut ticks: ResMut<Ticks>,
 ) {
+    // Pause => pause everything
     if pause.0 {
         return;
     }
+    // No more goals => pause everything
+    if path.0.is_empty() {
+        return;
+    }
+    let (_, origin, ls, qs, pivoting_side) = agent.get_current_state();
+    let given_goal = path.0.front().unwrap().clone();
+    let have_to_match = match pivoting_side {
+        PivotingSide::Left => given_goal[0] - origin[0] < 0.0,
+        PivotingSide::Right => given_goal[0] - origin[0] > 0.0,
+    };
+    if have_to_match {
+        path.0.push_front(origin.clone());
+        return;
+    }
+    let last = agent.get_last_vertex();
+    if (given_goal - last).length() < 0.01 {
+        agent.switch_pivot();
+        path.0.pop_front();
+        return;
+    }
 
-    let (_, origin, ls, qs, _) = agent.get_current_state();
     let (take_end_to_given_goal, push_com_x_from_its_goal, push_com_y_upward) = ik(
         origin,
         ls,
         qs,
-        &goal.0,
+        &given_goal,
         EndControl::JacobianTranspose,
         COMXGoalType::PivotGoalMidpoint,
     );
@@ -72,15 +102,8 @@ fn control(
         Array1::<f32>::zeros(qs.len())
     };
     agent.update(
-        2.0 * take_end_to_given_goal + -0.2 * push_com_x_from_its_goal + 1.0 * push_com_y_downward,
+        2.0 * take_end_to_given_goal + -0.1 * push_com_x_from_its_goal + 1.0 * push_com_y_downward,
     );
-
-    let last = agent.get_last_vertex();
-    if (goal.0 - last).length() < 0.01 {
-        agent.switch_pivot();
-        goal.0[1] -= 0.1;
-        goal.0[0] -= (rand::random::<f32>() - 0.5) * 0.2;
-    }
 
     ticks.0 += 1;
 }

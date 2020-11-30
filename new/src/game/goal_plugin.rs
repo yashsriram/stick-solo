@@ -1,5 +1,7 @@
-use crate::act::Goal;
 use bevy::prelude::*;
+
+#[derive(Clone)]
+pub struct Goal(pub Vec2);
 
 pub struct GoalPlugin {
     goal: Goal,

@@ -109,17 +109,18 @@
     - [x] Discounted com control for q_i by 1 / i
     - [x] Sending com to origin vs origin + goal / 2. Can actually send anywhere.
 - [x] COMy control. push com_y downward
-- [ ] NR agent
-    - [ ] Local maxima problem ys = 0.
+- [x] NR agent
+    - [x] Local maxima problem ys = 0. (very rare problem since other controls are generally involved.)
     - [ ] Powerful vs balanced tuning
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-- [ ] switching NR agent (general case of 2 limb as NR)
+- [x] switching NR agent (general case of 2 limb as NR)
     - [x] Reaching a hold
-    - [x] switching pivot
+    - [x] Switching pivot.
         - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
-    - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-        - [ ] If your right hand is free and next hold is on your left; switch hands
-    - [ ] Traversing a path
+    - [x] Matching hands. Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
+        - [x] If your right hand is free and next hold is on your left; switch hands
+    - [x] Traversing a path
+    - [ ] Powerful vs balanced tuning
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

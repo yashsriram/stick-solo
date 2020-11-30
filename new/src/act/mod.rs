@@ -3,9 +3,6 @@ use ndarray::prelude::*;
 pub mod switchable_nr;
 
 #[derive(Clone)]
-pub struct Goal(pub Vec2);
-
-#[derive(Clone)]
 pub struct NR {
     // State
     n: usize,

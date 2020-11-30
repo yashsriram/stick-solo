@@ -1,8 +1,16 @@
 extern crate stick_solo;
 use bevy::prelude::*;
 use ndarray::prelude::*;
-use stick_solo::act::{Goal, NR};
-use stick_solo::game::{pause_plugin::Pause, status_bar_plugin::Ticks, *};
+use stick_solo::act::NR;
+use stick_solo::game::{
+    base_plugins::BasePlugins,
+    camera_plugin::CameraPlugin,
+    goal_plugin::{Goal, GoalPlugin},
+    nr_plugin::NRPlugin,
+    pause_plugin::Pause,
+    pause_plugin::PausePlugin,
+    status_bar_plugin::{StatusBarPlugin, Ticks},
+};
 use stick_solo::plan::*;
 
 fn main() {
@@ -15,9 +23,9 @@ fn main() {
             height: 1000,
             ..Default::default()
         })
-        .add_plugins(base_plugins::BasePlugins)
-        .add_plugin(camera_plugin::CameraPlugin)
-        .add_plugin(nr_plugin::NRPlugin::new(NR::new(
+        .add_plugins(BasePlugins)
+        .add_plugin(CameraPlugin)
+        .add_plugin(NRPlugin::new(NR::new(
             Vec2::new(-0.5, -0.1),
             &[0.2, 0.3, 0.3, 0.2],
             &[-2.0, 0.0, 2.0, 0.0],
@@ -29,9 +37,9 @@ fn main() {
             ],
             0.01,
         )))
-        .add_plugin(goal_plugin::GoalPlugin::new(Goal(Vec2::new(0.1, -0.1))))
-        .add_plugin(status_bar_plugin::StatusBarPlugin)
-        .add_plugin(pause_plugin::PausePlugin)
+        .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.1, -0.1))))
+        .add_plugin(StatusBarPlugin)
+        .add_plugin(PausePlugin)
         .add_system(control.system())
         .add_system(bevy::input::system::exit_on_esc_system.system())
         .run();

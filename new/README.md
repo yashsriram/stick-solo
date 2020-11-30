@@ -119,6 +119,7 @@
         - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
     - [x] Matching hands. Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
         - [x] If your right hand is free and next hold is on your left; switch hands
+        - [x] using goal_reached_slack in deciding to match hands
     - [x] Traversing a path
     - [ ] Powerful vs balanced tuning
 - [ ] Understand jacobian transpose derivation properly

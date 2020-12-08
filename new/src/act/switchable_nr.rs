@@ -111,12 +111,22 @@ impl SwitchableNR {
         self.thickness
     }
 
-    pub fn get_current_state(&self) -> (usize, &Vec2, &Array1<f32>, &Array1<f32>, &PivotingSide) {
+    pub fn get_current_state(
+        &self,
+    ) -> (
+        usize,
+        &Vec2,
+        &Array1<f32>,
+        &Array1<f32>,
+        &Array1<(f32, f32)>,
+        &PivotingSide,
+    ) {
         (
             self.n,
             &self.origin,
             &self.ls,
             &self.qs,
+            &self.q_clamps,
             &self.pivoting_side,
         )
     }
@@ -125,7 +135,22 @@ impl SwitchableNR {
         &self.delta_qs
     }
 
+    pub fn update_qs(&mut self, new_qs: Array1<f32>) {
+        assert_eq!(new_qs.len(), self.n);
+        self.qs = new_qs;
+        for i in 0..self.n {
+            let (min, max) = self.q_clamps[i];
+            if self.qs[i] < min {
+                self.qs[i] = min
+            } else if self.qs[i] > max {
+                self.qs[i] = max
+            }
+        }
+        self.delta_qs *= 0.0;
+    }
+
     pub fn update(&mut self, control_delta_qs: Array1<f32>) {
+        assert_eq!(control_delta_qs.len(), self.n);
         self.delta_qs = control_delta_qs;
         self.delta_qs.mapv_inplace(|delta_q| {
             if delta_q.abs() > Self::MAX_DELTA_Q {

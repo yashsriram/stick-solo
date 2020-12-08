@@ -29,7 +29,7 @@ fn init(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let thickness = agent.thickness();
-    let (n, _, ls, _, _) = agent.get_current_state();
+    let (n, _, ls, _, _, _) = agent.get_current_state();
     // Edges
     for i in 0..n {
         commands
@@ -86,7 +86,7 @@ fn flush_transforms(
     mut com_query: Query<(&CenterOfMass, &mut Transform)>,
 ) {
     let transforms = agent.pose_to_transforms();
-    let (_, _, ls, _, _) = agent.get_current_state();
+    let (_, _, ls, _, _, _) = agent.get_current_state();
     for (edge, mut sprite, mut transform) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
         sprite.size = Vec2::new(ls[edge.0], agent.thickness());

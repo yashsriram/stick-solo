@@ -94,7 +94,7 @@ fn control(
     if path.0.is_empty() {
         return;
     }
-    let (_, origin, ls, qs, pivoting_side) = agent.get_current_state();
+    let (_, origin, ls, qs, _, pivoting_side) = agent.get_current_state();
     let given_goal = path.0.front().unwrap().clone();
     let have_to_match = match pivoting_side {
         PivotingSide::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,

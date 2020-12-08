@@ -83,13 +83,13 @@
     - [ ] With q contrains (including one side leg goal only, no cross overs).
     - [ ] Put center of mass over holds.
     - [ ] Formulate and achieve relaxing poses/efficient transfers.
-    - [ ] Do what all climb cycle agent can and more (ex same hand two time transfer).
-    - [ ] High level planner (independent of low level planner).
+    - [ ] Do what all climb cycle agent can and more.
+    - [ ] High level planner.
 
 - Tools
     - Networks; FCN, Conv, ... using Torch
     - Optimizors; CEO, Policy gradient and extensions, Deep Q learning and extensions.
-    - Rewards; Distance to goal, Control values, Difference in control values, Gravity, Relaxedness
+    - Rewards; Distance to goal, Time to goal, Control values, Difference in control values, Gravity, Relaxedness
     - Formulations; All joints controlled by network, Limbs controlled by IK + co-ordinated by network.
 
 | act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
@@ -102,24 +102,47 @@
 - Tried networks
     - [x] NR: ls, qs, goal input -> delta_qs
     - [x] NR: xis, yis, goal input -> delta_qs
-- [x] JT control
-- [ ] pseudo inverse control
-- [x] Implement COMx control.
-    - [x] delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c
-    - [x] Discounted com control for q_i by 1 / i
-    - [x] Sending com to origin vs origin + goal / 2. Can actually send anywhere.
-- [x] COMy control. push com_y downward
-- [x] NR agent
-    - [x] Local maxima problem ys = 0. (very rare problem since other controls are generally involved.)
-    - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-    - [ ] Powerful vs balanced tuning
-        - Use RL to control this
-- [x] 2 limb as NR (generally switching NR agent)
-    - [x] Reaching a hold
+
+- [x] Switching NR agent (2 limb as NR)
+    - [x] q clamps
+    - [x] Local optimal JT control
+    - [ ] Local optimal pseudo inverse control
+    - [x] Local com control
+        - [x] Implement COMx control.
+            - [x] delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c
+            - [x] Discounted com control for q_i by 1 / i
+            - [x] Sending com to origin vs origin + goal / 2. Can actually send anywhere.
+            - [x] Optimized calculation
+        - [x] COMy control. push com_y downward
+            - [x] Optimized calculation
+        - [x] Local maxima problem ys = 0. (very rare problem since other controls are generally involved.)
+        - [x] Heuristics to model powering through (adrenaline)
+            - [x] gaussian randomized end control (sometimes the weight is > 1 modelling overpower)
+            - [ ] Smoothen this to produce periodic spurs of energy (maybe perlin noise)
+        - [ ] Powerful vs balanced tuning
+    - [x] Arbitrarily global optimal control (Random sample solve and interpolate control)
+        - From the spirit of RANSAC.
+        - Given end effector goal, randomly sample q vector (in q clamps range) and keep the q\* which achieves closest approach.
+        - This at limit should not be stuck at local minima. Therefore is bit different from gradient descent.
+        - These iterations can be stopped after a fixed number of samples or if closest approach is less than a threshold.
+        - Given q\* just interpolate from current q to q\*
+        - Parallelizable
+    - [x] Arbitrarily global optimal control (Cross-entropy solve and interpolate control)
+        - From the spirit of CEO.
+        - Improvement. Instead of sampling randomly in whole q clamp, sample in small region around q, take the best q\*, then sample in vicinity of q\* and so on.
+        - More prone to local minima but given enough big sampling region local minima can be avoided.
+    - [x] Global optimal planning (Solving local planning minumum problem. Agents get stuck due to them even for cases where there is a solution).
+        - [x] 1. Heuristics to reduce local minima.
+            - relaxation time (theoretically guaranteed local minima problem solve given enough relaxation time)
+        - [x] 2. View it as a two link chain (decrease degree of freedom) (Don't want to implement now)
+        - [x] 3. Random global optimal solve
+        - [x] 4. Cross entropy global optimal solve
+    - [x] Reaching a hold.
+        - [x] Local planners
+        - [ ] Global planners. How to snap to hold once close enough
     - [x] Switching pivot.
         - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
-    - [x] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
-        - [x] Matching hands. If your right hand is free and next hold is on your left; switch hands
+    - [x] Matching hands. If your right hand is free and next hold is on your left; switch hands
         - [x] using goal_reached_slack in deciding to match hands;
             ```rust
             let have_to_match = match pivoting_side {
@@ -127,61 +150,46 @@
                 PivotingSide::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
             };
             ```
-        - [x] Heuristics to reduce local minima.
-            - relaxation time (theoretically guaranteed local minima problem solve given enough relaxation time)
-        - [ ] View it as a two link chain (decrease degree of freedom)
-        - [ ] Exact solve for NR agent with q clamps
-            - From the spirit of Cross entropy optimizor and RANSAC.
-            - Given end effector goal, randomly sample q vector (in q clamps range) and keep the q* which achieves closest approach. This at limit should not be stuck at local minima. Therefore is bit different from gradient descent.
-            - Small improvement. Instead of sampling randomly in whole q clamp, sample in small region around q, take the best q*, then sample in vicinity of q* and so on. More prone to local minima but given enough big sampling region local minima can be avoided.
-            - These iterations can be stopped after a fixed number of samples or if closest approach is less than a threshold.
-            - Given q* just interpolate from current q to q*
-            - Maybe then use gradient descent like jacobian transpose
-            - Parallelizable
-    - [x] Heuristics to model powering through (adrenaline)
-        - [x] gaussian randomized end control (sometimes the weight is > 1 modelling overpower)
-        - [ ] Smoothen this to produce periodic spurs of energy (maybe perlin noise)
     - [x] Traversing a path
-    - [ ] Powerful vs balanced tuning
-        - Use RL to control this
 - [ ] 2 limb as 2 switching NRs
+    - [ ] Enforcing constraints
+    - [ ] Formulating as RL problem
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 
 #### Demos
 - Possible variants
-    - (2) end controls
-        - jt end_control
-        - pseudo inv end_control
-    - (2) com_x controls
-        - origin com_x_control
-        - midpoint com_x_control
+    - (1) global optimal control or (2) local optimal controls [jt end_control, pseudo inv end_control]
+    - (2) com_x controls [origin com_x_control, midpoint com_x_control]
     - (1) com_y control
 
-- [ ] NR: end_control
-- [ ] worm NR: end_control
-
-- [ ] NR: end_control + com_x_control + com_y_control (2 x 2 x 1 x try various weights for controls)
-- [ ] worm NR: end_control + com_x_control + com_y_control (2 x 2 x 1 x try various weights for controls)
-
-- [ ] 2 limb as NR: end_control + com_x_control + com_y_control (2 x 2 x 1 x try various weights for controls)
-    - differs from NR iterative traversing agent in baseline in that
-        - has com_x control
-        - has com_y control
-        - left hand reaches out for left semi-circle; otherwise match and switch pivot
-        - has constraints
-    - [ ] reaching
+- [ ] NR (2 limb as NR): (1 x try various weights)
+    - differs from NR iterative traversing agent in baseline as mentioned by above reasons
+    - [ ] Illustrate constraints
+    - [ ] reaching: local
+        - [ ] Only end control (2)
+        - [ ] COM controls (2 x 1)
+        - [ ] Various values
+        - [ ] Local minima stuck
+    - [ ] reaching: global
+        - [ ] Solve local minima stuck, using relaxing, random solve, ceo solve
+        - [ ] Show other scenarios
+        - [ ] Compare quality of motions
+        - [ ] Compare convergence errors and times of random and ceo
     - [ ] reaching and switching (transfer)
+        - [ ] Successful scenario
+        - [ ] A scenario which needs matching
     - [ ] reaching, matching (if needed) and switching (transfer)
 
-- [ ] 2 limb as NR (learning): end_control + com_x_control + com_y_control + weights
+- [ ] worm NR: (1 x try various weights + 2 x 2 x 1 x try various weights for controls)
+
+- [x] 2 limb as NR (learning): end_control + com_x_control + com_y_control + weights
+    - No real learning part
 
 - [ ] 2 limb as 2 NR (non-learning): end_control + com_x_control + com_y_control
-
 - [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots): end_control + com_x_control + com_y_control
 
 - [ ] 2 limb as 2 NR (learning): end_control + com_x_control + com_y_control
-
 - [ ] 4 limb as 4 NR (non-learning): end_control + com_x_control + com_y_control
 
 ### Future work

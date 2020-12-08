@@ -1,14 +1,14 @@
 extern crate stick_solo;
 use bevy::prelude::*;
-use stick_solo::act::NR;
+use stick_solo::act::switchable_nr::{PivotingSide, SwitchableNR};
 use stick_solo::game::{
     base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     goal_plugin::{Goal, GoalPlugin},
-    nr_plugin::NRPlugin,
     pause_plugin::Pause,
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
+    switchable_nr_plugin::SwitchableNRPlugin,
 };
 use stick_solo::plan::*;
 
@@ -25,16 +25,17 @@ fn main() {
         .add_resource(RestTicks(0))
         .add_plugins(BasePlugins)
         .add_plugin(CameraPlugin)
-        .add_plugin(NRPlugin::new(NR::new(
+        .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
             &[0.2, 0.2, 0.2, 0.2],
             &[0.0, 0.0, 2.0, 0.0],
             &[
-                (-inf, pi / 2.0),
+                (-inf, inf),
                 (0.0, pi * 0.5),
                 (-pi * 0.5, pi),
                 (0.0, pi * 0.5),
             ],
+            PivotingSide::Left,
             0.01,
         )))
         .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.5, 0.5))))
@@ -48,7 +49,7 @@ fn main() {
 struct RestTicks(usize);
 
 fn control(
-    mut agent: ResMut<NR>,
+    mut agent: ResMut<SwitchableNR>,
     pause: Res<Pause>,
     goal: Res<Goal>,
     mut ticks: ResMut<Ticks>,
@@ -58,7 +59,7 @@ fn control(
     if pause.0 {
         return;
     }
-    let (_, origin, ls, qs) = agent.get_current_state();
+    let (_, origin, ls, qs, _, _) = agent.get_current_state();
     let given_goal = goal.0;
 
     let (take_end_to_given_goal, push_com_x_from_its_goal, _) = ik(

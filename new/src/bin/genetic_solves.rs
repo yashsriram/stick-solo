@@ -5,15 +5,15 @@ use ndarray_rand::rand_distr::Uniform;
 use ndarray_rand::RandomExt;
 use rand::prelude::*;
 use rayon::prelude::*;
-use stick_solo::act::NR;
+use stick_solo::act::switchable_nr::{PivotingSide, SwitchableNR};
 use stick_solo::game::{
     base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     goal_plugin::{Goal, GoalPlugin},
-    nr_plugin::NRPlugin,
     pause_plugin::Pause,
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
+    switchable_nr_plugin::SwitchableNRPlugin,
 };
 use stick_solo::plan::*;
 
@@ -29,57 +29,74 @@ fn main() {
         })
         .add_plugins(BasePlugins)
         .add_plugin(CameraPlugin)
-        .add_plugin(NRPlugin::new(NR::new(
+        .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
             &[0.2, 0.2, 0.2, 0.2],
-            &[1.0, 1.0, 2.0, 0.0],
+            &[1.0, 0.5, 0.0, 0.5],
             &[
-                (-pi, pi / 2.0),
+                (-inf, inf),
                 (0.0, pi * 0.5),
                 (-pi * 0.5, pi),
                 (0.0, pi * 0.5),
             ],
+            PivotingSide::Left,
             0.01,
         )))
         .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.1, -0.5))))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_system(genetic_solve_multi_gen.system())
+        .add_system(genetic_solve_from_current_state.system())
         // .add_system(interpolate.system())
         .add_system(bevy::input::system::exit_on_esc_system.system())
         .run();
 }
 
-fn genetic_solve_single_gen(mut agent: ResMut<NR>, goal: Res<Goal>) {
-    let (n, origin, ls, _, q_clamps) = agent.get_current_state();
-    let mut tries = (0..10000usize)
+fn genetic_solve_no_prior(mut agent: ResMut<SwitchableNR>, goal: Res<Goal>, pause: Res<Pause>) {
+    if pause.0 {
+        return;
+    }
+    let inf = f32::INFINITY;
+    let pi = std::f32::consts::PI;
+    let (n, origin, ls, _, q_clamps, _) = agent.get_current_state();
+    let mut losses = (0..10000usize)
         .into_par_iter()
         .map(|_| {
             let mut rng = thread_rng();
             let new_qs = q_clamps
                 .iter()
-                .map(|clamp| rng.gen_range(clamp.0, clamp.1))
+                .map(|clamp| {
+                    if clamp == &(-inf, inf) {
+                        rng.gen_range(-pi, pi)
+                    } else {
+                        rng.gen_range(clamp.0, clamp.1)
+                    }
+                })
                 .collect::<Array1<f32>>();
-            let mut e1 = *origin;
-            let mut cumulative_rotation = 0f32;
-            for i in 0..n {
-                cumulative_rotation += new_qs[i];
-                let e2 =
-                    e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * ls[i];
-                e1 = e2;
-            }
-            ((e1 - goal.0).length(), new_qs)
+            let (end, com) = get_end_verticex_and_com(origin, ls, &new_qs);
+            (
+                10.0 * (end - goal.0).length()
+                    + com[1]
+                    + (com[0] - (end[0] + goal.0[0]) / 2.0).powf(2.0),
+                new_qs,
+            )
         })
         .collect::<Vec<(f32, Array1<f32>)>>();
-    tries.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
-    println!("{:?}", tries[0].0);
-    agent.update_qs(tries[0].1.clone());
+    losses.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    println!("{:?}", losses[0].0);
+    agent.update_qs(losses[0].1.clone());
 }
 
-fn genetic_solve_multi_gen(mut agent: ResMut<NR>, goal: Res<Goal>) {
-    let (n, origin, ls, qs, q_clamps) = agent.get_current_state();
+fn genetic_solve_from_current_state(
+    mut agent: ResMut<SwitchableNR>,
+    goal: Res<Goal>,
+    pause: Res<Pause>,
+) {
+    if pause.0 {
+        return;
+    }
+    let (n, origin, ls, qs, q_clamps, _) = agent.get_current_state();
     let q_mutation = 2.0f32;
-    let mut tries = (0..10000usize)
+    let mut losses = (0..10000usize)
         .into_par_iter()
         .map(|_| {
             let mut rng = thread_rng();
@@ -93,24 +110,22 @@ fn genetic_solve_multi_gen(mut agent: ResMut<NR>, goal: Res<Goal>) {
                     new_qs[i] = max
                 }
             }
-            let mut e1 = *origin;
-            let mut cumulative_rotation = 0f32;
-            for i in 0..n {
-                cumulative_rotation += new_qs[i];
-                let e2 =
-                    e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * ls[i];
-                e1 = e2;
-            }
-            ((e1 - goal.0).length(), new_qs)
+            let (end, com) = get_end_verticex_and_com(origin, ls, &new_qs);
+            (
+                10.0 * (end - goal.0).length()
+                    + com[1]
+                    + (com[0] - (end[0] + goal.0[0]) / 2.0).powf(2.0),
+                new_qs,
+            )
         })
         .collect::<Vec<(f32, Array1<f32>)>>();
-    tries.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
-    println!("{:?}", tries[0].0);
-    agent.update_qs(tries[0].1.clone());
+    losses.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    println!("{:?}", losses[0].0);
+    agent.update_qs(losses[0].1.clone());
 }
 
 // fn interpolate(
-//     mut agent: ResMut<NR>,
+//     mut agent: ResMut<SwitchableNR>,
 //     pause: Res<Pause>,
 //     goal: Res<Goal>,
 //     mut ticks: ResMut<Ticks>,

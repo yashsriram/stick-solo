@@ -140,6 +140,7 @@
     - [x] Reaching a hold.
         - [x] Local planners
         - [ ] Global planners. How to snap to hold once close enough
+        - [ ] q1 clamp problem: -pi to pi, when right hand is pivot there is a discontinuity
     - [x] Switching pivot.
         - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
     - [x] Matching hands. If your right hand is free and next hold is on your left; switch hands
@@ -176,6 +177,7 @@
         - [ ] Show other scenarios
         - [ ] Compare quality of motions
         - [ ] Compare convergence errors and times of random and ceo
+        - [ ] Since the q* is achieved randomly, same route generates different motions (variations)
     - [ ] reaching and switching (transfer)
         - [ ] Successful scenario
         - [ ] A scenario which needs matching
@@ -188,8 +190,8 @@
 
 - [ ] 2 limb as 2 NR (non-learning): end_control + com_x_control + com_y_control
 - [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots): end_control + com_x_control + com_y_control
-
 - [ ] 2 limb as 2 NR (learning): end_control + com_x_control + com_y_control
+
 - [ ] 4 limb as 4 NR (non-learning): end_control + com_x_control + com_y_control
 
 ### Future work

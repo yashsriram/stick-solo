@@ -25,7 +25,7 @@ struct CenterOfMass;
 
 fn init(mut commands: Commands, agent: Res<NR>, mut materials: ResMut<Assets<ColorMaterial>>) {
     let thickness = agent.thickness();
-    let (n, _, ls, _) = agent.get_current_state();
+    let (n, _, ls, _, _) = agent.get_current_state();
     // Edges
     for i in 0..n {
         commands

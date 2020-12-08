@@ -40,8 +40,8 @@ impl NR {
         for i in 0..ls.len() {
             assert!(ls[i] > 0.0, "Non-positive length argument.");
             assert!(
-                q_clamps[i].0 <= q_clamps[i].1,
-                format!("Lower clamp greater than upper clamp.")
+                q_clamps[i].0 < q_clamps[i].1,
+                format!("Lower clamp greater than or equal to upper clamp.")
             );
             assert!(q_clamps[i].0 <= qs[i], "Disobidient q arguement.");
             assert!(qs[i] <= q_clamps[i].1, "Disobidient q arguement.");
@@ -76,12 +76,33 @@ impl NR {
         self.thickness
     }
 
-    pub fn get_current_state(&self) -> (usize, &Vec2, &Array1<f32>, &Array1<f32>) {
-        (self.n, &self.origin, &self.ls, &self.qs)
+    pub fn get_current_state(
+        &self,
+    ) -> (
+        usize,
+        &Vec2,
+        &Array1<f32>,
+        &Array1<f32>,
+        &Array1<(f32, f32)>,
+    ) {
+        (self.n, &self.origin, &self.ls, &self.qs, &self.q_clamps)
     }
 
     pub fn get_current_control(&self) -> &Array1<f32> {
         &self.delta_qs
+    }
+
+    pub fn update_qs(&mut self, new_qs: Array1<f32>) {
+        self.qs = new_qs;
+        for i in 0..self.n {
+            let (min, max) = self.q_clamps[i];
+            if self.qs[i] < min {
+                self.qs[i] = min
+            } else if self.qs[i] > max {
+                self.qs[i] = max
+            }
+        }
+        self.delta_qs *= 0.0;
     }
 
     pub fn update(&mut self, control_delta_qs: Array1<f32>) {

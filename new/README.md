@@ -113,6 +113,7 @@
     - [x] Local maxima problem ys = 0. (very rare problem since other controls are generally involved.)
     - [ ] Local planning minumum problem. Agents get stuck due to them even for cases where there is a solution.
     - [ ] Powerful vs balanced tuning
+        - Use RL to control this
 - [x] 2 limb as NR (generally switching NR agent)
     - [x] Reaching a hold
     - [x] Switching pivot.
@@ -128,10 +129,21 @@
             ```
         - [x] Heuristics to reduce local minima.
             - relaxation time (theoretically guaranteed local minima problem solve given enough relaxation time)
-        - [x] Heuristics to model overpower
-            - gaussian randomized end control (sometimes the weight is > 1 modelling overpower)
+        - [ ] View it as a two link chain (decrease degree of freedom)
+        - [ ] Exact solve for NR agent with q clamps
+            - From the spirit of Cross entropy optimizor and RANSAC.
+            - Given end effector goal, randomly sample q vector (in q clamps range) and keep the q* which achieves closest approach. This at limit should not be stuck at local minima. Therefore is bit different from gradient descent.
+            - Small improvement. Instead of sampling randomly in whole q clamp, sample in small region around q, take the best q*, then sample in vicinity of q* and so on. More prone to local minima but given enough big sampling region local minima can be avoided.
+            - These iterations can be stopped after a fixed number of samples or if closest approach is less than a threshold.
+            - Given q* just interpolate from current q to q*
+            - Maybe then use gradient descent like jacobian transpose
+            - Parallelizable
+    - [x] Heuristics to model powering through (adrenaline)
+        - [x] gaussian randomized end control (sometimes the weight is > 1 modelling overpower)
+        - [ ] Smoothen this to produce periodic spurs of energy (maybe perlin noise)
     - [x] Traversing a path
     - [ ] Powerful vs balanced tuning
+        - Use RL to control this
 - [ ] 2 limb as 2 switching NRs
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
@@ -162,13 +174,15 @@
     - [ ] reaching and switching (transfer)
     - [ ] reaching, matching (if needed) and switching (transfer)
 
+- [ ] 2 limb as NR (learning): end_control + com_x_control + com_y_control + weights
+
 - [ ] 2 limb as 2 NR (non-learning): end_control + com_x_control + com_y_control
 
 - [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots): end_control + com_x_control + com_y_control
 
-- [ ] 4 limb as 4 NR (non-learning): end_control + com_x_control + com_y_control
-
 - [ ] 2 limb as 2 NR (learning): end_control + com_x_control + com_y_control
+
+- [ ] 4 limb as 4 NR (non-learning): end_control + com_x_control + com_y_control
 
 ### Future work
 - [ ] 2D PRM/A\*

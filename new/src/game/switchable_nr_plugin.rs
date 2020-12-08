@@ -38,8 +38,7 @@ fn init(
                     size: Vec2::new(ls[i], thickness),
                     resize_mode: SpriteResizeMode::Manual,
                 },
-                material: materials
-                    .add(Color::rgb(rand::random(), rand::random(), rand::random()).into()),
+                material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
                 ..Default::default()
             })
             .with(Edge(i));
@@ -51,6 +50,7 @@ fn init(
                 size: Vec2::new(thickness * 2.0, thickness * 2.0),
                 resize_mode: SpriteResizeMode::Manual,
             },
+            material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
             ..Default::default()
         })
         .with(Vertex(0));
@@ -61,6 +61,7 @@ fn init(
                     size: Vec2::new(thickness * 2.0, thickness * 2.0),
                     resize_mode: SpriteResizeMode::Manual,
                 },
+                material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
                 ..Default::default()
             })
             .with(Vertex(i + 1));

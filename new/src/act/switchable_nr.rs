@@ -48,8 +48,8 @@ impl SwitchableNR {
         for i in 0..ls.len() {
             assert!(ls[i] > 0.0, "Non-positive length argument.");
             assert!(
-                q_clamps[i].0 <= q_clamps[i].1,
-                format!("Lower clamp greater than upper clamp.")
+                q_clamps[i].0 < q_clamps[i].1,
+                format!("Lower clamp greater than or equal to upper clamp.")
             );
             assert!(q_clamps[i].0 <= qs[i], "Disobidient q arguement.");
             assert!(qs[i] <= q_clamps[i].1, "Disobidient q arguement.");

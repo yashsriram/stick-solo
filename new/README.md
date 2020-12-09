@@ -105,6 +105,7 @@
 
 - [x] Switching NR agent (2 limb as NR)
     - [x] q clamps
+    - [x] delta q abs clamp
     - [x] Local optimal JT control
     - [ ] Local optimal pseudo inverse control
     - [x] Local com control
@@ -139,8 +140,9 @@
         - [x] 4. Cross entropy global optimal solve
     - [x] Reaching a hold.
         - [x] Local planners
-        - [ ] Global planners. How to snap to hold once close enough
-        - [ ] q1 clamp problem: -pi to pi, when right hand is pivot there is a discontinuity
+        - [x] Global planners. How to snap to hold once close enough (Give responsibility to local planner)
+        - [x] Restrict q0 sampling
+        - [x] Optimize sorting in genetic planners
     - [x] Switching pivot.
         - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf))
     - [x] Matching hands. If your right hand is free and next hold is on your left; switch hands
@@ -174,9 +176,13 @@
         - [ ] Local minima stuck
     - [ ] reaching: global
         - [ ] Solve local minima stuck, using relaxing, random solve, ceo solve
+        - [ ] Also show the use case of q0 clamping
+            - top to bottom not on wrong side
+            - bottom to side not too much
         - [ ] Show other scenarios
         - [ ] Compare quality of motions
         - [ ] Compare convergence errors and times of random and ceo
+        - [ ] Is the parallelization helpful?
         - [ ] Since the q* is achieved randomly, same route generates different motions (variations)
     - [ ] reaching and switching (transfer)
         - [ ] Successful scenario

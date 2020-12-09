@@ -16,8 +16,6 @@ pub struct SwitchableNR {
     qs: Array1<f32>,
     q_clamps: Array1<(f32, f32)>,
     pivoting_side: PivotingSide,
-    // Control
-    delta_qs: Array1<f32>,
     // Vis
     thickness: f32,
 }
@@ -66,7 +64,6 @@ impl SwitchableNR {
             qs: arr1(qs),
             q_clamps: arr1(q_clamps),
             pivoting_side: pivoting_side,
-            delta_qs: Array1::<f32>::zeros((qs.len(),)),
             thickness: thickness,
         }
     }
@@ -99,7 +96,6 @@ impl SwitchableNR {
         let mut q_clamps = vec![(-f32::INFINITY, f32::INFINITY)];
         q_clamps.append(&mut last_n_1_q_clamps);
         self.q_clamps = arr1(&q_clamps);
-        self.delta_qs *= 0.0;
         // pivoting_side
         self.pivoting_side = match self.pivoting_side {
             PivotingSide::Left => PivotingSide::Right,
@@ -131,10 +127,6 @@ impl SwitchableNR {
         )
     }
 
-    pub fn get_current_control(&self) -> &Array1<f32> {
-        &self.delta_qs
-    }
-
     pub fn update_qs(&mut self, new_qs: Array1<f32>) {
         assert_eq!(new_qs.len(), self.n);
         self.qs = new_qs;
@@ -146,20 +138,22 @@ impl SwitchableNR {
                 self.qs[i] = max
             }
         }
-        self.delta_qs *= 0.0;
     }
 
     pub fn update(&mut self, control_delta_qs: Array1<f32>) {
         assert_eq!(control_delta_qs.len(), self.n);
-        self.delta_qs = control_delta_qs;
-        self.delta_qs.mapv_inplace(|delta_q| {
-            if delta_q.abs() > Self::MAX_DELTA_Q {
-                Self::MAX_DELTA_Q * delta_q.signum()
-            } else {
-                delta_q
-            }
-        });
-        self.qs += &self.delta_qs;
+        let control_delta_qs = {
+            let mut control_delta_qs = control_delta_qs;
+            control_delta_qs.mapv_inplace(|delta_q| {
+                if delta_q.abs() > Self::MAX_DELTA_Q {
+                    Self::MAX_DELTA_Q * delta_q.signum()
+                } else {
+                    delta_q
+                }
+            });
+            control_delta_qs
+        };
+        self.qs += &control_delta_qs;
         for i in 0..self.n {
             let (min, max) = self.q_clamps[i];
             if self.qs[i] < min {

@@ -13,7 +13,7 @@ use stick_solo::game::{
     status_bar_plugin::{StatusBarPlugin, Ticks},
     switchable_nr_plugin::SwitchableNRPlugin,
 };
-use stick_solo::plan::*;
+use stick_solo::plan::gradient_descent::*;
 
 fn main() {
     let inf = f32::INFINITY;
@@ -112,7 +112,7 @@ fn control(
         return;
     }
 
-    let (take_end_to_given_goal, push_com_x_from_its_goal, push_com_y_upward) = ik(
+    let (take_end_to_given_goal, push_com_x_from_its_goal, push_com_y_upward) = gradient_descent(
         origin,
         ls,
         qs,

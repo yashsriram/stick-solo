@@ -154,6 +154,8 @@
             };
             ```
     - [x] Traversing a path
+        - local
+        - global
 - [ ] 2 limb as 2 switching NRs
     - [ ] Enforcing constraints
     - [ ] Formulating as RL problem

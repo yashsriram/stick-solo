@@ -59,7 +59,7 @@ fn main() {
             // path.push_back(Vec2::new(0.7, -1.3));
             // path.push_back(Vec2::new(0.7, -1.15));
             // path.push_back(Vec2::new(0.7, -1.0));
-            let parts = 8usize;
+            let parts = 7usize;
             for i in 0..parts {
                 let theta = 2.0 * pi * (i as f32) / (parts as f32);
                 path.push_back(Vec2::new(-1.0 + theta.cos(), theta.sin()) * 0.5);
@@ -121,24 +121,25 @@ fn control(
         COMXGoalType::PivotGoalMidpoint,
     );
 
-    let combined_control = if rest_ticks.0 < 40 {
+    fn downward_push_coeff(com: &Vec2, origin: Vec2) -> f32 {
+        let diff_y = com[1] - origin[1];
+        if diff_y < 0.0 {
+            0.0
+        } else {
+            1.0 * diff_y.abs()
+        }
+    }
+    let rnd: f32 = thread_rng().sample(Normal::new(0.0, 3.0).unwrap());
+    let beta = 0.03 / take_end_to_given_goal.mapv(|e| e * e).sum().sqrt();
+    let com = agent.get_center_of_mass();
+    let origin = origin.clone();
+    agent.update(if rest_ticks.0 < 40 {
         -1.0 * push_com_x_from_its_goal + -5.0 * push_com_y_upward
     } else {
-        fn downward_push_coeff(com: &Vec2, origin: &Vec2) -> f32 {
-            let diff_y = com[1] - origin[1];
-            if diff_y < 0.0 {
-                0.0
-            } else {
-                1.0 * diff_y.abs()
-            }
-        }
-        let rnd: f32 = thread_rng().sample(Normal::new(0.0, 3.0).unwrap());
-        2.0 * rnd * rnd.signum() * take_end_to_given_goal
+        beta * rnd * rnd.signum() * take_end_to_given_goal
             + -0.2 * push_com_x_from_its_goal
-            + -downward_push_coeff(&agent.get_center_of_mass(), origin) * push_com_y_upward
-    };
-
-    agent.update(combined_control);
+            + -downward_push_coeff(&com, origin) * push_com_y_upward
+    });
 
     ticks.0 += 1;
     rest_ticks.0 += 1;

@@ -202,7 +202,7 @@ fn control(
     //         + -downward_push_coeff(&agent.get_center_of_mass(), origin) * push_com_y_upward
     // };
     let alpha = 1.0 / (1.0 + ticks.0 as f32).powf(0.8);
-    let beta = 0.008 / take_end_to_given_goal.mapv(|e| e * e).sum().sqrt();
+    let beta = 0.01 / take_end_to_given_goal.mapv(|e| e * e).sum().sqrt();
     let gamma = 0.1;
     let delta = 0.1 / (1.0 + ticks.0 as f32).powf(1.0);
     agent.update(

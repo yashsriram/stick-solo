@@ -127,17 +127,8 @@ impl SwitchableNR {
         )
     }
 
-    pub fn update_qs(&mut self, new_qs: Array1<f32>) {
-        assert_eq!(new_qs.len(), self.n);
-        self.qs = new_qs;
-        for i in 0..self.n {
-            let (min, max) = self.q_clamps[i];
-            if self.qs[i] < min {
-                self.qs[i] = min
-            } else if self.qs[i] > max {
-                self.qs[i] = max
-            }
-        }
+    pub fn set_origin(&mut self, origin: Vec2) {
+        self.origin = origin;
     }
 
     pub fn update(&mut self, control_delta_qs: Array1<f32>) {

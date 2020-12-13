@@ -141,6 +141,7 @@
     - [x] Reaching a hold.
         - [x] Local planners
         - [x] Global planners. How to snap to hold once close enough (Give responsibility to local planner)
+        - [x] Weights of both planners as a function of ticks.
         - [x] Restrict q0 sampling
         - [x] Optimize sorting in genetic planners
     - [x] Switching pivot.

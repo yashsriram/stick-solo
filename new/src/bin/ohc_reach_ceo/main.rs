@@ -36,17 +36,29 @@ fn main() {
     let args = env::args();
     let exp = if args.len() == 1 {
         // Optimize
-        let world = World {};
+        let inf = f32::INFINITY;
+        let pi = std::f32::consts::PI;
+        let world = World {
+            origin: Vec2::new(0.0, -0.1),
+            holding_ls: vec![0.2, 0.2],
+            holding_q_clamps: vec![(-inf, inf), (0.0, pi)],
+            non_holding_ls: vec![0.2, 0.2],
+            non_holding_q_clamps: vec![(-inf, inf), (0.0, pi)],
+            relative_goal_region: (Vec2::new(-0.3, -0.5), Vec2::new(0.5, 0.5)),
+        };
         let mut fcn = FCN::new(vec![
-            (3 + 2 + 2, Activation::Linear),
+            (
+                world.holding_ls.len() + world.non_holding_ls.len() + 2,
+                Activation::Linear,
+            ),
             (16, Activation::LeakyReLu(0.1)),
             (16, Activation::LeakyReLu(0.1)),
-            (2, Activation::LeakyReLu(0.1)),
+            (2, Activation::Linear),
         ]);
         let ceo = CEO {
             generations: 200,
             batch_size: 50,
-            num_episodes: 1,
+            num_episodes: 15,
             num_episode_ticks: 200,
             elite_frac: 0.25,
             initial_std: 1.0,
@@ -87,10 +99,9 @@ fn main() {
         exp
     };
     println!("{:?}", exp);
-    // Visualize
-    let inf = f32::INFINITY;
-    let pi = std::f32::consts::PI;
 
+    // Visualize
+    let world = exp.world.clone();
     App::build()
         .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_resource(WindowDescriptor {
@@ -100,46 +111,72 @@ fn main() {
         })
         .add_plugins(BasePlugins)
         .add_plugin(CameraPlugin)
+        .add_plugin(exp.world)
         .add_resource(exp.fcn)
-        .add_resource(GoalQsCouple(Array::zeros(3), Array::zeros(2)))
+        .add_resource(GoalQsCouple(Array::zeros(0), Array::zeros(0)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
             OneHoldingSwitchableNRCouple::new_left_holding(
-                Vec2::new(0.0, -0.1),
-                &[0.2, 0.2, 0.1],
-                &[0.1, 0.1, 0.1],
-                &[(-inf, inf), (0.0, pi), (0.0, pi / 6.0)],
-                &[0.2, 0.3],
-                &[0.1, 0.2],
-                &[(-inf, inf), (0.0, pi)],
+                world.origin,
+                &world.holding_ls,
+                &world.sample_holding_qs(),
+                &world.holding_q_clamps,
+                &world.non_holding_ls,
+                &world.sample_non_holding_qs(),
+                &world.non_holding_q_clamps,
                 0.01,
             ),
         ))
         .add_plugin(GoalCouplePlugin::new(GoalCouple(
             Vec2::new(0.0, 0.0),
-            Vec2::new(0.5, -0.5),
+            world.sample_goal(),
         )))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_startup_system(random_sample_solve_system.system())
+        .add_startup_system(initial_set_goal_system.system())
+        .add_system(interactive_set_goal_system.system())
         .add_system(control_system.system())
         .add_system(bevy::input::system::exit_on_esc_system.system())
         .run();
 }
 
-fn random_sample_solve_system(
+fn set_goal(
+    agent: &OneHoldingSwitchableNRCouple,
+    goal_qs_couple: &mut GoalQsCouple,
+    goal_couple: &mut GoalCouple,
+    fcn: &FCN,
+) {
+    let (input, scale) = encode(&agent, &goal_couple.1);
+    let holding_goal = fcn.at(&input);
+    let holding_goal = Vec2::new(holding_goal[0], holding_goal[1]) * scale;
+    goal_couple.0 = holding_goal;
+    random_sample_solve(agent, goal_couple, goal_qs_couple);
+}
+
+fn initial_set_goal_system(
+    agent: Res<OneHoldingSwitchableNRCouple>,
+    mut goal_qs_couple: ResMut<GoalQsCouple>,
+    mut goal_couple: ResMut<GoalCouple>,
+    fcn: Res<FCN>,
+) {
+    set_goal(&agent, &mut goal_qs_couple, &mut goal_couple, &fcn);
+}
+
+fn interactive_set_goal_system(
     agent: Res<OneHoldingSwitchableNRCouple>,
     mut goal_qs_couple: ResMut<GoalQsCouple>,
     mut ticks: ResMut<Ticks>,
     mut goal_couple: ResMut<GoalCouple>,
     fcn: Res<FCN>,
+    keyboard_input: Res<Input<KeyCode>>,
 ) {
-    let (input, scale) = encode(&agent, &goal_couple.1);
-    let holding_goal = fcn.at(&input);
-    println!("{:?}", holding_goal);
-    let holding_goal = Vec2::new(holding_goal[0], holding_goal[1]) * scale;
-    goal_couple.0 = holding_goal;
-    random_sample_solve(&agent, &goal_couple, &mut goal_qs_couple);
-    ticks.0 = 0;
+    if keyboard_input.pressed(KeyCode::I)
+        || keyboard_input.pressed(KeyCode::K)
+        || keyboard_input.pressed(KeyCode::J)
+        || keyboard_input.pressed(KeyCode::L)
+    {
+        set_goal(&agent, &mut goal_qs_couple, &mut goal_couple, &fcn);
+        ticks.0 = 0;
+    }
 }
 
 fn control_system(

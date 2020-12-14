@@ -3,6 +3,7 @@ use super::fcn::*;
 use super::utils::{control, encode, random_sample_solve, GoalQsCouple};
 use bevy::prelude::*;
 use ndarray::prelude::*;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use stick_solo::act::switchable_nr::SwitchableNR;
@@ -10,26 +11,74 @@ use stick_solo::game::goal_couple_plugin::GoalCouple;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
-pub struct World {}
+pub struct World {
+    pub origin: Vec2,
+    pub holding_ls: Vec<f32>,
+    pub holding_q_clamps: Vec<(f32, f32)>,
+    pub non_holding_ls: Vec<f32>,
+    pub non_holding_q_clamps: Vec<(f32, f32)>,
+    pub relative_goal_region: (Vec2, Vec2),
+}
 
 impl World {
-    // pub fn sample_qs(&self) -> Vec<f32> {
-    //     let mut rng = rand::thread_rng();
-    //     self.qs
-    //         .iter()
-    //         .map(|(min, max)| rng.gen_range(min, max))
-    //         .collect()
-    // }
+    fn sample_qs(q_clamps: &[(f32, f32)]) -> Vec<f32> {
+        let mut rng = rand::thread_rng();
+        let inf = f32::INFINITY;
+        q_clamps
+            .iter()
+            .map(|(min, max)| {
+                if min.abs() == inf || max.abs() == inf {
+                    0.0
+                } else {
+                    rng.gen_range(min, max)
+                }
+            })
+            .collect()
+    }
 
-    // pub fn sample_goal(&self) -> Vec2 {
-    //     let (min, max) = self.goal;
-    //     let diff = max - min;
-    //     let rand_diff = Vec2::new(
-    //         rand::random::<f32>() * diff[0],
-    //         rand::random::<f32>() * diff[1],
-    //     );
-    //     min + rand_diff
-    // }
+    pub fn sample_holding_qs(&self) -> Vec<f32> {
+        World::sample_qs(&self.holding_q_clamps)
+    }
+
+    pub fn sample_non_holding_qs(&self) -> Vec<f32> {
+        World::sample_qs(&self.non_holding_q_clamps)
+    }
+
+    pub fn sample_goal(&self) -> Vec2 {
+        let (min, max) = self.relative_goal_region;
+        let diff = max - min;
+        let rand_diff = Vec2::new(
+            rand::random::<f32>() * diff[0],
+            rand::random::<f32>() * diff[1],
+        );
+        self.origin + min + rand_diff
+    }
+}
+
+impl Plugin for World {
+    fn build(&self, app: &mut AppBuilder) {
+        app.add_resource(self.clone())
+            .add_startup_system(init_vis.system());
+    }
+}
+
+fn init_vis(
+    mut commands: Commands,
+    world: Res<World>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    let (min, max) = world.relative_goal_region;
+    let midpoint = world.origin + (min + max) / 2.0;
+    let diff = max - min;
+    commands.spawn(SpriteComponents {
+        sprite: Sprite {
+            size: Vec2::new(diff[0], diff[1]),
+            resize_mode: SpriteResizeMode::Manual,
+        },
+        transform: Transform::from_translation(Vec3::new(midpoint[0], midpoint[1], 0.0)),
+        material: materials.add(Color::rgba(1.0, 0.0, 0.0, 0.05).into()),
+        ..Default::default()
+    });
 }
 
 impl Reward for World {
@@ -40,22 +89,20 @@ impl Reward for World {
         num_episodes: usize,
         num_episode_ticks: usize,
     ) -> f32 {
-        let inf = f32::INFINITY;
-        let pi = std::f32::consts::PI;
         let mut cumulative_reward = 0.0;
         for _ in 0..num_episodes {
             // Spawn agent
             let mut agent = OneHoldingSwitchableNRCouple::new_left_holding(
-                Vec2::new(0.0, -0.1),
-                &[0.2, 0.2, 0.1],
-                &[0.1, 0.1, 0.1],
-                &[(-inf, inf), (0.0, pi), (0.0, pi / 6.0)],
-                &[0.2, 0.3],
-                &[0.1, 0.2],
-                &[(-inf, inf), (0.0, pi)],
+                self.origin,
+                &self.holding_ls,
+                &self.sample_holding_qs(),
+                &self.holding_q_clamps,
+                &self.non_holding_ls,
+                &self.sample_non_holding_qs(),
+                &self.non_holding_q_clamps,
                 0.01,
             );
-            let non_holding_goal = Vec2::new(0.5, -0.5);
+            let non_holding_goal = self.sample_goal();
             let origin_x = agent.holding().get_current_state().1[0];
             let (input, scale) = encode(&agent, &non_holding_goal);
             let holding_goal = fcn.at_with(&input, params);

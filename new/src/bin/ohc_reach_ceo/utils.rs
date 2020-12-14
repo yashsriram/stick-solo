@@ -13,23 +13,22 @@ pub fn encode(agent: &OneHoldingSwitchableNRCouple, non_holding_goal: &Vec2) -> 
     let (_, _, non_holding_ls, _, _, _) = agent.non_holding().get_current_state();
     let relative_goal = non_holding_goal.clone() - holding_origin.clone();
 
+    // Scaling
     let scale = holding_ls.sum();
-    let holding_ls = holding_ls / scale;
-    let non_holding_ls = non_holding_ls / scale;
-    let relative_goal = relative_goal / scale;
+    let scaled_holding_ls = holding_ls / scale;
+    let scaled_non_holding_ls = non_holding_ls / scale;
+    let scaled_relative_goal = relative_goal / scale;
 
-    (
-        arr1(&[
-            holding_ls[0],
-            holding_ls[1],
-            holding_ls[2],
-            non_holding_ls[0],
-            non_holding_ls[1],
-            relative_goal[0],
-            relative_goal[1],
-        ]),
-        scale,
-    )
+    let mut encoding = Array1::zeros(scaled_holding_ls.len() + scaled_non_holding_ls.len() + 2);
+    for (i, &l) in scaled_holding_ls.iter().enumerate() {
+        encoding[i] = l;
+    }
+    for (i, &l) in scaled_non_holding_ls.iter().enumerate() {
+        encoding[scaled_holding_ls.len() + i] = l;
+    }
+    encoding[scaled_holding_ls.len() + scaled_non_holding_ls.len()] = scaled_relative_goal[0];
+    encoding[scaled_holding_ls.len() + scaled_non_holding_ls.len() + 1] = scaled_relative_goal[1];
+    (encoding, scale)
 }
 
 pub fn random_sample_solve(

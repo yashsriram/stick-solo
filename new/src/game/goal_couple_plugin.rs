@@ -61,13 +61,13 @@ fn interactive_goal_couple(
         goal_couple.0[0] += 0.01;
     }
 
-    if keyboard_input.pressed(KeyCode::T) {
+    if keyboard_input.pressed(KeyCode::I) {
         goal_couple.1[1] += 0.01;
-    } else if keyboard_input.pressed(KeyCode::G) {
+    } else if keyboard_input.pressed(KeyCode::K) {
         goal_couple.1[1] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::F) {
+    } else if keyboard_input.pressed(KeyCode::J) {
         goal_couple.1[0] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::H) {
+    } else if keyboard_input.pressed(KeyCode::L) {
         goal_couple.1[0] += 0.01;
     }
 }

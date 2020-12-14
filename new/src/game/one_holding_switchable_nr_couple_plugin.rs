@@ -1,23 +1,23 @@
+use crate::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use crate::act::switchable_nr::*;
-use crate::act::switchable_nr_couple::SwitchableNRCouple;
 use bevy::prelude::*;
 
-pub struct SwitchableNRCouplePlugin {
-    agent: SwitchableNRCouple,
+pub struct OneHoldingSwitchableNRCouplePlugin {
+    agent: OneHoldingSwitchableNRCouple,
 }
 
-impl SwitchableNRCouplePlugin {
-    pub fn new(agent: SwitchableNRCouple) -> SwitchableNRCouplePlugin {
-        SwitchableNRCouplePlugin { agent }
+impl OneHoldingSwitchableNRCouplePlugin {
+    pub fn new(agent: OneHoldingSwitchableNRCouple) -> OneHoldingSwitchableNRCouplePlugin {
+        OneHoldingSwitchableNRCouplePlugin { agent }
     }
 }
 
-impl Plugin for SwitchableNRCouplePlugin {
+impl Plugin for OneHoldingSwitchableNRCouplePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.agent.clone())
-            .add_startup_system(init.system())
-            .add_system(flush_transforms_left.system())
-            .add_system(flush_transforms_right.system());
+            .add_startup_system(init_vis.system())
+            .add_system(flush_transforms_original_holding.system())
+            .add_system(flush_transforms_original_non_holding.system());
     }
 }
 
@@ -25,13 +25,13 @@ struct Edge(usize);
 struct Vertex(usize);
 struct CenterOfMass;
 #[derive(Default)]
-struct Left;
+struct OriginalHolding;
 #[derive(Default)]
-struct Right;
+struct OriginalNonHolding;
 
-fn init(
+fn init_vis(
     mut commands: Commands,
-    agent: Res<SwitchableNRCouple>,
+    agent: Res<OneHoldingSwitchableNRCouple>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     fn init<T: Default + Sync + Component>(
@@ -82,61 +82,61 @@ fn init(
             .with(CenterOfMass)
             .with(T::default());
     }
-    let (left, right) = (agent.left(), agent.right());
-    init::<Left>(left, &mut commands, &mut materials);
-    init::<Right>(right, &mut commands, &mut materials);
+    let (holding, non_holding) = (agent.holding(), agent.non_holding());
+    init::<OriginalHolding>(holding, &mut commands, &mut materials);
+    init::<OriginalNonHolding>(non_holding, &mut commands, &mut materials);
 }
 
-fn flush_transforms_left(
-    agent: Res<SwitchableNRCouple>,
-    mut edge_query: Query<(&Edge, &mut Sprite, &mut Transform, &Left)>,
-    mut vertex_query: Query<(&Vertex, &mut Transform, &Left)>,
-    mut com_query: Query<(&CenterOfMass, &mut Transform, &Left)>,
+fn flush_transforms_original_holding(
+    agent: Res<OneHoldingSwitchableNRCouple>,
+    mut edge_query: Query<(&Edge, &mut Sprite, &mut Transform, &OriginalHolding)>,
+    mut vertex_query: Query<(&Vertex, &mut Transform, &OriginalHolding)>,
+    mut com_query: Query<(&CenterOfMass, &mut Transform, &OriginalHolding)>,
 ) {
-    let (left, _) = (agent.left(), agent.right());
-    let transforms = left.pose_to_transforms();
-    let (_, _, ls, _, _, _) = left.get_current_state();
+    let switchable_nr = agent.original_holding();
+    let transforms = switchable_nr.pose_to_transforms();
+    let (_, _, ls, _, _, _) = switchable_nr.get_current_state();
     for (edge, mut sprite, mut transform, _) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
-        sprite.size = Vec2::new(ls[edge.0], left.thickness());
+        sprite.size = Vec2::new(ls[edge.0], switchable_nr.thickness());
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
     }
-    let vertex_positions = left.get_all_vertices();
+    let vertex_positions = switchable_nr.get_all_vertices();
     for (idx, mut transform, _) in vertex_query.iter_mut() {
         transform.translation[0] = vertex_positions[idx.0][0];
         transform.translation[1] = vertex_positions[idx.0][1];
     }
-    let com = left.get_center_of_mass();
+    let com = switchable_nr.get_center_of_mass();
     for (_, mut transform, _) in com_query.iter_mut() {
         transform.translation[0] = com[0];
         transform.translation[1] = com[1];
     }
 }
 
-fn flush_transforms_right(
-    agent: Res<SwitchableNRCouple>,
-    mut edge_query: Query<(&Edge, &mut Sprite, &mut Transform, &Right)>,
-    mut vertex_query: Query<(&Vertex, &mut Transform, &Right)>,
-    mut com_query: Query<(&CenterOfMass, &mut Transform, &Right)>,
+fn flush_transforms_original_non_holding(
+    agent: Res<OneHoldingSwitchableNRCouple>,
+    mut edge_query: Query<(&Edge, &mut Sprite, &mut Transform, &OriginalNonHolding)>,
+    mut vertex_query: Query<(&Vertex, &mut Transform, &OriginalNonHolding)>,
+    mut com_query: Query<(&CenterOfMass, &mut Transform, &OriginalNonHolding)>,
 ) {
-    let (_, right) = (agent.left(), agent.right());
-    let transforms = right.pose_to_transforms();
-    let (_, _, ls, _, _, _) = right.get_current_state();
+    let switchable_nr = agent.original_non_holding();
+    let transforms = switchable_nr.pose_to_transforms();
+    let (_, _, ls, _, _, _) = switchable_nr.get_current_state();
     for (edge, mut sprite, mut transform, _) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
-        sprite.size = Vec2::new(ls[edge.0], right.thickness());
+        sprite.size = Vec2::new(ls[edge.0], switchable_nr.thickness());
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
     }
-    let vertex_positions = right.get_all_vertices();
+    let vertex_positions = switchable_nr.get_all_vertices();
     for (idx, mut transform, _) in vertex_query.iter_mut() {
         transform.translation[0] = vertex_positions[idx.0][0];
         transform.translation[1] = vertex_positions[idx.0][1];
     }
-    let com = right.get_center_of_mass();
+    let com = switchable_nr.get_center_of_mass();
     for (_, mut transform, _) in com_query.iter_mut() {
         transform.translation[0] = com[0];
         transform.translation[1] = com[1];

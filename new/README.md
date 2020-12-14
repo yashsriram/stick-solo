@@ -165,24 +165,28 @@
 
 #### Demos
 - Possible variants
-    - (1) global optimal control or (2) local optimal controls [jt end_control, pseudo inv end_control]
+    - (2) global optimal control or (2) local optimal controls [jt end_control, pseudo inv end_control]
     - (2) com_x controls [origin com_x_control, midpoint com_x_control]
     - (1) com_y control
 
-- [ ] NR (2 limb as NR): (1 x try various weights)
+- [ ] 2 limb as 4R: (1 x try various weights)
     - differs from NR iterative traversing agent in baseline as mentioned by above reasons
-    - [ ] Illustrate constraints
+    - [ ] Illustrate q and delta q constraints
     - [ ] reaching: local
         - [ ] Only end control (2)
         - [ ] COM controls (2 x 1)
         - [ ] Various values
         - [ ] Local minima stuck
-    - [ ] reaching: global
-        - [ ] Solve local minima stuck, using relaxing, random solve, ceo solve
-        - [ ] Also show the use case of q0 clamping
+            - crossing hands
             - top to bottom not on wrong side
             - bottom to side not too much
-        - [ ] Show other scenarios
+    - [ ] reaching: global
+        - [ ] Show normal scenarios
+        - [ ] Solve local minima stuck, using relaxing, random solve, ceo solve
+        - [ ] Also show the use case of q0 clamping
+            - crossing hands
+            - top to bottom not on wrong side
+            - bottom to side not too much
         - [ ] Compare quality of motions
         - [ ] Compare convergence errors and times of random and ceo
         - [ ] Is the parallelization helpful?
@@ -191,19 +195,33 @@
         - [ ] Successful scenario
         - [ ] A scenario which needs matching
     - [ ] reaching, matching (if needed) and switching (transfer)
-
-- [ ] worm NR: (1 x try various weights + 2 x 2 x 1 x try various weights for controls)
-
-- [x] 2 limb as NR (learning): end_control + com_x_control + com_y_control + weights
+        - [ ] Show as many types of transfers and possible
+- [x] 2 limb as 4R (learning): end_control + com_x_control + com_y_control + weights
     - No real learning part
+- [ ] 2 limb as NR (worm): (1 x try various weights + 2 x 2 x 1 x try various weights for controls)
+    - [ ] Show as many types of transfers and possible
 
 - [ ] 2 limb as 2 NR (non-learning): end_control + com_x_control + com_y_control
-- [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots): end_control + com_x_control + com_y_control
 - [ ] 2 limb as 2 NR (learning): end_control + com_x_control + com_y_control
-
-- [ ] 4 limb as 4 NR (non-learning): end_control + com_x_control + com_y_control
+    - [ ] Illustrate q and delta q constraints
+    - [ ] reaching: local
+        - [ ] Local minima stuck
+            - crossing hands
+            - top to bottom not on wrong side
+            - bottom to side not too much
+    - [ ] reaching: global
+        - [ ] Show normal scenarios
+        - [ ] Solve local minima stuck, using relaxing, random solve, ceo solve
+        - [ ] Since the q* is achieved randomly, same route generates different motions (variations)
+    - [ ] reaching and switching (transfer)
+        - [ ] Successful scenario
+        - [ ] A scenario which needs matching
+    - [ ] reaching, matching (if needed) and switching (transfer)
+        - [ ] Show as many types of transfers and possible
 
 ### Future work
+- [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots)
+- [ ] 4 limb as 4 NR (general, multiple simultaneous pivots)
 - [ ] 2D PRM/A\*
     - [ ] Avoid duplication of same start and finish
 - [ ] Belay rope

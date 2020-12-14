@@ -103,6 +103,15 @@ impl OneHoldingSwitchableNRCouple {
         &self.non_holding
     }
 
+    pub fn get_center_of_mass(&self) -> Vec2 {
+        let m1 = self.holding().get_total_mass();
+        let com1 = self.holding().get_center_of_mass();
+        let m2 = self.non_holding().get_total_mass();
+        let com2 = self.non_holding().get_center_of_mass();
+
+        (m1 * com1 + m2 * com2) / (m1 + m2)
+    }
+
     pub fn update(&mut self, holding_delta_qs: Array1<f32>, non_holding_delta_qs: Array1<f32>) {
         self.holding.update(holding_delta_qs);
         let origin_non_holding = self.holding.get_last_vertex();

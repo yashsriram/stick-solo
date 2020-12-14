@@ -182,6 +182,10 @@ impl SwitchableNR {
         vertices
     }
 
+    pub fn get_total_mass(&self) -> f32 {
+        self.ls.sum()
+    }
+
     pub fn get_center_of_mass(&self) -> Vec2 {
         let mut com = Vec2::zero();
         let mut e1 = self.origin;

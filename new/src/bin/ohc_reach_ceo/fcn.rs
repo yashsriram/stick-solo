@@ -9,7 +9,7 @@ use std::fmt;
 pub enum Activation {
     Linear,
     LeakyReLu(f32),
-    Sigmoid,
+    Sigmoid(f32, f32),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -40,6 +40,9 @@ impl FCN {
             let mut num_params = 0;
             for i in 1..layers.len() {
                 num_params += (layers[i - 1].0 + 1) * layers[i].0;
+                if let Activation::Sigmoid(min, max) = layers[i].1 {
+                    assert!(min < max, "Bad sigmoid arguments.");
+                }
             }
             num_params
         };
@@ -71,7 +74,10 @@ impl FCN {
         output = match &self.layers[0].1 {
             Activation::Linear => output,
             Activation::LeakyReLu(leak) => output.mapv(|e| if e > 0.0 { e } else { e * leak }),
-            Activation::Sigmoid => output.mapv(|e| 1.0 / (1.0 + (-e).exp())),
+            Activation::Sigmoid(min, max) => output.mapv(|e| {
+                let zero_to_one = 1.0 / (1.0 + (-e).exp());
+                (zero_to_one - min) / (max - min)
+            }),
         };
         for i in 1..self.layers.len() {
             let prev_layer_dof = self.layers[i - 1].0;
@@ -95,7 +101,10 @@ impl FCN {
             output = match curr_layer_activation {
                 Activation::Linear => output,
                 Activation::LeakyReLu(leak) => output.mapv(|e| if e > 0.0 { e } else { e * leak }),
-                Activation::Sigmoid => output.mapv(|e| 1.0 / (1.0 + (-e).exp())),
+                Activation::Sigmoid(min, max) => output.mapv(|e| {
+                    let zero_to_one = 1.0 / (1.0 + (-e).exp());
+                    (zero_to_one - min) / (max - min)
+                }),
             };
             params_offset += curr_layer_dof;
             // println!("2:{}", now.elapsed().as_nanos());

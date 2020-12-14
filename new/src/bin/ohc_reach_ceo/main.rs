@@ -1,0 +1,157 @@
+extern crate stick_solo;
+
+mod ceo;
+mod fcn;
+mod utils;
+mod world;
+
+use bevy::prelude::*;
+use ceo::CEO;
+use fcn::*;
+use ndarray::prelude::*;
+use serde::{Deserialize, Serialize};
+use std::{env, fs::File, io::BufReader};
+use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
+use stick_solo::game::{
+    base_plugins::BasePlugins,
+    camera_plugin::CameraPlugin,
+    goal_couple_plugin::{GoalCouple, GoalCouplePlugin},
+    one_holding_switchable_nr_couple_plugin::OneHoldingSwitchableNRCouplePlugin,
+    pause_plugin::Pause,
+    pause_plugin::PausePlugin,
+    status_bar_plugin::{StatusBarPlugin, Ticks},
+};
+use utils::{control, encode, random_sample_solve, GoalQsCouple};
+use world::World;
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Experiment {
+    fcn: FCN,
+    ceo: CEO,
+    world: World,
+}
+
+fn main() {
+    let args = env::args();
+    let exp = if args.len() == 1 {
+        // Optimize
+        let world = World {};
+        let mut fcn = FCN::new(vec![
+            (3 + 2 + 2, Activation::Linear),
+            (16, Activation::LeakyReLu(0.1)),
+            (16, Activation::LeakyReLu(0.1)),
+            (2, Activation::LeakyReLu(0.1)),
+        ]);
+        let ceo = CEO {
+            generations: 200,
+            batch_size: 50,
+            num_episodes: 1,
+            num_episode_ticks: 200,
+            elite_frac: 0.25,
+            initial_std: 1.0,
+            noise_factor: 1.0,
+            ..Default::default()
+        };
+        let (mean_reward, _th_std) = ceo.optimize(&mut fcn, &world).unwrap();
+        let exp = Experiment {
+            fcn: fcn,
+            ceo: ceo,
+            world: world,
+        };
+        // Save
+        use chrono::{Datelike, Timelike, Utc};
+        let now = Utc::now();
+        serde_json::to_writer_pretty(
+            &File::create(format!(
+                "{}-{}:{}@{:.2}.json",
+                now.month(),
+                now.day(),
+                now.num_seconds_from_midnight(),
+                mean_reward
+            ))
+            .unwrap(),
+            &exp,
+        )
+        .unwrap();
+        exp
+    } else {
+        if args.len() != 2 {
+            panic!("Bad cmd line parameters.");
+        }
+        // Load from file
+        let args = args.collect::<Vec<String>>();
+        let file = File::open(&args[1]).unwrap();
+        let reader = BufReader::new(file);
+        let exp: Experiment = serde_json::from_reader(reader).unwrap();
+        exp
+    };
+    println!("{:?}", exp);
+    // Visualize
+    let inf = f32::INFINITY;
+    let pi = std::f32::consts::PI;
+
+    App::build()
+        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .add_resource(WindowDescriptor {
+            width: 2000,
+            height: 1000,
+            ..Default::default()
+        })
+        .add_plugins(BasePlugins)
+        .add_plugin(CameraPlugin)
+        .add_resource(exp.fcn)
+        .add_resource(GoalQsCouple(Array::zeros(3), Array::zeros(2)))
+        .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
+            OneHoldingSwitchableNRCouple::new_left_holding(
+                Vec2::new(0.0, -0.1),
+                &[0.2, 0.2, 0.1],
+                &[0.1, 0.1, 0.1],
+                &[(-inf, inf), (0.0, pi), (0.0, pi / 6.0)],
+                &[0.2, 0.3],
+                &[0.1, 0.2],
+                &[(-inf, inf), (0.0, pi)],
+                0.01,
+            ),
+        ))
+        .add_plugin(GoalCouplePlugin::new(GoalCouple(
+            Vec2::new(0.0, 0.0),
+            Vec2::new(0.5, -0.5),
+        )))
+        .add_plugin(StatusBarPlugin)
+        .add_plugin(PausePlugin)
+        .add_startup_system(random_sample_solve_system.system())
+        .add_system(control_system.system())
+        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .run();
+}
+
+fn random_sample_solve_system(
+    agent: Res<OneHoldingSwitchableNRCouple>,
+    mut goal_qs_couple: ResMut<GoalQsCouple>,
+    mut ticks: ResMut<Ticks>,
+    mut goal_couple: ResMut<GoalCouple>,
+    fcn: Res<FCN>,
+) {
+    let (input, scale) = encode(&agent, &goal_couple.1);
+    let holding_goal = fcn.at(&input);
+    println!("{:?}", holding_goal);
+    let holding_goal = Vec2::new(holding_goal[0], holding_goal[1]) * scale;
+    goal_couple.0 = holding_goal;
+    random_sample_solve(&agent, &goal_couple, &mut goal_qs_couple);
+    ticks.0 = 0;
+}
+
+fn control_system(
+    mut agent: ResMut<OneHoldingSwitchableNRCouple>,
+    pause: Res<Pause>,
+    mut ticks: ResMut<Ticks>,
+    goal_qs_couple: Res<GoalQsCouple>,
+    goal_couple: ResMut<GoalCouple>,
+) {
+    if pause.0 {
+        return;
+    }
+    control(&mut agent, &goal_qs_couple, &goal_couple, ticks.0);
+    ticks.0 += 1;
+}

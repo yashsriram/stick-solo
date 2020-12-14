@@ -17,13 +17,13 @@ impl PathPlugin {
 impl Plugin for PathPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.path.clone())
-            .add_startup_system(init.system());
+            .add_startup_system(init_vis.system());
     }
 }
 
 struct Vertex(usize);
 
-fn init(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn init_vis(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Assets<ColorMaterial>>) {
     // Vertices
     for (i, vertex) in path.0.iter().enumerate() {
         commands

@@ -11,12 +11,12 @@ impl Plugin for StatusBarPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(Ticks(0))
             .add_plugin(FrameTimeDiagnosticsPlugin)
-            .add_startup_system(init_fps.system())
+            .add_startup_system(init_fps_vis.system())
             .add_system(fps_update_system.system());
     }
 }
 
-fn init_fps(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn init_fps_vis(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(TextComponents {
         style: Style::default(),
         text: Text {

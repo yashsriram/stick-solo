@@ -16,7 +16,7 @@ impl GoalPlugin {
 impl Plugin for GoalPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.goal.clone())
-            .add_startup_system(init.system())
+            .add_startup_system(init_vis.system())
             .add_system(interactive_goal.system())
             .add_system(flush_transforms.system());
     }
@@ -24,7 +24,7 @@ impl Plugin for GoalPlugin {
 
 struct GoalMarker;
 
-fn init(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn init_vis(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     commands
         .spawn(SpriteComponents {
             sprite: Sprite {

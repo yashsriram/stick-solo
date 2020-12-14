@@ -14,7 +14,7 @@ impl SwitchableNRPlugin {
 impl Plugin for SwitchableNRPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.agent.clone())
-            .add_startup_system(init.system())
+            .add_startup_system(init_vis.system())
             .add_system(flush_transforms.system());
     }
 }
@@ -23,7 +23,7 @@ struct Edge(usize);
 struct Vertex(usize);
 struct CenterOfMass;
 
-fn init(
+fn init_vis(
     mut commands: Commands,
     agent: Res<SwitchableNR>,
     mut materials: ResMut<Assets<ColorMaterial>>,

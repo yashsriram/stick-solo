@@ -16,7 +16,7 @@ impl GoalCouplePlugin {
 impl Plugin for GoalCouplePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(self.goal_couple.clone())
-            .add_startup_system(init.system())
+            .add_startup_system(init_vis.system())
             .add_system(interactive_goal_couple.system())
             .add_system(flush_transforms.system());
     }
@@ -25,7 +25,7 @@ impl Plugin for GoalCouplePlugin {
 struct Goal0Marker;
 struct Goal1Marker;
 
-fn init(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn init_vis(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     commands
         .spawn(SpriteComponents {
             sprite: Sprite {

@@ -161,14 +161,21 @@
     - [x] Enforcing constraints - (no more constraints; uses previous constraints)
     - [ ] Formulating as RL problem
         - [x] Very nice visualization of holding goal w.r.t non-holding goal
-        - [x] Useful for debugging and reward function design
-        - [x] Useful for testing too; since the output of network does not depend on qs (initial state) if every point is roguhly tested it is enough, O(N) no need to test every pair of points (src, dest) O(N^2)
+        - [x] Useful for debugging, reward function design and testing
+            - since the output of network does not depend on qs (initial state) if every point is roguhly tested it is enough, O(N) no need to test every pair of points (src, dest) O(N^2)
         - [x] Encoding input
         - [x] Decoding output
         - [x] Reward function design
+            - Explain why end of episode comy reward is a bad one (If the goal is high up and the agent reaches it; its com y will be high resulting in a lower reward for good behavior)
+            - This is also a problem with in episode comy reward but (giving less weight to it and having a lot of episodes per batch asymptotically mitigates it)
         - [x] FCN design
         - [x] CEO parameters tuning
-        - [ ] Left and right holding networks
+        - [x] Left, right holding seperate networks
+        - [x] Ensure and showcase mostly working, holding origin invariance, scale invariance
+        - [ ] Auto scale goal region based on holding ls
+        - [ ] Left and right holding single network
+        - [ ] Improve comy behavior
+        - Discuss how non-trivial the deciding holding goal and how RL is a good tool here (different positions, non-trivial gaits, discontinuity at ends).
     - [ ] Switcing and matching (transfers)
     - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
 - [ ] Understand jacobian transpose derivation properly

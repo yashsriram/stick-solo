@@ -21,7 +21,7 @@ use stick_solo::game::{
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
 };
-use utils::{control, encode, random_sample_solve, GoalQsCouple};
+use utils::{control, decode, encode, random_sample_solve, GoalQsCouple};
 use world::World;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -37,22 +37,22 @@ fn main() {
     let exp = if args.len() == 1 {
         // Optimize
         let pi = std::f32::consts::PI;
-        // let world = World {
-        //     origin: Vec2::new(0.0, -0.1),
-        //     holding_ls: vec![0.2, 0.2],
-        //     holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
-        //     non_holding_ls: vec![0.2, 0.2],
-        //     non_holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
-        //     relative_goal_region: (Vec2::new(-0.5, -0.5), Vec2::new(0.1, 0.5)),
-        // };
         let world = World {
             origin: Vec2::new(0.0, -0.1),
             holding_ls: vec![0.2, 0.2],
-            holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
+            holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
             non_holding_ls: vec![0.2, 0.2],
-            non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
-            relative_goal_region: (Vec2::new(-0.1, -0.5), Vec2::new(0.5, 0.5)),
+            non_holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
+            relative_goal_region: (Vec2::new(-0.5, -0.5), Vec2::new(0.1, 0.5)),
         };
+        // let world = World {
+        //     origin: Vec2::new(0.5, -0.5),
+        //     holding_ls: vec![0.2, 0.2],
+        //     holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
+        //     non_holding_ls: vec![0.2, 0.2],
+        //     non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
+        //     relative_goal_region: (Vec2::new(-0.1, -0.5), Vec2::new(0.5, 0.5)),
+        // };
         let mut fcn = FCN::new(vec![
             (
                 world.holding_ls.len() + world.non_holding_ls.len() + 2,
@@ -122,7 +122,7 @@ fn main() {
         .add_resource(exp.fcn)
         .add_resource(GoalQsCouple(Array::zeros(0), Array::zeros(0)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
-            OneHoldingSwitchableNRCouple::new_left_holding(
+            OneHoldingSwitchableNRCouple::new_right_holding(
                 world.origin,
                 &world.holding_ls,
                 &world.sample_holding_qs(),
@@ -152,10 +152,14 @@ fn set_goal(
     goal_couple: &mut GoalCouple,
     fcn: &FCN,
 ) {
-    let (input, scale) = encode(&agent, &goal_couple.1);
-    let holding_goal = fcn.at(&input);
-    let holding_goal = Vec2::new(holding_goal[0], holding_goal[1]) * scale;
-    goal_couple.0 = holding_goal;
+    let holding_origin = agent.holding().get_current_state().1.clone();
+    let non_holding_goal = goal_couple.1;
+    // Network pipeline
+    let (input, scale) = encode(&agent, &non_holding_goal);
+    let forward_pass = fcn.at(&input);
+    let holding_goal = decode(&forward_pass, scale, holding_origin);
+    // Setting GoalCouple and GoalQsCouple
+    *goal_couple = GoalCouple(holding_goal, non_holding_goal);
     random_sample_solve(agent, goal_couple, goal_qs_couple);
 }
 

@@ -1,6 +1,6 @@
 use super::ceo::Reward;
 use super::fcn::*;
-use super::utils::{control, encode, random_sample_solve, GoalQsCouple};
+use super::utils::{control, decode, encode, random_sample_solve, GoalQsCouple};
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use rand::Rng;
@@ -112,7 +112,7 @@ impl Reward for World {
         let mut cumulative_reward = 0.0;
         for _ in 0..num_episodes {
             // Spawn agent
-            let mut agent = OneHoldingSwitchableNRCouple::new_left_holding(
+            let mut agent = OneHoldingSwitchableNRCouple::new_right_holding(
                 self.origin,
                 &self.holding_ls,
                 &self.sample_holding_qs(),
@@ -122,13 +122,15 @@ impl Reward for World {
                 &self.non_holding_q_clamps(),
                 0.01,
             );
+            let holding_origin = agent.holding().get_current_state().1.clone();
             let non_holding_goal = self.sample_goal();
-            let origin_x = agent.holding().get_current_state().1[0];
+            // Network pipeline
             let (input, scale) = encode(&agent, &non_holding_goal);
-            let holding_goal = fcn.at_with(&input, params);
-            let holding_goal = Vec2::new(holding_goal[0], holding_goal[1]) * scale;
+            let forward_pass = fcn.at_with(&input, params);
+            let holding_goal = decode(&forward_pass, scale, holding_origin);
+            // Setting GoalCouple and GoalQsCouple
             let goal_couple = GoalCouple(holding_goal, non_holding_goal);
-            let mut goal_qs_couple = GoalQsCouple(Array::zeros(3), Array::zeros(2));
+            let mut goal_qs_couple = GoalQsCouple(Array::zeros(0), Array::zeros(0));
             random_sample_solve(&agent, &goal_couple, &mut goal_qs_couple);
             // Start calculating reward
             let mut episode_reward = 0.0;
@@ -145,7 +147,7 @@ impl Reward for World {
                 episode_reward -= dist * 10.0;
                 // COM x
                 let com = agent.get_center_of_mass();
-                episode_reward -= (com[0] - (non_holding_goal[0] - origin_x) / 2.0).abs();
+                episode_reward -= (com[0] - (non_holding_goal[0] + holding_origin[0]) / 2.0).abs();
                 // COM y
                 let com = agent.get_center_of_mass();
                 episode_reward -= com[1];

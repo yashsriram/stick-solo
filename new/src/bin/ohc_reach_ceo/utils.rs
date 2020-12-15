@@ -31,6 +31,10 @@ pub fn encode(agent: &OneHoldingSwitchableNRCouple, non_holding_goal: &Vec2) -> 
     (encoding, scale)
 }
 
+pub fn decode(forward_pass: &Array1<f32>, scale: f32, holding_origin: Vec2) -> Vec2 {
+    Vec2::new(forward_pass[0], forward_pass[1]) * scale + holding_origin
+}
+
 pub fn random_sample_solve(
     agent: &OneHoldingSwitchableNRCouple,
     goal_couple: &GoalCouple,

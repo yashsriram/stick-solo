@@ -14,23 +14,22 @@ use stick_solo::game::goal_couple_plugin::GoalCouple;
 pub struct World {
     pub origin: Vec2,
     pub holding_ls: Vec<f32>,
-    pub holding_q_clamps: Vec<(f32, f32)>,
+    pub holding_q_clamps: Vec<(Option<f32>, Option<f32>)>,
     pub non_holding_ls: Vec<f32>,
-    pub non_holding_q_clamps: Vec<(f32, f32)>,
+    pub non_holding_q_clamps: Vec<(Option<f32>, Option<f32>)>,
     pub relative_goal_region: (Vec2, Vec2),
 }
 
 impl World {
-    fn sample_qs(q_clamps: &[(f32, f32)]) -> Vec<f32> {
+    fn sample_qs(q_clamps: &[(Option<f32>, Option<f32>)]) -> Vec<f32> {
         let mut rng = rand::thread_rng();
-        let inf = f32::INFINITY;
         q_clamps
             .iter()
             .map(|(min, max)| {
-                if min.abs() == inf || max.abs() == inf {
+                if *min == None || *max == None {
                     0.0
                 } else {
-                    rng.gen_range(min, max)
+                    rng.gen_range(min.unwrap(), max.unwrap())
                 }
             })
             .collect()
@@ -42,6 +41,27 @@ impl World {
 
     pub fn sample_non_holding_qs(&self) -> Vec<f32> {
         World::sample_qs(&self.non_holding_q_clamps)
+    }
+
+    fn get_q_clamps(q_clamps: &[(Option<f32>, Option<f32>)]) -> Vec<(f32, f32)> {
+        let inf = f32::INFINITY;
+        q_clamps
+            .iter()
+            .map(|(min, max)| match (min, max) {
+                (None, None) => (-inf, inf),
+                (None, Some(l)) => (-inf, *l),
+                (Some(l), None) => (*l, inf),
+                (Some(l1), Some(l2)) => (*l1, *l2),
+            })
+            .collect()
+    }
+
+    pub fn holding_q_clamps(&self) -> Vec<(f32, f32)> {
+        World::get_q_clamps(&self.holding_q_clamps)
+    }
+
+    pub fn non_holding_q_clamps(&self) -> Vec<(f32, f32)> {
+        World::get_q_clamps(&self.non_holding_q_clamps)
     }
 
     pub fn sample_goal(&self) -> Vec2 {
@@ -96,10 +116,10 @@ impl Reward for World {
                 self.origin,
                 &self.holding_ls,
                 &self.sample_holding_qs(),
-                &self.holding_q_clamps,
+                &self.holding_q_clamps(),
                 &self.non_holding_ls,
                 &self.sample_non_holding_qs(),
-                &self.non_holding_q_clamps,
+                &self.non_holding_q_clamps(),
                 0.01,
             );
             let non_holding_goal = self.sample_goal();

@@ -36,14 +36,13 @@ fn main() {
     let args = env::args();
     let exp = if args.len() == 1 {
         // Optimize
-        let inf = f32::INFINITY;
         let pi = std::f32::consts::PI;
         let world = World {
             origin: Vec2::new(0.0, -0.1),
             holding_ls: vec![0.2, 0.2],
-            holding_q_clamps: vec![(-inf, inf), (0.0, pi)],
+            holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
             non_holding_ls: vec![0.2, 0.2],
-            non_holding_q_clamps: vec![(-inf, inf), (0.0, pi)],
+            non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
             relative_goal_region: (Vec2::new(-0.3, -0.5), Vec2::new(0.5, 0.5)),
         };
         let mut fcn = FCN::new(vec![
@@ -119,10 +118,10 @@ fn main() {
                 world.origin,
                 &world.holding_ls,
                 &world.sample_holding_qs(),
-                &world.holding_q_clamps,
+                &world.holding_q_clamps(),
                 &world.non_holding_ls,
                 &world.sample_non_holding_qs(),
-                &world.non_holding_q_clamps,
+                &world.non_holding_q_clamps(),
                 0.01,
             ),
         ))

@@ -154,6 +154,8 @@
                 Side::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
             };
             ```
+        - But now the end of the hand can be atmost 2 * GOAL_REACHED_SLACK from the hold
+        - And to visualize this we need sqaures of size 4 * GOAL_REACHED_SLACK from the hold
     - [x] Traversing a path
         - local
         - global

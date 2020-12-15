@@ -124,7 +124,7 @@ fn main() {
         .add_resource(GoalQsCouple(Array::zeros(0), Array::zeros(0)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
             OneHoldingSwitchableNRCouple::new(
-                Side::Right,
+                Side::Left,
                 world.origin,
                 &world.holding_ls,
                 &world.sample_holding_qs(),

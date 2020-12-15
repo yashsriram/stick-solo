@@ -105,8 +105,8 @@ fn init_vis(
     commands.spawn(SpriteComponents {
         sprite: Sprite {
             size: Vec2::new(
-                SwitchableNR::GOAL_REACHED_SLACK,
-                SwitchableNR::GOAL_REACHED_SLACK,
+                2.0 * SwitchableNR::GOAL_REACHED_SLACK,
+                2.0 * SwitchableNR::GOAL_REACHED_SLACK,
             ),
             resize_mode: SpriteResizeMode::Manual,
         },

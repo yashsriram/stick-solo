@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use ndarray::prelude::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Side {
     Left,
     Right,

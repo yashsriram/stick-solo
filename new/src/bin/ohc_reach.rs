@@ -31,7 +31,7 @@ fn main() {
         .add_resource(GoalQs(Array::zeros(2), Array::zeros(3)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
             OneHoldingSwitchableNRCouple::new(
-                Side::Right,
+                &Side::Right,
                 Vec2::new(0.0, -0.1),
                 &[0.2, 0.3],
                 &[-0.1, -0.2],
@@ -49,7 +49,7 @@ fn main() {
         // .add_resource(GoalQs(Array::zeros(3), Array::zeros(2)))
         // .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
         //     OneHoldingSwitchableNRCouple::new(
-        //         Side::Left,
+        //         &Side::Left,
         //         Vec2::new(0.0, -0.1),
         //         &[0.2, 0.2, 0.1],
         //         &[0.1, 0.1, 0.1],

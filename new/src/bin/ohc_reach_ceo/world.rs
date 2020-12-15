@@ -13,6 +13,7 @@ use stick_solo::game::goal_couple_plugin::GoalCouple;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct World {
+    pub holding_side: Side,
     pub origin: Vec2,
     pub holding_ls: Vec<f32>,
     pub holding_q_clamps: Vec<(Option<f32>, Option<f32>)>,
@@ -118,7 +119,7 @@ impl Reward for World {
         for _ in 0..num_episodes {
             // Spawn agent
             let mut agent = OneHoldingSwitchableNRCouple::new(
-                Side::Left,
+                &self.holding_side,
                 self.origin,
                 &self.holding_ls,
                 &self.sample_holding_qs(),

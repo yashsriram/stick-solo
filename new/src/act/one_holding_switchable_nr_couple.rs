@@ -12,7 +12,7 @@ pub struct OneHoldingSwitchableNRCouple {
 
 impl OneHoldingSwitchableNRCouple {
     pub fn new(
-        holding_side: Side,
+        holding_side: &Side,
         origin_holding: Vec2,
         ls_holding: &[f32],
         qs_holding: &[f32],

@@ -158,8 +158,19 @@
         - local
         - global
 - [ ] 2 limb as 2 switching NRs
-    - [ ] Enforcing constraints
+    - [x] Enforcing constraints - (no more constraints; uses previous constraints)
     - [ ] Formulating as RL problem
+        - [x] Very nice visualization of holding goal w.r.t non-holding goal
+        - [x] Useful for debugging and reward function design
+        - [x] Useful for testing too; since the output of network does not depend on qs (initial state) if every point is roguhly tested it is enough, O(N) no need to test every pair of points (src, dest) O(N^2)
+        - [x] Encoding input
+        - [x] Decoding output
+        - [x] Reward function design
+        - [x] FCN design
+        - [x] CEO parameters tuning
+        - [ ] Left and right holding networks
+    - [ ] Switcing and matching (transfers)
+    - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

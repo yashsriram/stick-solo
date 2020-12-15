@@ -37,13 +37,21 @@ fn main() {
     let exp = if args.len() == 1 {
         // Optimize
         let pi = std::f32::consts::PI;
+        // let world = World {
+        //     origin: Vec2::new(0.0, -0.1),
+        //     holding_ls: vec![0.2, 0.2],
+        //     holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
+        //     non_holding_ls: vec![0.2, 0.2],
+        //     non_holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
+        //     relative_goal_region: (Vec2::new(-0.5, -0.5), Vec2::new(0.1, 0.5)),
+        // };
         let world = World {
             origin: Vec2::new(0.0, -0.1),
             holding_ls: vec![0.2, 0.2],
             holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
             non_holding_ls: vec![0.2, 0.2],
             non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
-            relative_goal_region: (Vec2::new(-0.3, -0.5), Vec2::new(0.5, 0.5)),
+            relative_goal_region: (Vec2::new(-0.1, -0.5), Vec2::new(0.5, 0.5)),
         };
         let mut fcn = FCN::new(vec![
             (
@@ -55,7 +63,7 @@ fn main() {
             (2, Activation::Linear),
         ]);
         let ceo = CEO {
-            generations: 200,
+            generations: 500,
             batch_size: 50,
             num_episodes: 15,
             num_episode_ticks: 200,
@@ -122,7 +130,7 @@ fn main() {
                 &world.non_holding_ls,
                 &world.sample_non_holding_qs(),
                 &world.non_holding_q_clamps(),
-                0.007,
+                0.01,
             ),
         ))
         .add_plugin(GoalCouplePlugin::new(GoalCouple(

@@ -142,7 +142,7 @@ impl Reward for World {
                 // Non holding
                 let last_vertex = agent.non_holding().get_last_vertex();
                 let dist = (last_vertex - non_holding_goal).length();
-                episode_reward -= dist * 5.0;
+                episode_reward -= dist * 10.0;
                 // COM x
                 let com = agent.get_center_of_mass();
                 episode_reward -= (com[0] - (non_holding_goal[0] - origin_x) / 2.0).abs();

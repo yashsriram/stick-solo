@@ -21,7 +21,7 @@ pub struct SwitchableNR {
 }
 
 impl SwitchableNR {
-    pub const GOAL_REACHED_SLACK: f32 = 0.02;
+    pub const GOAL_REACHED_SLACK: f32 = 0.01;
     const MAX_DELTA_Q: f32 = 0.04;
 
     pub fn new(

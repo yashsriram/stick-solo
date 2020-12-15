@@ -2,6 +2,7 @@ extern crate stick_solo;
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
+use stick_solo::act::switchable_nr::PivotingSide;
 use stick_solo::game::{
     base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
@@ -29,7 +30,8 @@ fn main() {
         .add_plugin(CameraPlugin)
         .add_resource(GoalQs(Array::zeros(2), Array::zeros(3)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
-            OneHoldingSwitchableNRCouple::new_right_holding(
+            OneHoldingSwitchableNRCouple::new(
+                PivotingSide::Right,
                 Vec2::new(0.0, -0.1),
                 &[0.2, 0.3],
                 &[-0.1, -0.2],
@@ -46,7 +48,8 @@ fn main() {
         )))
         // .add_resource(GoalQs(Array::zeros(3), Array::zeros(2)))
         // .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
-        //     OneHoldingSwitchableNRCouple::new_left_holding(
+        //     OneHoldingSwitchableNRCouple::new(
+        //         PivotingSide::Left,
         //         Vec2::new(0.0, -0.1),
         //         &[0.2, 0.2, 0.1],
         //         &[0.1, 0.1, 0.1],

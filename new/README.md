@@ -173,9 +173,9 @@
         - [x] Left, right holding seperate networks
         - [x] Ensure and showcase mostly working, holding origin invariance, scale invariance
         - [x] Auto scale goal region based on holding ls
+        - [ ] Left and right holding single network
         - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
         - [ ] Improve comy behavior
-        - [ ] Left and right holding single network
         - Discuss how non-trivial the deciding holding goal and how RL is a good tool here (different positions, non-trivial gaits, discontinuity at ends).
     - [ ] Switcing and matching (transfers)
 - [ ] Understand jacobian transpose derivation properly

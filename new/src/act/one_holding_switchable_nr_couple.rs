@@ -11,70 +11,37 @@ pub struct OneHoldingSwitchableNRCouple {
 }
 
 impl OneHoldingSwitchableNRCouple {
-    pub fn new_left_holding(
-        origin_left: Vec2,
-        ls_left: &[f32],
-        qs_left: &[f32],
-        q_clamps_left: &[(f32, f32)],
-        ls_right: &[f32],
-        qs_right: &[f32],
-        q_clamps_right: &[(f32, f32)],
+    pub fn new(
+        holding_side: PivotingSide,
+        origin_holding: Vec2,
+        ls_holding: &[f32],
+        qs_holding: &[f32],
+        q_clamps_holding: &[(f32, f32)],
+        ls_non_holding: &[f32],
+        qs_non_holding: &[f32],
+        q_clamps_non_holding: &[(f32, f32)],
         thickness: f32,
     ) -> Self {
-        let left = SwitchableNR::new(
-            origin_left,
-            ls_left,
-            qs_left,
-            q_clamps_left,
-            PivotingSide::Left,
+        let holding = SwitchableNR::new(
+            origin_holding,
+            ls_holding,
+            qs_holding,
+            q_clamps_holding,
+            holding_side.clone(),
             thickness,
         );
-        let origin_right = left.get_last_vertex();
-        let right = SwitchableNR::new(
-            origin_right,
-            ls_right,
-            qs_right,
-            q_clamps_right,
-            PivotingSide::Left,
+        let origin_non_holding = holding.get_last_vertex();
+        let non_holding = SwitchableNR::new(
+            origin_non_holding,
+            ls_non_holding,
+            qs_non_holding,
+            q_clamps_non_holding,
+            holding_side.clone(),
             thickness,
         );
         OneHoldingSwitchableNRCouple {
-            holding: left,
-            non_holding: right,
-            is_holding_as_initialized: true,
-        }
-    }
-
-    pub fn new_right_holding(
-        origin_right: Vec2,
-        ls_right: &[f32],
-        qs_right: &[f32],
-        q_clamps_right: &[(f32, f32)],
-        ls_left: &[f32],
-        qs_left: &[f32],
-        q_clamps_left: &[(f32, f32)],
-        thickness: f32,
-    ) -> Self {
-        let right = SwitchableNR::new(
-            origin_right,
-            ls_right,
-            qs_right,
-            q_clamps_right,
-            PivotingSide::Right,
-            thickness,
-        );
-        let origin_left = right.get_last_vertex();
-        let left = SwitchableNR::new(
-            origin_left,
-            ls_left,
-            qs_left,
-            q_clamps_left,
-            PivotingSide::Right,
-            thickness,
-        );
-        OneHoldingSwitchableNRCouple {
-            holding: right,
-            non_holding: left,
+            holding: holding,
+            non_holding: non_holding,
             is_holding_as_initialized: true,
         }
     }

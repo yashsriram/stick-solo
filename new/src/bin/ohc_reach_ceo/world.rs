@@ -6,6 +6,7 @@ use ndarray::prelude::*;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
+use stick_solo::act::switchable_nr::PivotingSide;
 use stick_solo::act::switchable_nr::SwitchableNR;
 use stick_solo::game::goal_couple_plugin::GoalCouple;
 
@@ -116,7 +117,8 @@ impl Reward for World {
         let mut cumulative_reward = 0.0;
         for _ in 0..num_episodes {
             // Spawn agent
-            let mut agent = OneHoldingSwitchableNRCouple::new_right_holding(
+            let mut agent = OneHoldingSwitchableNRCouple::new(
+                PivotingSide::Left,
                 self.origin,
                 &self.holding_ls,
                 &self.sample_holding_qs(),

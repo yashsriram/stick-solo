@@ -43,7 +43,7 @@ fn main() {
             holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
             non_holding_ls: vec![0.2, 0.2],
             non_holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
-            relative_goal_region: (Vec2::new(-0.5, -0.5), Vec2::new(0.1, 0.5)),
+            unscaled_relative_goal_region: (Vec2::new(-1.0, -1.0), Vec2::new(0.1, 1.0)),
         };
         // let world = World {
         //     origin: Vec2::new(0.5, -0.5),
@@ -51,7 +51,7 @@ fn main() {
         //     holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
         //     non_holding_ls: vec![0.2, 0.2],
         //     non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
-        //     relative_goal_region: (Vec2::new(-0.1, -0.5), Vec2::new(0.5, 0.5)),
+        //     unscaled_relative_goal_region: (Vec2::new(-0.1, -0.5), Vec2::new(0.5, 0.5)),
         // };
         let mut fcn = FCN::new(vec![
             (

@@ -172,12 +172,12 @@
         - [x] CEO parameters tuning
         - [x] Left, right holding seperate networks
         - [x] Ensure and showcase mostly working, holding origin invariance, scale invariance
-        - [ ] Auto scale goal region based on holding ls
-        - [ ] Left and right holding single network
+        - [x] Auto scale goal region based on holding ls
+        - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
         - [ ] Improve comy behavior
+        - [ ] Left and right holding single network
         - Discuss how non-trivial the deciding holding goal and how RL is a good tool here (different positions, non-trivial gaits, discontinuity at ends).
     - [ ] Switcing and matching (transfers)
-    - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

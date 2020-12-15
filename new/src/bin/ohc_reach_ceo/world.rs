@@ -17,7 +17,7 @@ pub struct World {
     pub holding_q_clamps: Vec<(Option<f32>, Option<f32>)>,
     pub non_holding_ls: Vec<f32>,
     pub non_holding_q_clamps: Vec<(Option<f32>, Option<f32>)>,
-    pub relative_goal_region: (Vec2, Vec2),
+    pub unscaled_relative_goal_region: (Vec2, Vec2),
 }
 
 impl World {
@@ -65,7 +65,9 @@ impl World {
     }
 
     pub fn sample_goal(&self) -> Vec2 {
-        let (min, max) = self.relative_goal_region;
+        let (min, max) = self.unscaled_relative_goal_region;
+        let scale = self.holding_ls.iter().sum::<f32>() + self.non_holding_ls.iter().sum::<f32>();
+        let (min, max) = (min * scale, max * scale);
         let diff = max - min;
         let rand_diff = Vec2::new(
             rand::random::<f32>() * diff[0],
@@ -87,7 +89,9 @@ fn init_vis(
     world: Res<World>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let (min, max) = world.relative_goal_region;
+    let (min, max) = world.unscaled_relative_goal_region;
+    let scale = world.holding_ls.iter().sum::<f32>() + world.non_holding_ls.iter().sum::<f32>();
+    let (min, max) = (min * scale, max * scale);
     let midpoint = world.origin + (min + max) / 2.0;
     let diff = max - min;
     commands.spawn(SpriteComponents {

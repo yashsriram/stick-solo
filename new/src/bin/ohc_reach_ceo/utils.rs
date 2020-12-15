@@ -14,7 +14,7 @@ pub fn encode(agent: &OneHoldingSwitchableNRCouple, non_holding_goal: &Vec2) -> 
     let relative_goal = non_holding_goal.clone() - holding_origin.clone();
 
     // Scaling
-    let scale = holding_ls.sum();
+    let scale = holding_ls.sum() + non_holding_ls.sum();
     let scaled_holding_ls = holding_ls / scale;
     let scaled_non_holding_ls = non_holding_ls / scale;
     let scaled_relative_goal = relative_goal / scale;

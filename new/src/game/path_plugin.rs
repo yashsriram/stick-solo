@@ -1,3 +1,4 @@
+use crate::act::switchable_nr::SwitchableNR;
 use bevy::prelude::*;
 use std::collections::LinkedList;
 
@@ -29,7 +30,10 @@ fn init_vis(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Asset
         commands
             .spawn(SpriteComponents {
                 sprite: Sprite {
-                    size: Vec2::new(0.02, 0.02),
+                    size: Vec2::new(
+                        SwitchableNR::GOAL_REACHED_SLACK,
+                        SwitchableNR::GOAL_REACHED_SLACK,
+                    ),
                     resize_mode: SpriteResizeMode::Manual,
                 },
                 material: materials.add(Color::rgb(0.4, 0.4, 0.4).into()),

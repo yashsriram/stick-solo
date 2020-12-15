@@ -12,7 +12,7 @@ use ndarray::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::{env, fs::File, io::BufReader};
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
-use stick_solo::act::switchable_nr::PivotingSide;
+use stick_solo::act::switchable_nr::Side;
 use stick_solo::game::{
     base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
@@ -124,7 +124,7 @@ fn main() {
         .add_resource(GoalQsCouple(Array::zeros(0), Array::zeros(0)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
             OneHoldingSwitchableNRCouple::new(
-                PivotingSide::Left,
+                Side::Right,
                 world.origin,
                 &world.holding_ls,
                 &world.sample_holding_qs(),

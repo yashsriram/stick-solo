@@ -38,7 +38,7 @@ fn main() {
                 (-pi * 0.5, pi),
                 (0.0, pi * 0.5),
             ],
-            PivotingSide::Left,
+            Side::Left,
             0.01,
         )))
         .add_plugin(PathPlugin::new(Path({
@@ -97,8 +97,8 @@ fn control(
     let (_, origin, ls, qs, _, pivoting_side) = agent.get_current_state();
     let given_goal = path.0.front().unwrap().clone();
     let have_to_match = match pivoting_side {
-        PivotingSide::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
-        PivotingSide::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
+        Side::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
+        Side::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
     };
     if have_to_match {
         path.0.push_front(origin.clone());

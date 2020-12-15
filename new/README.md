@@ -150,8 +150,8 @@
         - [x] using goal_reached_slack in deciding to match hands;
             ```rust
             let have_to_match = match pivoting_side {
-                PivotingSide::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
-                PivotingSide::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
+                Side::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
+                Side::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
             };
             ```
     - [x] Traversing a path

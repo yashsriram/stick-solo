@@ -1,5 +1,5 @@
 use super::*;
-use crate::act::switchable_nr::PivotingSide;
+use crate::act::switchable_nr::Side;
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use ndarray_rand::rand_distr::Uniform;
@@ -7,15 +7,15 @@ use ndarray_rand::RandomExt;
 use rand::prelude::*;
 use rayon::prelude::*;
 
-fn get_q0_clamp(q0: f32, pivoting_side: &PivotingSide) -> (f32, f32) {
+fn get_q0_clamp(q0: f32, pivoting_side: &Side) -> (f32, f32) {
     let pi = std::f32::consts::PI;
     match pivoting_side {
-        PivotingSide::Left => {
+        Side::Left => {
             let factor = (q0 + pi) / (2.0 * pi);
             let base = factor.floor() * 2.0 * pi;
             (base - pi * 5.0 / 6.0, base + pi * 2.0 / 6.0)
         }
-        PivotingSide::Right => {
+        Side::Right => {
             let factor = q0 / (2.0 * pi);
             let base = factor.floor() * 2.0 * pi;
             (base + pi * 4.0 / 6.0, base + pi * 11.0 / 6.0)
@@ -28,7 +28,7 @@ pub fn no_prior_random_sample_optimizer<F>(
     origin: &Vec2,
     ls: &Array1<f32>,
     q0: f32,
-    pivoting_side: &PivotingSide,
+    pivoting_side: &Side,
     q_clamps: &Array1<(f32, f32)>,
     goal: &Vec2,
     loss_fn: F,
@@ -66,7 +66,7 @@ pub fn from_current_state_random_sample_optimizer<F>(
     origin: &Vec2,
     ls: &Array1<f32>,
     qs: &Array1<f32>,
-    pivoting_side: &PivotingSide,
+    pivoting_side: &Side,
     q_clamps: &Array1<(f32, f32)>,
     goal: &Vec2,
     loss_fn: F,

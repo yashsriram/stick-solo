@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use ndarray::prelude::*;
 
 #[derive(Clone)]
-pub enum PivotingSide {
+pub enum Side {
     Left,
     Right,
 }
@@ -15,13 +15,13 @@ pub struct SwitchableNR {
     ls: Array1<f32>,
     qs: Array1<f32>,
     q_clamps: Array1<(f32, f32)>,
-    pivoting_side: PivotingSide,
+    pivoting_side: Side,
     // Vis
     thickness: f32,
 }
 
 impl SwitchableNR {
-    pub const GOAL_REACHED_SLACK: f32 = 0.04;
+    pub const GOAL_REACHED_SLACK: f32 = 0.02;
     const MAX_DELTA_Q: f32 = 0.04;
 
     pub fn new(
@@ -29,7 +29,7 @@ impl SwitchableNR {
         ls: &[f32],
         qs: &[f32],
         q_clamps: &[(f32, f32)],
-        pivoting_side: PivotingSide,
+        pivoting_side: Side,
         thickness: f32,
     ) -> Self {
         assert!(ls.len() > 0, "Zero links argument.");
@@ -98,8 +98,8 @@ impl SwitchableNR {
         self.q_clamps = arr1(&q_clamps);
         // pivoting_side
         self.pivoting_side = match self.pivoting_side {
-            PivotingSide::Left => PivotingSide::Right,
-            PivotingSide::Right => PivotingSide::Left,
+            Side::Left => Side::Right,
+            Side::Right => Side::Left,
         };
     }
 
@@ -115,7 +115,7 @@ impl SwitchableNR {
         &Array1<f32>,
         &Array1<f32>,
         &Array1<(f32, f32)>,
-        &PivotingSide,
+        &Side,
     ) {
         (
             self.n,

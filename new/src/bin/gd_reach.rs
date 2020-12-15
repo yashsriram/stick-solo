@@ -1,6 +1,6 @@
 extern crate stick_solo;
 use bevy::prelude::*;
-use stick_solo::act::switchable_nr::{PivotingSide, SwitchableNR};
+use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
     base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
@@ -35,7 +35,7 @@ fn main() {
                 (-pi * 0.5, pi),
                 (0.0, pi * 0.5),
             ],
-            PivotingSide::Left,
+            Side::Left,
             0.01,
         )))
         .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.5, 0.5))))

@@ -1,3 +1,4 @@
+use crate::act::switchable_nr::SwitchableNR;
 use bevy::prelude::*;
 
 #[derive(Clone)]
@@ -29,19 +30,25 @@ fn init_vis(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>
     commands
         .spawn(SpriteComponents {
             sprite: Sprite {
-                size: Vec2::new(0.04, 0.04),
+                size: Vec2::new(
+                    SwitchableNR::GOAL_REACHED_SLACK,
+                    SwitchableNR::GOAL_REACHED_SLACK,
+                ),
                 resize_mode: SpriteResizeMode::Manual,
             },
-            material: materials.add(Color::rgb(1.0, 1.0, 0.0).into()),
+            material: materials.add(Color::rgb(0.0, 1.0, 0.0).into()),
             ..Default::default()
         })
         .with(Goal0Marker)
         .spawn(SpriteComponents {
             sprite: Sprite {
-                size: Vec2::new(0.04, 0.04),
+                size: Vec2::new(
+                    SwitchableNR::GOAL_REACHED_SLACK,
+                    SwitchableNR::GOAL_REACHED_SLACK,
+                ),
                 resize_mode: SpriteResizeMode::Manual,
             },
-            material: materials.add(Color::rgb(1.0, 0.0, 1.0).into()),
+            material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
             ..Default::default()
         })
         .with(Goal1Marker);

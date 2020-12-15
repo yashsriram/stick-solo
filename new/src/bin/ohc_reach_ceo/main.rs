@@ -122,7 +122,7 @@ fn main() {
                 &world.non_holding_ls,
                 &world.sample_non_holding_qs(),
                 &world.non_holding_q_clamps(),
-                0.01,
+                0.007,
             ),
         ))
         .add_plugin(GoalCouplePlugin::new(GoalCouple(

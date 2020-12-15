@@ -96,7 +96,7 @@ fn init_vis(
             resize_mode: SpriteResizeMode::Manual,
         },
         transform: Transform::from_translation(Vec3::new(midpoint[0], midpoint[1], 0.0)),
-        material: materials.add(Color::rgba(1.0, 0.0, 0.0, 0.05).into()),
+        material: materials.add(Color::rgba(1.0, 0.0, 0.0, 0.02).into()),
         ..Default::default()
     });
 }

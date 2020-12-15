@@ -39,6 +39,7 @@ fn init_vis(
         commands: &mut Commands,
         materials: &mut ResMut<Assets<ColorMaterial>>,
     ) {
+        let random_color = Color::rgb(rand::random(), rand::random(), rand::random());
         let thickness = agent.thickness();
         let (n, _, ls, _, _, _) = agent.get_current_state();
         // Edges
@@ -49,7 +50,7 @@ fn init_vis(
                         size: Vec2::new(ls[i], thickness),
                         resize_mode: SpriteResizeMode::Manual,
                     },
-                    material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+                    material: materials.add(random_color.into()),
                     ..Default::default()
                 })
                 .with(Edge(i))
@@ -63,7 +64,7 @@ fn init_vis(
                         size: Vec2::new(thickness * 2.0, thickness * 2.0),
                         resize_mode: SpriteResizeMode::Manual,
                     },
-                    material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
+                    material: materials.add(random_color.into()),
                     ..Default::default()
                 })
                 .with(Vertex(i))
@@ -73,16 +74,33 @@ fn init_vis(
         commands
             .spawn(SpriteComponents {
                 sprite: Sprite {
-                    size: Vec2::new(0.04, 0.04),
+                    size: Vec2::new(thickness * 2.0, thickness * 2.0),
                     resize_mode: SpriteResizeMode::Manual,
                 },
-                material: materials.add(Color::rgb(1.0, 0.0, 0.0).into()),
+                material: materials.add(random_color.into()),
                 ..Default::default()
             })
             .with(CenterOfMass)
             .with(T::default());
     }
     let (holding, non_holding) = (agent.holding(), agent.non_holding());
+    let (_, holding_origin, _, _, _, _) = holding.get_current_state();
+    commands.spawn(SpriteComponents {
+        sprite: Sprite {
+            size: Vec2::new(
+                SwitchableNR::GOAL_REACHED_SLACK,
+                SwitchableNR::GOAL_REACHED_SLACK,
+            ),
+            resize_mode: SpriteResizeMode::Manual,
+        },
+        transform: Transform::from_translation(Vec3::new(
+            holding_origin[0],
+            holding_origin[1],
+            0.0,
+        )),
+        material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+        ..Default::default()
+    });
     init::<OriginalHolding>(holding, &mut commands, &mut materials);
     init::<OriginalNonHolding>(non_holding, &mut commands, &mut materials);
 }

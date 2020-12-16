@@ -3,7 +3,6 @@ mod world;
 
 use bevy::prelude::*;
 use ndarray::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::{env, fs::File, io::BufReader};
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use stick_solo::act::switchable_nr::Side;
@@ -17,26 +16,20 @@ use stick_solo::game::{
     status_bar_plugin::{StatusBarPlugin, Ticks},
 };
 use stick_solo::plan::cross_entropy_optimizing::ceo::CEO;
+use stick_solo::plan::cross_entropy_optimizing::experiment::Experiment;
 use stick_solo::plan::cross_entropy_optimizing::fcn::*;
 use stick_solo::plan::cross_entropy_optimizing::utils::{
     control, decode, encode, random_sample_solve, GoalQsCouple,
 };
-use world::World;
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct Experiment {
-    fcn: FCN,
-    ceo: CEO,
-    world: World,
-}
+use stick_solo::plan::cross_entropy_optimizing::world::World;
+use world::Wrapper;
 
 fn main() {
     let args = env::args();
     let exp = if args.len() == 1 {
         // Optimize
         let pi = std::f32::consts::PI;
-        let world = World {
+        let wrapper = Wrapper(World {
             holding_side: Side::Right,
             origin: Vec2::new(0.0, -0.1),
             holding_ls: vec![0.2, 0.2],
@@ -44,8 +37,8 @@ fn main() {
             non_holding_ls: vec![0.2, 0.2],
             non_holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
             unscaled_relative_goal_region: (Vec2::new(-0.8, -0.8), Vec2::new(0.1, 0.8)),
-        };
-        // let world = World {
+        });
+        // let wrapper = Wrapper(World {
         //     holding_side: Side::Left,
         //     origin: Vec2::new(0.5, -0.5),
         //     holding_ls: vec![0.2, 0.2],
@@ -53,10 +46,10 @@ fn main() {
         //     non_holding_ls: vec![0.2, 0.2],
         //     non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
         //     unscaled_relative_goal_region: (Vec2::new(-0.1, -0.8), Vec2::new(0.8, 0.8)),
-        // };
+        // });
         let mut fcn = FCN::new(vec![
             (
-                world.holding_ls.len() + world.non_holding_ls.len() + 2,
+                wrapper.0.holding_ls.len() + wrapper.0.non_holding_ls.len() + 2,
                 Activation::Linear,
             ),
             (16, Activation::LeakyReLu(0.1)),
@@ -73,11 +66,11 @@ fn main() {
             noise_factor: 1.0,
             ..Default::default()
         };
-        let (mean_reward, _th_std) = ceo.optimize(&mut fcn, &world).unwrap();
+        let (mean_reward, _th_std) = ceo.optimize(&mut fcn, &wrapper).unwrap();
         let exp = Experiment {
             fcn: fcn,
             ceo: ceo,
-            world: world,
+            world: wrapper.0,
         };
         // Save
         use chrono::{Datelike, Timelike, Utc};

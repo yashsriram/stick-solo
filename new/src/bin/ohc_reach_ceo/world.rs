@@ -1,9 +1,5 @@
-use bevy::prelude::*;
 use ndarray::prelude::*;
-use rand::Rng;
-use serde::{Deserialize, Serialize};
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
-use stick_solo::act::switchable_nr::Side;
 use stick_solo::act::switchable_nr::SwitchableNR;
 use stick_solo::game::goal_couple_plugin::GoalCouple;
 use stick_solo::plan::cross_entropy_optimizing::ceo::Reward;
@@ -11,105 +7,11 @@ use stick_solo::plan::cross_entropy_optimizing::fcn::*;
 use stick_solo::plan::cross_entropy_optimizing::utils::{
     control, decode, encode, random_sample_solve, GoalQsCouple,
 };
+use stick_solo::plan::cross_entropy_optimizing::world::World;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct World {
-    pub holding_side: Side,
-    pub origin: Vec2,
-    pub holding_ls: Vec<f32>,
-    pub holding_q_clamps: Vec<(Option<f32>, Option<f32>)>,
-    pub non_holding_ls: Vec<f32>,
-    pub non_holding_q_clamps: Vec<(Option<f32>, Option<f32>)>,
-    pub unscaled_relative_goal_region: (Vec2, Vec2),
-}
+pub struct Wrapper(pub World);
 
-impl World {
-    fn sample_qs(q_clamps: &[(Option<f32>, Option<f32>)]) -> Vec<f32> {
-        let mut rng = rand::thread_rng();
-        q_clamps
-            .iter()
-            .map(|(min, max)| {
-                if *min == None || *max == None {
-                    0.0
-                } else {
-                    rng.gen_range(min.unwrap(), max.unwrap())
-                }
-            })
-            .collect()
-    }
-
-    pub fn sample_holding_qs(&self) -> Vec<f32> {
-        World::sample_qs(&self.holding_q_clamps)
-    }
-
-    pub fn sample_non_holding_qs(&self) -> Vec<f32> {
-        World::sample_qs(&self.non_holding_q_clamps)
-    }
-
-    fn get_q_clamps(q_clamps: &[(Option<f32>, Option<f32>)]) -> Vec<(f32, f32)> {
-        let inf = f32::INFINITY;
-        q_clamps
-            .iter()
-            .map(|(min, max)| match (min, max) {
-                (None, None) => (-inf, inf),
-                (None, Some(l)) => (-inf, *l),
-                (Some(l), None) => (*l, inf),
-                (Some(l1), Some(l2)) => (*l1, *l2),
-            })
-            .collect()
-    }
-
-    pub fn holding_q_clamps(&self) -> Vec<(f32, f32)> {
-        World::get_q_clamps(&self.holding_q_clamps)
-    }
-
-    pub fn non_holding_q_clamps(&self) -> Vec<(f32, f32)> {
-        World::get_q_clamps(&self.non_holding_q_clamps)
-    }
-
-    pub fn sample_goal(&self) -> Vec2 {
-        let (min, max) = self.unscaled_relative_goal_region;
-        let scale = self.holding_ls.iter().sum::<f32>() + self.non_holding_ls.iter().sum::<f32>();
-        let (min, max) = (min * scale, max * scale);
-        let diff = max - min;
-        let rand_diff = Vec2::new(
-            rand::random::<f32>() * diff[0],
-            rand::random::<f32>() * diff[1],
-        );
-        self.origin + min + rand_diff
-    }
-}
-
-impl Plugin for World {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(self.clone())
-            .add_startup_system(init_vis.system());
-    }
-}
-
-fn init_vis(
-    mut commands: Commands,
-    world: Res<World>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-) {
-    let (min, max) = world.unscaled_relative_goal_region;
-    let scale = world.holding_ls.iter().sum::<f32>() + world.non_holding_ls.iter().sum::<f32>();
-    let (min, max) = (min * scale, max * scale);
-    let midpoint = world.origin + (min + max) / 2.0;
-    let diff = max - min;
-    commands.spawn(SpriteComponents {
-        sprite: Sprite {
-            size: Vec2::new(diff[0], diff[1]),
-            resize_mode: SpriteResizeMode::Manual,
-        },
-        transform: Transform::from_translation(Vec3::new(midpoint[0], midpoint[1], 0.0)),
-        material: materials.add(Color::rgba(1.0, 0.0, 0.0, 0.02).into()),
-        ..Default::default()
-    });
-}
-
-impl Reward for World {
+impl Reward for Wrapper {
     fn average_reward(
         &self,
         fcn: &FCN,
@@ -121,18 +23,18 @@ impl Reward for World {
         for _ in 0..num_episodes {
             // Spawn agent
             let mut agent = OneHoldingSwitchableNRCouple::new(
-                &self.holding_side,
-                self.origin,
-                &self.holding_ls,
-                &self.sample_holding_qs(),
-                &self.holding_q_clamps(),
-                &self.non_holding_ls,
-                &self.sample_non_holding_qs(),
-                &self.non_holding_q_clamps(),
+                &self.0.holding_side,
+                self.0.origin,
+                &self.0.holding_ls,
+                &self.0.sample_holding_qs(),
+                &self.0.holding_q_clamps(),
+                &self.0.non_holding_ls,
+                &self.0.sample_non_holding_qs(),
+                &self.0.non_holding_q_clamps(),
                 0.01,
             );
             let holding_origin = agent.holding().get_current_state().1.clone();
-            let non_holding_goal = self.sample_goal();
+            let non_holding_goal = self.0.sample_goal();
             // Network pipeline
             let (input, scale) = encode(&agent, &non_holding_goal);
             let forward_pass = fcn.at_with(&input, params);

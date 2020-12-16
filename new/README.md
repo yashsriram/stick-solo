@@ -159,9 +159,9 @@
     - [x] Traversing a path
         - local
         - global
-- [ ] 2 limb as 2 switching NRs
+- [x] 2 limb as 2 switching NRs
     - [x] Enforcing constraints - (no more constraints; uses previous constraints)
-    - [ ] Formulating as RL problem
+    - [x] Formulating as RL problem
         - [x] Very nice visualization of holding goal w.r.t non-holding goal
         - [x] Useful for debugging, reward function design and testing
             - since the output of network does not depend on qs (initial state) if every point is roguhly tested it is enough, O(N) no need to test every pair of points (src, dest) O(N^2)
@@ -175,11 +175,12 @@
         - [x] Left, right holding seperate networks
         - [x] Ensure and showcase mostly working, holding origin invariance, scale invariance
         - [x] Auto scale goal region based on holding ls
-        - [ ] Left and right holding single network
-        - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
-        - [ ] Improve comy behavior
         - Discuss how non-trivial the deciding holding goal and how RL is a good tool here (different positions, non-trivial gaits, discontinuity at ends).
-    - [ ] Switcing and matching (transfers)
+    - [x] Switcing and matching (transfers)
+    - [ ] Left and right holding single network
+    - [ ] Improve comy behavior
+    - [ ] Improve the transfers demo
+    - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

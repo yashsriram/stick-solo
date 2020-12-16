@@ -36,7 +36,7 @@ fn init_vis(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Asset
                     ),
                     resize_mode: SpriteResizeMode::Manual,
                 },
-                material: materials.add(Color::rgb(0.4, 0.4, 0.4).into()),
+                material: materials.add(Color::rgba(0.4, 0.4, 0.4, 0.4).into()),
                 transform: Transform::from_translation(Vec3::new(vertex[0], vertex[1], 0.0)),
                 ..Default::default()
             })

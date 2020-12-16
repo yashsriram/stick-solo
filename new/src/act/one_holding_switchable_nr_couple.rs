@@ -85,4 +85,15 @@ impl OneHoldingSwitchableNRCouple {
         self.non_holding.set_origin(origin_non_holding);
         self.non_holding.update(non_holding_delta_qs);
     }
+
+    pub fn switch_hold(&mut self) {
+        // Switch pivot
+        self.non_holding.switch_pivot();
+        self.holding.switch_pivot();
+        // Swap
+        let prev_holding = self.holding.clone();
+        self.holding = self.non_holding.clone();
+        self.non_holding = prev_holding;
+        self.is_holding_as_initialized = !self.is_holding_as_initialized;
+    }
 }

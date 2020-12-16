@@ -1,13 +1,7 @@
 extern crate stick_solo;
-
-mod ceo;
-mod fcn;
-mod utils;
 mod world;
 
 use bevy::prelude::*;
-use ceo::CEO;
-use fcn::*;
 use ndarray::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::{env, fs::File, io::BufReader};
@@ -22,7 +16,11 @@ use stick_solo::game::{
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
 };
-use utils::{control, decode, encode, random_sample_solve, GoalQsCouple};
+use stick_solo::plan::cross_entropy_optimizing::ceo::CEO;
+use stick_solo::plan::cross_entropy_optimizing::fcn::*;
+use stick_solo::plan::cross_entropy_optimizing::utils::{
+    control, decode, encode, random_sample_solve, GoalQsCouple,
+};
 use world::World;
 
 #[derive(Debug, Serialize, Deserialize)]

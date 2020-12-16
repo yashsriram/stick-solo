@@ -1,5 +1,7 @@
+pub mod cross_entropy_optimizing;
 pub mod gradient_descent;
 pub mod random_sampling;
+
 use bevy::prelude::*;
 use ndarray::prelude::*;
 

@@ -1,6 +1,3 @@
-use super::ceo::Reward;
-use super::fcn::*;
-use super::utils::{control, decode, encode, random_sample_solve, GoalQsCouple};
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use rand::Rng;
@@ -9,6 +6,11 @@ use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCou
 use stick_solo::act::switchable_nr::Side;
 use stick_solo::act::switchable_nr::SwitchableNR;
 use stick_solo::game::goal_couple_plugin::GoalCouple;
+use stick_solo::plan::cross_entropy_optimizing::ceo::Reward;
+use stick_solo::plan::cross_entropy_optimizing::fcn::*;
+use stick_solo::plan::cross_entropy_optimizing::utils::{
+    control, decode, encode, random_sample_solve, GoalQsCouple,
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(deny_unknown_fields)]

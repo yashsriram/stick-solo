@@ -1,10 +1,10 @@
+use crate::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
+use crate::game::goal_couple_plugin::GoalCouple;
+use crate::plan::gradient_descent::*;
+use crate::plan::random_sampling::*;
+use crate::plan::*;
 use bevy::prelude::*;
 use ndarray::prelude::*;
-use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
-use stick_solo::game::goal_couple_plugin::GoalCouple;
-use stick_solo::plan::gradient_descent::*;
-use stick_solo::plan::random_sampling::*;
-use stick_solo::plan::*;
 
 pub struct GoalQsCouple(pub Array1<f32>, pub Array1<f32>);
 

@@ -134,7 +134,7 @@ fn control(
             &path.0.front().unwrap().clone(),
             |end, com, goal| {
                 5.0 * (end.clone() - goal.clone()).length()
-                    + com[1]
+                    + 5.0 * com[1]
                     + (com[0] - (end[0] + goal[0]) / 2.0).abs()
             },
         );

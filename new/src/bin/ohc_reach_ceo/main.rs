@@ -141,14 +141,14 @@ fn main() {
         )))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_startup_system(initial_set_goal_system.system())
-        .add_system(interactive_set_goal_system.system())
+        .add_startup_system(initial_set_goal_qs_couple_system.system())
+        .add_system(interactive_set_goal_qs_couple_system.system())
         .add_system(control_system.system())
         .add_system(bevy::input::system::exit_on_esc_system.system())
         .run();
 }
 
-fn set_goal(
+fn set_goal_qs_couple(
     agent: &OneHoldingSwitchableNRCouple,
     goal_qs_couple: &mut GoalQsCouple,
     goal_couple: &mut GoalCouple,
@@ -165,16 +165,16 @@ fn set_goal(
     random_sample_solve(agent, goal_couple, goal_qs_couple);
 }
 
-fn initial_set_goal_system(
+fn initial_set_goal_qs_couple_system(
     agent: Res<OneHoldingSwitchableNRCouple>,
     mut goal_qs_couple: ResMut<GoalQsCouple>,
     mut goal_couple: ResMut<GoalCouple>,
     fcn: Res<FCN>,
 ) {
-    set_goal(&agent, &mut goal_qs_couple, &mut goal_couple, &fcn);
+    set_goal_qs_couple(&agent, &mut goal_qs_couple, &mut goal_couple, &fcn);
 }
 
-fn interactive_set_goal_system(
+fn interactive_set_goal_qs_couple_system(
     agent: Res<OneHoldingSwitchableNRCouple>,
     mut goal_qs_couple: ResMut<GoalQsCouple>,
     mut ticks: ResMut<Ticks>,
@@ -187,7 +187,7 @@ fn interactive_set_goal_system(
         || keyboard_input.pressed(KeyCode::J)
         || keyboard_input.pressed(KeyCode::L)
     {
-        set_goal(&agent, &mut goal_qs_couple, &mut goal_couple, &fcn);
+        set_goal_qs_couple(&agent, &mut goal_qs_couple, &mut goal_couple, &fcn);
         ticks.0 = 0;
     }
 }

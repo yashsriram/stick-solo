@@ -179,13 +179,11 @@
     - [x] Switcing and matching (transfers)
     - [x] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
     - [x] Left and right holding single network (since the current task can be seperated into mutually exclusive and exhaustive problems; left holding and right holding, seperate networks for each would work)
-    - [ ] Improve comy behavior (loss function itself and tuning)
-    - [ ] Improve the transfers demo
+    - [x] Improve comy behavior (loss function itself and tuning)
     - [ ] Improve visuals (stich sprites)
+    - [ ] Improve the transfers demo
     - [ ] Uneven climbing agents
     - [ ] Climbing legs
-- [ ] Understand jacobian transpose derivation properly
-- [ ] Understand neural network as an extension to jacobian transpose optimization.
 
 #### Demos
 - Possible variants
@@ -244,6 +242,8 @@
         - [ ] Show as many types of transfers and possible
 
 ### Future work
+- [ ] Understand jacobian transpose derivation properly
+- [ ] Understand neural network as an extension to jacobian transpose optimization.
 - [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots)
 - [ ] 4 limb as 4 NR (general, multiple simultaneous pivots)
 - [ ] 2D PRM/A\*

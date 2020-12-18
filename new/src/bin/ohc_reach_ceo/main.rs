@@ -29,24 +29,24 @@ fn main() {
     let exp = if args.len() == 1 {
         // Optimize
         let pi = std::f32::consts::PI;
-        // let wrapper = Wrapper(World {
-        //     holding_side: Side::Right,
-        //     origin: Vec2::new(0.0, -0.1),
-        //     holding_ls: vec![0.2, 0.2],
-        //     holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
-        //     non_holding_ls: vec![0.2, 0.2],
-        //     non_holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
-        //     unscaled_relative_goal_region: (Vec2::new(-0.8, -0.8), Vec2::new(0.1, 0.8)),
-        // });
         let wrapper = Wrapper(World {
-            holding_side: Side::Left,
-            origin: Vec2::new(0.5, -0.5),
+            holding_side: Side::Right,
+            origin: Vec2::new(0.0, 0.0),
             holding_ls: vec![0.2, 0.2],
-            holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
+            holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
             non_holding_ls: vec![0.2, 0.2],
-            non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
-            unscaled_relative_goal_region: (Vec2::new(-0.1, -0.8), Vec2::new(0.8, 0.8)),
+            non_holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],
+            unscaled_relative_goal_region: (Vec2::new(-0.8, -0.8), Vec2::new(0.1, 0.8)),
         });
+        // let wrapper = Wrapper(World {
+        //     holding_side: Side::Left,
+        //     origin: Vec2::new(0.0, 0.0),
+        //     holding_ls: vec![0.2, 0.2],
+        //     holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
+        //     non_holding_ls: vec![0.2, 0.2],
+        //     non_holding_q_clamps: vec![(None, None), (Some(0.0), Some(pi))],
+        //     unscaled_relative_goal_region: (Vec2::new(-0.1, -0.8), Vec2::new(0.8, 0.8)),
+        // });
         let mut fcn = FCN::new(vec![
             (
                 wrapper.0.holding_ls.len() + wrapper.0.non_holding_ls.len() + 2,
@@ -59,7 +59,7 @@ fn main() {
         let ceo = CEO {
             generations: 500,
             batch_size: 50,
-            num_episodes: 15,
+            num_episodes: 20,
             num_episode_ticks: 200,
             elite_frac: 0.25,
             initial_std: 1.0,

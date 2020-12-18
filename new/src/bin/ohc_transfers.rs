@@ -1,7 +1,6 @@
 extern crate stick_solo;
 use bevy::prelude::*;
 use ndarray::prelude::*;
-use std::collections::LinkedList;
 use std::{env, fs::File, io::BufReader};
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use stick_solo::act::switchable_nr::*;
@@ -22,7 +21,6 @@ use stick_solo::plan::cross_entropy_optimizing::utils::{
 };
 
 fn main() {
-    let pi = std::f32::consts::PI;
     let args = env::args();
     if args.len() != 3 {
         panic!("Bad cmd line parameters.");
@@ -69,32 +67,7 @@ fn main() {
             Vec2::new(0.0, 0.0),
             Vec2::new(0.5, 0.0),
         )))
-        .add_plugin(PathPlugin::new(Path({
-            let mut path = LinkedList::new();
-            let parts = 10usize;
-            for i in 0..parts {
-                let theta = 2.0 * pi * (i as f32) / (parts as f32);
-                path.push_back(Vec2::new(-2.0 + 2.0 * theta.cos(), 2.0 * theta.sin()) * 0.5);
-            }
-            let parts = 8usize;
-            for i in 0..parts {
-                let theta = 2.0 * pi * ((parts - i) as f32) / (parts as f32) + pi;
-                path.push_back(Vec2::new(1.0 + theta.cos(), theta.sin()) * 0.5);
-            }
-            for i in 0..5 {
-                path.push_back(Vec2::new(0.0, 0.5 * i as f32));
-            }
-            for i in 0..5 {
-                path.push_back(Vec2::new(0.5 * i as f32, 2.0));
-            }
-            for i in (0..5).rev() {
-                path.push_back(Vec2::new(2.0, 0.5 * i as f32));
-            }
-            for i in (0..5).rev() {
-                path.push_back(Vec2::new(0.5 * i as f32, 0.0));
-            }
-            path
-        })))
+        .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_startup_system(initial_set_goal_qs_couple_system.system())

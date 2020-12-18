@@ -1,7 +1,6 @@
 extern crate stick_solo;
 use bevy::prelude::*;
 use ndarray::prelude::*;
-use std::collections::LinkedList;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
     base_plugins::BasePlugins,
@@ -41,35 +40,7 @@ fn main() {
             0.01,
         )))
         .add_resource(GoalQs(Array::zeros(4)))
-        .add_plugin(PathPlugin::new(Path({
-            let mut path = LinkedList::new();
-            // path.push_back(Vec2::new(-0.6, 0.1));
-            // path.push_back(Vec2::new(-0.5, 0.1));
-            // path.push_back(Vec2::new(-0.1, 0.1));
-            // path.push_back(Vec2::new(0.3, 0.1));
-            // path.push_back(Vec2::new(-0.1, -0.3));
-            // path.push_back(Vec2::new(-0.2, -0.5));
-            // path.push_back(Vec2::new(-0.3, -0.7));
-            // path.push_back(Vec2::new(-0.3, -0.9));
-            // path.push_back(Vec2::new(-0.3, -1.1));
-            // path.push_back(Vec2::new(-0.3, -1.1));
-            // path.push_back(Vec2::new(-0.2, -1.3));
-            // path.push_back(Vec2::new(0.1, -1.5));
-            // path.push_back(Vec2::new(0.5, -1.5));
-            // path.push_back(Vec2::new(0.7, -1.3));
-            // path.push_back(Vec2::new(0.7, -1.15));
-            // path.push_back(Vec2::new(0.7, -1.0));
-            let parts = 8usize;
-            for i in 0..parts {
-                let theta = 2.0 * pi * (i as f32) / (parts as f32);
-                path.push_back(Vec2::new(-1.0 + theta.cos(), theta.sin()) * 0.5);
-            }
-            for i in 0..parts {
-                let theta = 2.0 * pi * ((parts - i) as f32) / (parts as f32) + pi;
-                path.push_back(Vec2::new(1.0 + theta.cos(), theta.sin()) * 0.5);
-            }
-            path
-        })))
+        .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_startup_system(set_first_goal.system())
@@ -185,20 +156,6 @@ fn control(
         COMXGoalType::PivotGoalMidpoint,
     );
 
-    // {
-    //     fn downward_push_coeff(com: &Vec2, origin: &Vec2) -> f32 {
-    //         let diff_y = com[1] - origin[1];
-    //         if diff_y < 0.0 {
-    //             0.0
-    //         } else {
-    //             1.0 * diff_y.abs()
-    //         }
-    //     }
-    //     let rnd: f32 = thread_rng().sample(Normal::new(0.0, 3.0).unwrap());
-    //     2.0 * rnd * rnd.signum() * take_end_to_given_goal
-    //         + -0.2 * push_com_x_from_its_goal
-    //         + -downward_push_coeff(&agent.get_center_of_mass(), origin) * push_com_y_upward
-    // };
     let alpha = 1.0 / (1.0 + ticks.0 as f32).powf(0.8);
     let beta = 0.01 / take_end_to_given_goal.mapv(|e| e * e).sum().sqrt();
     let gamma = 0.1;

@@ -43,7 +43,7 @@ fn init_vis(
         agent: &SwitchableNR,
         commands: &mut Commands,
         materials: &mut ResMut<Assets<ColorMaterial>>,
-        color: Color,
+        _color: Color,
         asset_server: &AssetServer,
     ) {
         let thickness = agent.thickness();

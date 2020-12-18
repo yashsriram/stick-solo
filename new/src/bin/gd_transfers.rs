@@ -1,8 +1,5 @@
 extern crate stick_solo;
 use bevy::prelude::*;
-use rand::prelude::*;
-use rand_distr::Normal;
-use std::collections::LinkedList;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
     base_plugins::BasePlugins,
@@ -41,35 +38,7 @@ fn main() {
             Side::Left,
             0.01,
         )))
-        .add_plugin(PathPlugin::new(Path({
-            let mut path = LinkedList::new();
-            // path.push_back(Vec2::new(-0.6, 0.1));
-            // path.push_back(Vec2::new(-0.5, 0.1));
-            // path.push_back(Vec2::new(-0.1, 0.1));
-            // path.push_back(Vec2::new(0.3, 0.1));
-            // path.push_back(Vec2::new(-0.1, -0.3));
-            // path.push_back(Vec2::new(-0.2, -0.5));
-            // path.push_back(Vec2::new(-0.3, -0.7));
-            // path.push_back(Vec2::new(-0.3, -0.9));
-            // path.push_back(Vec2::new(-0.3, -1.1));
-            // path.push_back(Vec2::new(-0.3, -1.1));
-            // path.push_back(Vec2::new(-0.2, -1.3));
-            // path.push_back(Vec2::new(0.1, -1.5));
-            // path.push_back(Vec2::new(0.5, -1.5));
-            // path.push_back(Vec2::new(0.7, -1.3));
-            // path.push_back(Vec2::new(0.7, -1.15));
-            // path.push_back(Vec2::new(0.7, -1.0));
-            let parts = 7usize;
-            for i in 0..parts {
-                let theta = 2.0 * pi * (i as f32) / (parts as f32);
-                path.push_back(Vec2::new(-1.0 + theta.cos(), theta.sin()) * 0.5);
-            }
-            for i in 0..parts {
-                let theta = 2.0 * pi * ((parts - i) as f32) / (parts as f32) + pi;
-                path.push_back(Vec2::new(1.0 + theta.cos(), theta.sin()) * 0.5);
-            }
-            path
-        })))
+        .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(control.system())
@@ -126,15 +95,14 @@ fn control(
         if diff_y < 0.0 {
             0.0
         } else {
-            1.0 * diff_y.abs()
+            0.1 * diff_y.abs()
         }
     }
-    let rnd: f32 = thread_rng().sample(Normal::new(0.0, 3.0).unwrap());
     let beta = 0.03 / take_end_to_given_goal.mapv(|e| e * e).sum().sqrt();
     let com = agent.get_center_of_mass();
     let origin = origin.clone();
     agent.update(
-        beta * rnd * rnd.signum() * take_end_to_given_goal
+        beta * take_end_to_given_goal
             + -0.2 * push_com_x_from_its_goal
             + -downward_push_coeff(&com, origin) * push_com_y_upward,
     );

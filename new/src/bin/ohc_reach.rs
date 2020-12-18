@@ -92,6 +92,11 @@ fn random_sample_solve(
     {
         let (_, origin_holding, ls, qs, q_clamps, pivoting_side) =
             agent.holding().get_current_state();
+        let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+            5.0 * (end.clone() - goal.clone()).length()
+                + com[1]
+                + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+        };
         let (_min_loss, best_q) = no_prior_random_sample_optimizer(
             10_000,
             origin_holding,
@@ -100,11 +105,7 @@ fn random_sample_solve(
             pivoting_side,
             q_clamps,
             &goal_couple.0,
-            |end, com, goal| {
-                5.0 * (end.clone() - goal.clone()).length()
-                    + com[1]
-                    + (com[0] - (end[0] + goal[0]) / 2.0).abs()
-            },
+            loss_fn,
         );
         goal_qs.0 = best_q;
         let (origin_non_holding, _) = get_end_verticex_and_com(origin_holding, ls, &goal_qs.0);
@@ -117,11 +118,7 @@ fn random_sample_solve(
             pivoting_side,
             q_clamps,
             &goal_couple.1,
-            |end, com, goal| {
-                5.0 * (end.clone() - goal.clone()).length()
-                    + com[1]
-                    + (com[0] - (end[0] + goal[0]) / 2.0).abs()
-            },
+            loss_fn,
         );
         goal_qs.1 = best_q;
         ticks.0 = 0;

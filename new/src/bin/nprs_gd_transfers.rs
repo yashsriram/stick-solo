@@ -82,6 +82,11 @@ struct GoalQs(Array1<f32>);
 
 fn set_first_goal(agent: ResMut<SwitchableNR>, path: ResMut<Path>, mut goal_qs: ResMut<GoalQs>) {
     let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+    let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+        5.0 * (end.clone() - goal.clone()).length()
+            + 5.0 * com[1]
+            + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+    };
     let (_min_loss, best_q) = no_prior_random_sample_optimizer(
         10_000,
         origin,
@@ -90,11 +95,7 @@ fn set_first_goal(agent: ResMut<SwitchableNR>, path: ResMut<Path>, mut goal_qs: 
         pivoting_side,
         q_clamps,
         &path.0.front().unwrap().clone(),
-        |end, com, goal| {
-            5.0 * (end.clone() - goal.clone()).length()
-                + com[1]
-                + (com[0] - (end[0] + goal[0]) / 2.0).abs()
-        },
+        loss_fn,
     );
     goal_qs.0 = best_q;
 }
@@ -120,6 +121,11 @@ fn control(
         Side::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
         Side::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
     };
+    let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+        5.0 * (end.clone() - goal.clone()).length()
+            + 5.0 * com[1]
+            + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+    };
     if have_to_match {
         path.0.push_front(origin.clone());
 
@@ -132,11 +138,7 @@ fn control(
             pivoting_side,
             q_clamps,
             &path.0.front().unwrap().clone(),
-            |end, com, goal| {
-                5.0 * (end.clone() - goal.clone()).length()
-                    + 5.0 * com[1]
-                    + (com[0] - (end[0] + goal[0]) / 2.0).abs()
-            },
+            loss_fn,
         );
         goal_qs.0 = best_q;
 
@@ -159,11 +161,7 @@ fn control(
                 pivoting_side,
                 q_clamps,
                 &path.0.front().unwrap().clone(),
-                |end, com, goal| {
-                    5.0 * (end.clone() - goal.clone()).length()
-                        + 5.0 * com[1]
-                        + (com[0] - (end[0] + goal[0]) / 2.0).abs()
-                },
+                loss_fn,
             );
             goal_qs.0 = best_q;
         }

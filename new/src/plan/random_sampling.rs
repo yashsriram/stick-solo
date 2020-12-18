@@ -34,7 +34,7 @@ pub fn no_prior_random_sample_optimizer<F>(
     loss_fn: F,
 ) -> (f32, Array1<f32>)
 where
-    F: Fn(&Vec2, &Vec2, &Vec2) -> f32 + Send + Sync,
+    F: Fn(&Vec2, &Vec2, &Vec2, &Vec2) -> f32 + Send + Sync,
 {
     let q0_clamp = get_q0_clamp(q0, pivoting_side);
     (0..num_samples)
@@ -53,7 +53,7 @@ where
                 })
                 .collect::<Array1<f32>>();
             let (end, com) = get_end_verticex_and_com(origin, ls, &new_qs);
-            (loss_fn(&end, &com, goal), new_qs)
+            (loss_fn(&end, &com, goal, origin), new_qs)
         })
         .min_by(|x, y| x.0.partial_cmp(&y.0).unwrap())
         .unwrap()
@@ -72,7 +72,7 @@ pub fn from_current_state_random_sample_optimizer<F>(
     loss_fn: F,
 ) -> (f32, Array1<f32>)
 where
-    F: Fn(&Vec2, &Vec2, &Vec2) -> f32 + Send + Sync,
+    F: Fn(&Vec2, &Vec2, &Vec2, &Vec2) -> f32 + Send + Sync,
 {
     let (q0_min, q0_max) = get_q0_clamp(qs[0], pivoting_side);
     (0..num_samples)
@@ -94,7 +94,7 @@ where
                 }
             }
             let (end, com) = get_end_verticex_and_com(origin, ls, &new_qs);
-            (loss_fn(&end, &com, goal), new_qs)
+            (loss_fn(&end, &com, goal, origin), new_qs)
         })
         .min_by(|x, y| x.0.partial_cmp(&y.0).unwrap())
         .unwrap()

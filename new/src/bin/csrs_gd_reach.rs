@@ -72,6 +72,11 @@ fn genetic_solve_from_current_state(
         || keyboard_input.pressed(KeyCode::D)
     {
         let (n, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+        let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+            5.0 * (end.clone() - goal.clone()).length()
+                + 5.0 * com[1]
+                + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+        };
         let (_min_loss, best_q) = from_current_state_random_sample_optimizer(
             10_000,
             2.0,
@@ -82,11 +87,7 @@ fn genetic_solve_from_current_state(
             pivoting_side,
             q_clamps,
             &goal.0,
-            |end, com, goal| {
-                5.0 * (end.clone() - goal.clone()).length()
-                    + com[1]
-                    + (com[0] - (end[0] + goal[0]) / 2.0).abs()
-            },
+            loss_fn,
         );
         // println!("{:?}", min_loss);
         // println!("{:?}", best_q[0]);

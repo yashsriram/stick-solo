@@ -72,6 +72,11 @@ fn genetic_solve_no_prior(
         || keyboard_input.pressed(KeyCode::D)
     {
         let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+        let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+            5.0 * (end.clone() - goal.clone()).length()
+                + com[1]
+                + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+        };
         let (_min_loss, best_q) = no_prior_random_sample_optimizer(
             10_000,
             origin,
@@ -80,11 +85,7 @@ fn genetic_solve_no_prior(
             pivoting_side,
             q_clamps,
             &goal.0,
-            |end, com, goal| {
-                5.0 * (end.clone() - goal.clone()).length()
-                    + com[1]
-                    + (com[0] - (end[0] + goal[0]) / 2.0).abs()
-            },
+            loss_fn,
         );
         // println!("{:?}", min_loss);
         // println!("{:?}", best_q[0]);

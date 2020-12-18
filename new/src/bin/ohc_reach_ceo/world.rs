@@ -51,17 +51,17 @@ impl Reward for Wrapper {
                 // Holding
                 let last_vertex = agent.holding().get_last_vertex();
                 let dist = (last_vertex - holding_goal).length();
-                episode_reward -= dist * 2.0;
+                episode_reward -= 2.0 * dist;
                 // Non holding
                 let last_vertex = agent.non_holding().get_last_vertex();
                 let dist = (last_vertex - non_holding_goal).length();
-                episode_reward -= dist * 10.0;
+                episode_reward -= 10.0 * dist;
+                // COM y
+                let com = agent.get_center_of_mass();
+                episode_reward -= 5.0 * com[1];
                 // COM x
                 let com = agent.get_center_of_mass();
                 episode_reward -= (com[0] - (non_holding_goal[0] + holding_origin[0]) / 2.0).abs();
-                // COM y
-                let com = agent.get_center_of_mass();
-                episode_reward -= com[1];
             }
             // Holding
             let last_vertex = agent.holding().get_last_vertex();

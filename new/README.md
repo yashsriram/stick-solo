@@ -177,10 +177,13 @@
         - [x] Auto scale goal region based on holding ls
         - Discuss how non-trivial the deciding holding goal and how RL is a good tool here (different positions, non-trivial gaits, discontinuity at ends).
     - [x] Switcing and matching (transfers)
-    - [ ] Left and right holding single network
-    - [ ] Improve comy behavior
+    - [x] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
+    - [x] Left and right holding single network (since the current task can be seperated into mutually exclusive and exhaustive problems; left holding and right holding, seperate networks for each would work)
+    - [ ] Improve comy behavior (loss function itself and tuning)
     - [ ] Improve the transfers demo
-    - [ ] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
+    - [ ] Improve visuals (stich sprites)
+    - [ ] Uneven climbing agents
+    - [ ] Climbing legs
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 

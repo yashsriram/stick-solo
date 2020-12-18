@@ -182,8 +182,7 @@
     - [x] Improve comy behavior (loss function itself and tuning)
     - [x] Improve visuals (stich sprites)
     - [x] Improve the transfers demo
-    - [ ] Uneven climbing agents
-    - [ ] Climbing legs
+    - [x] Uneven climbing agents (ohc reach)
 
 #### Demos
 - Possible variants

@@ -180,8 +180,8 @@
     - [x] Can even make a full network visualization ((x,y)_non_holding_goal vs dist(x,y)_holding_goal_from_origin)
     - [x] Left and right holding single network (since the current task can be seperated into mutually exclusive and exhaustive problems; left holding and right holding, seperate networks for each would work)
     - [x] Improve comy behavior (loss function itself and tuning)
-    - [ ] Improve visuals (stich sprites)
-    - [ ] Improve the transfers demo
+    - [x] Improve visuals (stich sprites)
+    - [x] Improve the transfers demo
     - [ ] Uneven climbing agents
     - [ ] Climbing legs
 

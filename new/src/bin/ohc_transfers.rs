@@ -71,14 +71,27 @@ fn main() {
         )))
         .add_plugin(PathPlugin::new(Path({
             let mut path = LinkedList::new();
-            let parts = 8usize;
+            let parts = 10usize;
             for i in 0..parts {
                 let theta = 2.0 * pi * (i as f32) / (parts as f32);
-                path.push_back(Vec2::new(-1.0 + theta.cos(), theta.sin()) * 0.5);
+                path.push_back(Vec2::new(-2.0 + 2.0 * theta.cos(), 2.0 * theta.sin()) * 0.5);
             }
+            let parts = 8usize;
             for i in 0..parts {
                 let theta = 2.0 * pi * ((parts - i) as f32) / (parts as f32) + pi;
                 path.push_back(Vec2::new(1.0 + theta.cos(), theta.sin()) * 0.5);
+            }
+            for i in 0..5 {
+                path.push_back(Vec2::new(0.0, 0.5 * i as f32));
+            }
+            for i in 0..5 {
+                path.push_back(Vec2::new(0.5 * i as f32, 2.0));
+            }
+            for i in (0..5).rev() {
+                path.push_back(Vec2::new(2.0, 0.5 * i as f32));
+            }
+            for i in (0..5).rev() {
+                path.push_back(Vec2::new(0.5 * i as f32, 0.0));
             }
             path
         })))

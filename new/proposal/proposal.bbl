@@ -1,0 +1,38 @@
+\begin{thebibliography}{}
+
+\bibitem[Bull et~al., 1995]{bull1995adaptive}
+Bull, L., Fogarty, T.~C., Mikami, S., and Thomas, J.~G. (1995).
+\newblock Adaptive gait acquisition using multi-agent learning for wall
+  climbing robots.
+\newblock {\em Automation and Robotics in Construction XII}, pages 80--86.
+
+\bibitem[Grieco et~al., 1998]{Grieco1998ASC}
+Grieco, J.~C., Prieto, M., Armada, M., and de~Santos, P.~G. (1998).
+\newblock A six-legged climbing robot for high payloads.
+\newblock {\em Proceedings of the 1998 IEEE International Conference on Control
+  Applications (Cat. No.98CH36104)}, 1:446--450 vol.1.
+
+\bibitem[Kalisiak and Van~de Panne, 2001]{kalisiak2001grasp}
+Kalisiak, M. and Van~de Panne, M. (2001).
+\newblock A grasp-based motion planning algorithm for character animation.
+\newblock {\em The Journal of Visualization and Computer Animation},
+  12(3):117--129.
+
+\bibitem[Naderi et~al., 2017]{10.1145/3072959.3073707}
+Naderi, K., Rajam\"{a}ki, J., and H\"{a}m\"{a}l\"{a}inen, P. (2017).
+\newblock Discovering and synthesizing humanoid climbing movements.
+\newblock {\em ACM Trans. Graph.}, 36(4).
+
+\bibitem[{Nagakubo} and {Hirose}, 1994]{351225}
+{Nagakubo}, A. and {Hirose}, S. (1994).
+\newblock Walking and running of the quadruped wall-climbing robot.
+\newblock In {\em Proceedings of the 1994 IEEE International Conference on
+  Robotics and Automation}, pages 1005--1012 vol.2.
+
+\bibitem[Peng et~al., 2017]{2017-TOG-deepLoco}
+Peng, X.~B., Berseth, G., Yin, K., and van~de Panne, M. (2017).
+\newblock Deeploco: Dynamic locomotion skills using hierarchical deep
+  reinforcement learning.
+\newblock {\em ACM Transactions on Graphics (Proc. SIGGRAPH 2017)}, 36(4).
+
+\end{thebibliography}

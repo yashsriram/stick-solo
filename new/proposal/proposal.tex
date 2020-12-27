@@ -1,0 +1,59 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{cite}
+
+\title{CSci 8980\\Project - Stick Solo\\Proposal}
+\author{
+Yashasvi Sriram Patkuri - patku001@umn.edu\\
+}
+
+\begin{document}
+\maketitle
+
+\paragraph{description}
+The problem is to generate a controller for a given (human-like) stick-figure agent for the task of wall climbing (as in bouldering) so that the agent reaches the goal in a natural motion.
+The environment and agent will be mostly in 2D.
+The focus will be on using optimization based methods.
+
+\paragraph{members}
+\begin{enumerate}[nolistsep]
+    \item Yashasvi Sriram Patkuri - patku001@umn.edu
+\end{enumerate}
+
+\paragraph{baseline}
+Baseline is chosen as previous work on this problem, by me, using classical methods.
+Demo: \url{https://www.youtube.com/watch?v=bZg6pS2gGPw}.
+Github: \url{https://github.com/buggedbit/stick-solo}.
+
+\paragraph{oracle}
+There are two components of evaluation in this problem.
+\begin{enumerate}[nolistsep]
+    \item Reaching the goal.
+    \item Moving naturally.
+\end{enumerate}
+While the first one can be evaluated automatically, the latter one is best evaluated using user-studies for now.
+For example, if the controller produces motion for a climbing route which is not very distinguishable from some human climber's motion, that's a point.
+An arbitrary threshold for number of such points can be set as one evaluation metric.
+
+\paragraph{academic papers}
+\cite{bull1995adaptive} proposes wall climbing robot gait control using genetic algorithms and Q-learning.
+\cite{Grieco1998ASC} and \cite{351225} demonstrate wall-climbing robots.
+\cite{kalisiak2001grasp} is one of the first papers to work on animating 2D parkour agents.
+\cite{10.1145/3072959.3073707} addresses the problem of offline path and movement planning for wall climbing humanoid agents.
+\cite{2017-TOG-deepLoco} discusses the idea of hierarchical controller generation for the tasks of walking, running, jogging. This is what I intend to apply to the task of wall climbing.
+
+\paragraph{time estimates}
+I think there are two major parts to the project.
+Generating controller for local movements and higher level path planning.
+Depending on how the first part evolves the time for second one might vary.
+The most time in the first part should be taken by formulating dynamics, comparing and choosing RL algorithms, reward functions, implementation and debugging for incrementally sophisticated agents.
+
+\bibliographystyle{apalike}
+\bibliography{cites}
+
+\end{document}

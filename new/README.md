@@ -53,7 +53,7 @@
     - Given these two networks, depending on current case it uses appropriate network to control neck.
 - `ohc_plot` and `plotting/plot3d.m` are used together for analyzing and plotting some graphs for a given optimized neural network.
 
-### features
+### features (lot of gifs, might take a bit to load :) )
 
 | Gradient descent IK control | Neural network IK control |
 | --- | --- |
@@ -122,7 +122,7 @@ Therefore direct neural-network IK control is not used.
 
 ![](./github/9.worm.gif)
 
-- One holding NR couple as two limb agent
+- One holding NR couple as two limb agent.
     - Manual neck and reaching hand goal control.
     - No-prior random-sample near-global solve + gradient-descent snapping IK control.
 
@@ -147,7 +147,7 @@ Therefore direct neural-network IK control is not used.
 - Visualizing neural network policy for neck using texture map distortion method.
     - Input to network is lengths of agent links and reaching hand goal.
     - Output is neck goal.
-    - Since for a given agent lengths are fixed policy is a map from R^2 -> R^2.
+    - Since for a given agent lengths are fixed, policy is a map from R^2 -> R^2.
     - Left map shows original texture with linear mapping y = x.
     - Right map shows texture distorted using policy y = f(x).
 
@@ -322,8 +322,6 @@ Therefore direct neural-network IK control is not used.
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 - [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots)
 - [ ] 4 limb as 4 NR (general, multiple simultaneous pivots)
-- [ ] 2D PRM/A\*
-    - [ ] Avoid duplication of same start and finish
 - [ ] Belay rope
 - [ ] Angle bound obstacles, replanning in known environment
 - [ ] Prismatic joints

@@ -1,3 +1,51 @@
+# stick-solo
+
+## description
+- Simple planning methods for 2D stick-figure free-solo climbing agents.
+- This work mainly has random sampling based global inverse kinematics solves + gradient descent and cross-entropy optimization based reinforcement learning.
+
+## code
+- Code is written in nightly rust.
+    - `.cargo/` contains cargo config, especially linker and generic sharing config for speedy iterative compilations.
+    - `assets/` contains game assets.
+    - `latex/` contains latex literature produced including proposal, update and report.
+    - `plotting/` contain matlab script for plotting.
+    - `src/` contains all source code.
+
+## documentation
+- For most of the code, the documentation is itself.
+
+## usage
+- Use `cargo +nightly run --release --bin <bin crate>` to run a bin crate.
+- Common controls
+    - `w a s d` and `i j k l` for goal control.
+    - `- +` for camera zoom in and out movements.
+    - `arrow keys` camera panning.
+
+## demonstration
+### bin crates
+- `gd_*` - illustrates vanilla gradient descent ik control for NR agent as two limb agent.
+- `relax_gd_transfers` - illustrates relaxing heuristic + gradient descent ik control for NR agent as two limb agent.
+- `nprs_gd_*` - illustrates no prior random sampling + gradient descent ik control for NR agent as two limb agent.
+- `csrs_gd_*` - illustrates current state random sampling + gradient descent ik control for NR agent as two limb agent.
+- `ohc_reach_manual` - illustrates (manual neck control) + (no prior random sampling + gradient descent ik control) for one holding NR couple agent as two limb agent.
+- `ohc_reach_ceo` - illustrates (optimizing a network for neck control using cross entropy method) + (no prior random sampling + gradient descent ik control) for one holding NR couple agent as two limb agent.
+    - Seperate networks are independently optimized left holding and right holding cases.
+    - After training for a case the optimized network is written to a file.
+- `ohc_transfers` - illustrates (network neck control) + (no prior random sampling + gradient descent ik control) for one holding NR couple agent as two limb agent.
+    - It takes two command line arguments, path to neural network file for left case and right case respectively.
+    - Given these two networks, depending on current case it uses appropriate network to control neck.
+- `ohc_plot` and `plotting/plot3d.m` are used together for analyzing and plotting some graphs for a given optimized neural network.
+
+### features
+The journey from a two-link agent to a human-like agent.
+
+![](./github/0.ik.gif)
+
+
+## roadmap
+- Problems solved until now are documented in `report.pdf`
+
 ### Assumptions
 - 2D wall and 2D constrained stick-figure agents
 - 2D circle and line segment obstacles on wall
@@ -57,20 +105,6 @@
 - [x] Trail of hand (useful for showing shortest path of pseudo inverse vs jacobian method)
 - [x] Worm agent
 - [x] Improve colors of water and sky
-
-### Demos
-- [x] RRAnalytical demo
-- [x] NRIterative agent demos
-    - [x] Jacobian vs Pseudo inverse
-- [x] Worm
-- [x] Two arm agent demo
-- [x] Four arm agent demo
-    - [x] Climbing up-left, up-right
-    - [x] Climbing down-left, down-right
-    - [x] Climbing sideways
-    - [x] Climbing all in same path
-- [x] Four arm agent race demo
-- [x] A demo containing everything
 
 ### New ideas
 - My game my rules ----------------- Physical Simulator --------------------- Real world
@@ -190,55 +224,38 @@
     - (2) com_x controls [origin com_x_control, midpoint com_x_control]
     - (1) com_y control
 
-- [ ] 2 limb as 4R: (1 x try various weights)
+- [x] 2 limb as 4R: (1 x try various weights)
     - differs from NR iterative traversing agent in baseline as mentioned by above reasons
-    - [ ] Illustrate q and delta q constraints
-    - [ ] reaching: local
-        - [ ] Only end control (2)
-        - [ ] COM controls (2 x 1)
-        - [ ] Various values
-        - [ ] Local minima stuck
+    - [x] Illustrate q and delta q constraints
+    - [x] reaching: local
+        - [x] Only end control (2)
+        - [x] COM controls (2 x 1)
+        - [x] Local minima stuck
             - crossing hands
             - top to bottom not on wrong side
             - bottom to side not too much
-    - [ ] reaching: global
-        - [ ] Show normal scenarios
-        - [ ] Solve local minima stuck, using relaxing, random solve, ceo solve
-        - [ ] Also show the use case of q0 clamping
+    - [x] reaching: global
+        - [x] Show normal scenarios
+        - [x] Solve local minima stuck, using relaxing, random solve, ceo solve
+        - [x] Also show the use case of q0 clamping
             - crossing hands
             - top to bottom not on wrong side
             - bottom to side not too much
-        - [ ] Compare quality of motions
-        - [ ] Compare convergence errors and times of random and ceo
-        - [ ] Is the parallelization helpful?
-        - [ ] Since the q* is achieved randomly, same route generates different motions (variations)
-    - [ ] reaching and switching (transfer)
-        - [ ] Successful scenario
-        - [ ] A scenario which needs matching
-    - [ ] reaching, matching (if needed) and switching (transfer)
-        - [ ] Show as many types of transfers and possible
+        - [x] Compare quality of motions
+        - [x] Compare convergence errors and times of random and ceo
+        - [x] Since the q* is achieved randomly, same route generates different motions (variations)
+    - [x] reaching and switching (transfer)
+        - [x] Successful scenario
+        - [x] A scenario which needs matching
+    - [x] reaching, matching (if needed) and switching (transfer)
+        - [x] Show as many types of transfers and possible
 - [x] 2 limb as 4R (learning): end_control + com_x_control + com_y_control + weights
     - No real learning part
-- [ ] 2 limb as NR (worm): (1 x try various weights + 2 x 2 x 1 x try various weights for controls)
-    - [ ] Show as many types of transfers and possible
+- [x] 2 limb as NR (worm): (1 x try various weights + 2 x 2 x 1 x try various weights for controls)
 
-- [ ] 2 limb as 2 NR (non-learning): end_control + com_x_control + com_y_control
-- [ ] 2 limb as 2 NR (learning): end_control + com_x_control + com_y_control
-    - [ ] Illustrate q and delta q constraints
-    - [ ] reaching: local
-        - [ ] Local minima stuck
-            - crossing hands
-            - top to bottom not on wrong side
-            - bottom to side not too much
-    - [ ] reaching: global
-        - [ ] Show normal scenarios
-        - [ ] Solve local minima stuck, using relaxing, random solve, ceo solve
-        - [ ] Since the q* is achieved randomly, same route generates different motions (variations)
-    - [ ] reaching and switching (transfer)
-        - [ ] Successful scenario
-        - [ ] A scenario which needs matching
-    - [ ] reaching, matching (if needed) and switching (transfer)
-        - [ ] Show as many types of transfers and possible
+- [x] 2 limb as 2 NR (non-learning): end_control + com_x_control + com_y_control
+- [x] 2 limb as 2 NR (learning): end_control + com_x_control + com_y_control
+    - [x] reaching, matching (if needed) and switching (transfer)
 
 ### Future work
 - [ ] Understand jacobian transpose derivation properly

@@ -167,9 +167,11 @@ Therefore direct neural-network IK control is not used.
 ## roadmap
 - Problems solved until now are documented in `report.pdf`.
 
+```
 - My game my rules ----------------- Physical Simulator --------------------- Real world
                         |
                 current project
+```
 
 - Idea for human like stick figure agent.
     - [ ] IK for each limb.

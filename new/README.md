@@ -168,32 +168,23 @@ Therefore direct neural-network IK control is not used.
 - Problems solved until now are documented in `report.pdf`.
 
 ```
-- My game my rules ----------------- Physical Simulator --------------------- Real world
+My game my rules ----------------- Physical Simulator --------------------- Real world
                         |
                 current project
 ```
 
 - Idea for human like stick figure agent.
-    - [ ] IK for each limb.
-    - [ ] Co-ordinate among limbs.
-    - [ ] With q contrains (including one side leg goal only, no cross overs).
-    - [ ] Put center of mass over holds.
-    - [ ] Formulate and achieve relaxing poses/efficient transfers.
-    - [ ] Do what all climb cycle agent can and more.
-    - [ ] High level planner.
-
-- Tools.
-    - Networks; FCN, Conv, ... using Torch.
-    - Optimizors; CEO, Policy gradient and extensions, Deep Q learning and extensions.
-    - Rewards; Distance to goal, Time to goal, Control values, Difference in control values, Gravity, Relaxedness.
-    - Formulations; All joints controlled by network, Limbs controlled by IK + co-ordinated by network.
+    - [x] IK for each limb.
+    - [x] Co-ordinate among limbs.
+    - [x] With q contrains.
+    - [x] Put center of mass over holds.
+    - [x] Do what all climb cycle agent can and more.
+    - [x] High level planner.
 
 | act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
 | ---                | ---         | ---           | ---                      | ---            |
 | 1 NR               | done        | done          | N/A                      | done           |
-| 2 NR               | done        | -             | -                        | -              |
-| 2 NR + core        | done        | -             | -                        | -              |
-| 2 NR + core + 2 NR | done        | -             | -                        | -              |
+| one holding 2 NR   | done        | done          | done                     | done           |
 
 - Tried networks.
     - [x] NR: ls, qs, goal input -> delta_qs.
@@ -320,6 +311,14 @@ Therefore direct neural-network IK control is not used.
     - [x] reaching, matching (if needed) and switching (transfer).
 
 ### Future work
+| act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
+| ---                | ---         | ---           | ---                      | ---            |
+| two holding 2 NR   | done        | -             | -                        | -              |
+| 2 NR + core        | done        | -             | -                        | -              |
+| 2 NR + core + 2 NR | done        | -             | -                        | -              |
+
+- [ ] Optimizors; Policy gradient and extensions, Deep Q learning and extensions.
+- [ ] Formulate and achieve relaxing poses/efficient transfers.
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
 - [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots)

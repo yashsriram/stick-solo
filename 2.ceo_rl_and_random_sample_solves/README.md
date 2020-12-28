@@ -53,7 +53,9 @@
     - Given these two networks, depending on current case it uses appropriate network to control neck.
 - `ohc_plot` and `plotting/plot3d.m` are used together for analyzing and plotting some graphs for a given optimized neural network.
 
-### features (lot of gifs, might take a bit to load :) )
+### features
+#### This section contains many high quality gifs.
+#### If you find some missing or stuttering, it means that they are loading. In that case please wait.
 
 | Gradient descent IK control | Neural network IK control |
 | --- | --- |

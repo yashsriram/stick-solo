@@ -53,9 +53,32 @@
     - Given these two networks, depending on current case it uses appropriate network to control neck.
 - `ohc_plot` and `plotting/plot3d.m` are used together for analyzing and plotting some graphs for a given optimized neural network.
 
-### 
-![](./github/0.1.ik.gif)
+### features
 
+| Gradient descent IK control | Neural network IK control |
+| --- | --- |
+| ![](./github/0.1.ik.gif) | ![](./github/0.2.ceo.gif) |
+| Has smooth control | Has noisy control and difficult to train generally |
+
+Therefore direct neural-network IK control is not used.
+
+- Baseline
+
+![](./github/1.jt.gif)
+
+![](./github/2.cc.gif)
+
+- New system intro
+
+![](./github/3.0.intro.gif)
+
+- Effect of center of mass term in gradient descent IK.
+
+![](./github/3.1.com.gif)
+
+| Local minima problem | Its solution |
+| --- | --- |
+| ![](./github/4.0.local_minima.gif) | ![](./github/4.1.solve_local_minima.gif) |
 
 ## roadmap
 - Problems solved until now are documented in `report.pdf`.

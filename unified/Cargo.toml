@@ -1,0 +1,10 @@
+[package]
+name = "stick_solo"
+version = "0.1.0"
+authors = ["Yashasvi Sriram <yash.3997@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ggez = "0.6.0"
+nalgebra = { version = "0.29.0", features = ["mint"] }
+rand = "0.8.4"

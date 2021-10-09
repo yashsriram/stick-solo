@@ -1,5 +1,6 @@
 use ggez::{Context, GameResult};
 
+pub mod act;
 pub mod plan;
 pub mod sense;
 

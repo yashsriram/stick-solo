@@ -319,6 +319,9 @@ My game my rules ----------------- Physical Simulator --------------------- Real
 | 2 NR + core        | done        | -             | -                        | -              |
 | 2 NR + core + 2 NR | done        | -             | -                        | -              |
 
+- Improve global IK solve
+    - [ ] Since search space is continous and has no jerks use PRM with high number of vertices to approx the solution
+
 - [ ] Optimizors; Policy gradient and extensions, Deep Q learning and extensions.
 - [ ] Formulate and achieve relaxing poses/efficient transfers.
 - [ ] Understand jacobian transpose derivation properly

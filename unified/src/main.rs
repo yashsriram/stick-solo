@@ -23,7 +23,7 @@ impl MainState {
         let pos_conf_space = PosConfSpace {
             obstacles: vec![
                 Box::new(CircleObstacle::new(Point2::new(400.0, 400.0), 100.0)),
-                Box::new(CircleObstacle::new(Point2::new(200.0, 100.0), 100.0)),
+                Box::new(CircleObstacle::new(Point2::new(200.0, 500.0), 100.0)),
                 Box::new(LineSegmentObstacle::new(
                     Point2::new(000.0, 000.0),
                     Point2::new(200.0, 100.0),

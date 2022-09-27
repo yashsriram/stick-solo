@@ -170,80 +170,73 @@ My game my rules ----------------- Physical Simulator --------------------- Real
                 current project
 ```
 
-- Idea for human like stick figure agent.
-    - [x] IK for each limb.
-    - [x] Co-ordinate among limbs.
-    - [x] With q contrains.
-    - [x] Put center of mass over holds.
-    - [x] Do what all climb cycle agent can and more.
-    - [x] High level planner.
-
-| act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
-| ---                | ---         | ---           | ---                      | ---            |
-| 1 Chain               | done        | done          | N/A                      | done           |
-| Pinned 2 Chain   | done        | done          | done                     | done           |
-
+- Learning based neck position predictor + (Monte-carlo + gradient descent) based inverse kinematic controller for chains.
+- Angle constraints.
 - Tried networks.
-    - [x] Chain: ls, qs, goal input -> delta_qs.
-    - [x] Chain: xis, yis, goal input -> delta_qs.
+    - Chain: ls, qs, goal input -> delta_qs.
+    - Chain: xis, yis, goal input -> delta_qs.
 
-- [x] Switching Chain agent (2 limb as Chain).
-    - [x] q clamps.
-    - [x] delta q abs clamp.
-    - [x] Local optimal JT control.
-    - [ ] Local optimal pseudo inverse control.
-    - [x] Local com control.
-        - [x] Implement COMx control.
-            - [x] delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c.
-            - [x] Discounted com control for q_i by 1 / i.
-            - [x] Sending com to origin vs origin + goal / 2. Can actually send anywhere.
-            - [x] Optimized calculation.
-        - [x] COMy control. push com_y downward.
-            - [x] Optimized calculation.
-        - [x] Local maxima problem ys = 0. (very rare problem since other controls are generally involved.).
-        - [x] Heuristics to model powering through (adrenaline).
-            - [x] gaussian randomized end control (sometimes the weight is > 1 modelling overpower).
-            - [ ] Smoothen this to produce periodic spurs of energy (maybe perlin noise).
-        - [ ] Powerful vs balanced tuning.
-    - [x] Arbitrarily global optimal control (Random sample solve and interpolate control).
-        - From the spirit of RANSAC.
-        - Given end effector goal, randomly sample q vector (in q clamps range) and keep the q\* which achieves closest approach.
-        - This at limit should not be stuck at local minima. Therefore is bit different from gradient descent.
-        - These iterations can be stopped after a fixed number of samples or if closest approach is less than a threshold.
-        - Given q\* just interpolate from current q to q\*.
-        - Parallelizable.
-    - [x] Arbitrarily global optimal control (Cross-entropy solve and interpolate control).
-        - From the spirit of CEO.
-        - Improvement. Instead of sampling randomly in whole q clamp, sample in small region around q, take the best q\*, then sample in vicinity of q\* and so on.
-        - More prone to local minima but given enough big sampling region local minima can be avoided.
-    - [x] Global optimal planning (Solving local planning minumum problem. Agents get stuck due to them even for cases where there is a solution).
-        - [x] 1. Heuristics to reduce local minima.
-            - relaxation time (theoretically guaranteed local minima problem solve given enough relaxation time).
-        - [x] 2. View it as a two link chain (decrease degree of freedom) (Don't want to implement now).
-        - [x] 3. Random global optimal solve.
-        - [x] 4. Cross entropy global optimal solve.
-    - [x] Reaching a hold.
-        - [x] Local planners.
-        - [x] Global planners. How to snap to hold once close enough (Give responsibility to local planner).
-        - [x] Weights of both planners as a function of ticks.
-        - [x] Restrict q0 sampling.
-        - [x] Optimize sorting in genetic planners.
-    - [x] Switching pivot.
-        - [x] q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf)).
-    - [x] Matching hands. If your right hand is free and next hold is on your left; switch hands.
-        - [x] using goal_reached_slack in deciding to match hands;
-            ```rust
-            let have_to_match = match pivoting_side {
-                Side::Left => given_goal[0] - origin[0] < -Chain::GOAL_REACHED_SLACK,
-                Side::Right => given_goal[0] - origin[0] > Chain::GOAL_REACHED_SLACK,
-            };
-            ```
-        - But now the end of the hand can be atmost 2 * GOAL_REACHED_SLACK from the hold.
-        - And to visualize this we need sqaures of size 4 * GOAL_REACHED_SLACK from the hold.
-    - [x] Traversing a path.
-        - local.
-        - global.
-- [x] 2 limb as 2 switching Chain.
+- Local com control.
+    - Implement COMx control.
+        - delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c.
+        - Discounted com control for q_i by 1 / i.
+        - Sending com to origin vs origin + goal / 2. Can actually send anywhere.
+        - Optimized calculation.
+    - COMy control. push com_y downward.
+    - Local maxima problem ys = 0. (very rare problem since other controls are generally involved.).
+    - Heuristics to model powering through (adrenaline).
+        - gaussian randomized end control (sometimes the weight is > 1 modelling overpower).
+
+- Center of mass realism; duct-taping.
+    - Local com control.
+        - Implement COMx control.
+            - delta_q1 = 2 * x_c * dx/dq1; not = dx/dqq; i.e. min x_c^2 not x_c.
+            - Discounted com control for q_i by 1 / i.
+            - Sending com to origin vs origin + goal / 2. Can actually send anywhere.
+            - Optimized calculation.
+        - COMy control. push com_y downward.
+        - Local maxima problem ys = 0. (very rare problem since other controls are generally involved.).
+        - Heuristics to model powering through (adrenaline).
+            - gaussian randomized end control (sometimes the weight is > 1 modelling overpower).
+- Arbitrarily global optimal control (Random sample solve and interpolate control).
+    - From the spirit of RANSAC.
+    - Given end effector goal, randomly sample q vector (in q clamps range) and keep the q\* which achieves closest approach.
+    - This at limit should not be stuck at local minima. Therefore is bit different from gradient descent.
+    - These iterations can be stopped after a fixed number of samples or if closest approach is less than a threshold.
+    - Given q\* just interpolate from current q to q\*.
+    - Parallelizable.
+- Arbitrarily global optimal control (Cross-entropy solve and interpolate control).
+    - From the spirit of CEO.
+    - Improvement. Instead of sampling randomly in whole q clamp, sample in small region around q, take the best q\*, then sample in vicinity of q\* and so on.
+    - More prone to local minima but given enough big sampling region local minima can be avoided.
+- Global optimal planning (Solving local planning minumum problem. Agents get stuck due to them even for cases where there is a solution).
+    - 1. Heuristics to reduce local minima.
+        - relaxation time (theoretically guaranteed local minima problem solve given enough relaxation time).
+    - 2. View it as a two link chain (decrease degree of freedom) (Don't want to implement now).
+    - 3. Random global optimal solve.
+    - 4. Cross entropy global optimal solve.
+- Reaching a hold.
+    - Local planners.
+    - Global planners. How to snap to hold once close enough (Give responsibility to local planner).
+    - Weights of both planners as a function of ticks.
+    - Restrict q0 sampling.
+    - Optimize sorting in genetic planners.
+- Switching pivot.
+    - q and q clamp assignment on switching (refer to code for math and why q1 clamp has to be (-inf, inf)).
+- Matching hands. If your right hand is free and next hold is on your left; switch hands.
+    - using goal_reached_slack in deciding to match hands;
+        ```rust
+        let have_to_match = match pivoting_side {
+            Side::Left => given_goal[0] - origin[0] < -Chain::GOAL_REACHED_SLACK,
+            Side::Right => given_goal[0] - origin[0] > Chain::GOAL_REACHED_SLACK,
+        };
+        ```
+    - But now the end of the hand can be atmost 2 * GOAL_REACHED_SLACK from the hold.
+    - And to visualize this we need sqaures of size 4 * GOAL_REACHED_SLACK from the hold.
+- Traversing a path.
+    - local.
+    - global.
+- 2 limb as 2 switching Chain.
     - [x] Enforcing constraints - (no more constraints; uses previous constraints).
     - [x] Formulating as RL problem.
         - [x] Very nice visualization of holding goal w.r.t non-holding goal.

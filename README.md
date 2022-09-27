@@ -16,3 +16,21 @@
 - The final result of `2.ceo_rl_and_random_sample_solves`.
 
 ![](./2.ceo_rl_and_random_sample_solves/github/12.gif)
+
+# paper
+
+## summary
+
+## configuration space of chain agent
+
+## configuration point of goal pose
+
+## analytical solve for (l = 1,2) chains
+
+## gradient descent solves for (l > 2) chains
+
+## monte-carlo seedings
+
+## heuristics
+
+## neural network neck prediction

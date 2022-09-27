@@ -9,16 +9,16 @@
 ### Assumptions
 - 2D wall and 2D constrained stick-figure agents.
 
-### NR agent
+### Chain agent
 - Rigid links + revolute joints.
 - Links arranged serially.
 - N links <=> N joints <=> N sized joint tuple <=> N + 1 ends.
 - Always one pivot end and one free end.
 
-### One holding NR couple agent
-- Two NR agents connected end to end.
+### Pinned Chain couple agent
+- Two Chain agents connected end to end.
 - Always one holding end and one free end.
-- The holding NR's free end determines non-holding NR's pivot at any instant.
+- The holding Chain's free end determines non-holding Chain's pivot at any instant.
 
 ## code
 - Code is written in `rust`. Some of features used were in `nightly` stage at the time of writing this.
@@ -27,9 +27,6 @@
     - `latex/` contains latex literature produced including proposal, update and report.
     - `plotting/` contain matlab script for plotting.
     - `src/` contains all source code.
-
-## documentation
-- For most of the code, the documentation is itself.
 
 ## usage
 - Use `cargo +nightly run --release --bin <bin crate>` to run a bin crate.
@@ -40,22 +37,20 @@
 
 ## demonstration
 ### bin crates
-- `gd_*` - illustrates vanilla gradient descent ik control for NR agent as two limb agent.
-- `relax_gd_transfers` - illustrates relaxing heuristic + gradient descent ik control for NR agent as two limb agent.
-- `nprs_gd_*` - illustrates no prior random sampling + gradient descent ik control for NR agent as two limb agent.
-- `csrs_gd_*` - illustrates current state random sampling + gradient descent ik control for NR agent as two limb agent.
-- `ohc_reach_manual` - illustrates (manual neck control) + (no prior random sampling + gradient descent ik control) for one holding NR couple agent as two limb agent.
-- `ohc_reach_ceo` - illustrates (optimizing a network for neck control using cross entropy method) + (no prior random sampling + gradient descent ik control) for one holding NR couple agent as two limb agent.
+- `gd_*` - illustrates vanilla gradient descent ik control for Chain agent as two limb agent.
+- `relax_gd_transfers` - illustrates relaxing heuristic + gradient descent ik control for Chain agent as two limb agent.
+- `nprs_gd_*` - illustrates no prior random sampling + gradient descent ik control for Chain agent as two limb agent.
+- `csrs_gd_*` - illustrates current state random sampling + gradient descent ik control for Chain agent as two limb agent.
+- `ohc_reach_manual` - illustrates (manual neck control) + (no prior random sampling + gradient descent ik control) for Pinned Chain couple agent as two limb agent.
+- `ohc_reach_ceo` - illustrates (optimizing a network for neck control using cross entropy method) + (no prior random sampling + gradient descent ik control) for Pinned Chain couple agent as two limb agent.
     - Seperate networks are independently optimized left holding and right holding cases.
     - After training for a case the optimized network is written to a file.
-- `ohc_transfers` - illustrates (network neck control) + (no prior random sampling + gradient descent ik control) for one holding NR couple agent as two limb agent.
+- `ohc_transfers` - illustrates (network neck control) + (no prior random sampling + gradient descent ik control) for Pinned Chain couple agent as two limb agent.
     - It takes two command line arguments, path to neural network file for left case and right case respectively.
     - Given these two networks, depending on current case it uses appropriate network to control neck.
 - `ohc_plot` and `plotting/plot3d.m` are used together for analyzing and plotting some graphs for a given optimized neural network.
 
 ### features
-#### This section contains many high quality gifs.
-#### If you find some missing or stuttering, it means that they are loading. In that case please wait.
 
 | Gradient descent IK control | Neural network IK control |
 | --- | --- |
@@ -104,19 +99,19 @@ Therefore direct neural-network IK control is not used.
 
 ![](./github/7.3.matching.gif)
 
-- NR as two limb agent on a climbing route: Vanilla gradient-descent control.
+- Chain as two limb agent on a climbing route: Vanilla gradient-descent control.
 
 ![](./github/8.1.gd.gif)
 
-- NR as two limb agent on a climbing route: Relax on every hold + gradient-descent control.
+- Chain as two limb agent on a climbing route: Relax on every hold + gradient-descent control.
 
 ![](./github/8.2.relax.gif)
 
-- NR as two limb agent on a climbing route: No-prior random-sample near-global solve + gradient-descent snapping control.
+- Chain as two limb agent on a climbing route: No-prior random-sample near-global solve + gradient-descent snapping control.
 
 ![](./github/8.3.nprs.gif)
 
-- NR as two limb agent on a climbing route: Current-state random-sample near-global solve + gradient-descent snapping control.
+- Chain as two limb agent on a climbing route: Current-state random-sample near-global solve + gradient-descent snapping control.
 
 ![](./github/8.4.csrs.gif)
 
@@ -124,13 +119,13 @@ Therefore direct neural-network IK control is not used.
 
 ![](./github/9.worm.gif)
 
-- One holding NR couple as two limb agent.
+- Pinned Chain couple as two limb agent.
     - Manual neck and reaching hand goal control.
     - No-prior random-sample near-global solve + gradient-descent snapping IK control.
 
 ![](./github/10.ohc_reach.gif)
 
-- One holding NR couple as two limb agent.
+- Pinned Chain couple as two limb agent.
     - Holding with left arm.
     - Manual reaching hand goal control.
     - Cross-entropy optimized network neck control.
@@ -138,7 +133,7 @@ Therefore direct neural-network IK control is not used.
 
 ![](./github/11.1.gif)
 
-- One holding NR couple as two limb agent.
+- Pinned Chain couple as two limb agent.
     - Holding with right arm.
     - Manual reaching hand goal control.
     - Cross-entropy optimized network neck control.
@@ -159,7 +154,7 @@ Therefore direct neural-network IK control is not used.
 
 ![](./github/parallelization.png)
 
-- One holding NR couple as two limb agent.
+- Pinned Chain couple as two limb agent.
     - Manual reaching hand goal control (derived from given path).
     - Cross-entropy optimized network neck control.
     - No-prior random-sample near-global solve + gradient-descent snapping IK control.
@@ -185,14 +180,14 @@ My game my rules ----------------- Physical Simulator --------------------- Real
 
 | act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
 | ---                | ---         | ---           | ---                      | ---            |
-| 1 NR               | done        | done          | N/A                      | done           |
-| one holding 2 NR   | done        | done          | done                     | done           |
+| 1 Chain               | done        | done          | N/A                      | done           |
+| Pinned 2 Chain   | done        | done          | done                     | done           |
 
 - Tried networks.
-    - [x] NR: ls, qs, goal input -> delta_qs.
-    - [x] NR: xis, yis, goal input -> delta_qs.
+    - [x] Chain: ls, qs, goal input -> delta_qs.
+    - [x] Chain: xis, yis, goal input -> delta_qs.
 
-- [x] Switching NR agent (2 limb as NR).
+- [x] Switching Chain agent (2 limb as Chain).
     - [x] q clamps.
     - [x] delta q abs clamp.
     - [x] Local optimal JT control.
@@ -239,8 +234,8 @@ My game my rules ----------------- Physical Simulator --------------------- Real
         - [x] using goal_reached_slack in deciding to match hands;
             ```rust
             let have_to_match = match pivoting_side {
-                Side::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
-                Side::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
+                Side::Left => given_goal[0] - origin[0] < -Chain::GOAL_REACHED_SLACK,
+                Side::Right => given_goal[0] - origin[0] > Chain::GOAL_REACHED_SLACK,
             };
             ```
         - But now the end of the hand can be atmost 2 * GOAL_REACHED_SLACK from the hold.
@@ -248,7 +243,7 @@ My game my rules ----------------- Physical Simulator --------------------- Real
     - [x] Traversing a path.
         - local.
         - global.
-- [x] 2 limb as 2 switching NRs.
+- [x] 2 limb as 2 switching Chain.
     - [x] Enforcing constraints - (no more constraints; uses previous constraints).
     - [x] Formulating as RL problem.
         - [x] Very nice visualization of holding goal w.r.t non-holding goal.
@@ -280,7 +275,7 @@ My game my rules ----------------- Physical Simulator --------------------- Real
     - (1) com_y control.
 
 - [x] 2 limb as 4R: (1 x try various weights)
-    - differs from NR iterative traversing agent in baseline as mentioned by above reasons.
+    - differs from Chain iterative traversing agent in baseline as mentioned by above reasons.
     - [x] Illustrate q and delta q constraints.
     - [x] reaching: local.
         - [x] Only end control (2).
@@ -306,18 +301,18 @@ My game my rules ----------------- Physical Simulator --------------------- Real
         - [x] Show as many types of transfers and possible.
 - [x] 2 limb as 4R (learning): end_control + com_x_control + com_y_control + weights.
     - No real learning part.
-- [x] 2 limb as NR (worm): (1 x try various weights + 2 x 2 x 1 x try various weights for controls).
+- [x] 2 limb as Chain (worm): (1 x try various weights + 2 x 2 x 1 x try various weights for controls).
 
-- [x] 2 limb as 2 NR (non-learning): end_control + com_x_control + com_y_control.
-- [x] 2 limb as 2 NR (learning): end_control + com_x_control + com_y_control.
+- [x] 2 limb as 2 Chain (non-learning): end_control + com_x_control + com_y_control.
+- [x] 2 limb as 2 Chain (learning): end_control + com_x_control + com_y_control.
     - [x] reaching, matching (if needed) and switching (transfer).
 
 ### Future work
 | act/plan           | per limb ik | q constraints | multi limb co-orindation | com over holds |
 | ---                | ---         | ---           | ---                      | ---            |
-| two holding 2 NR   | done        | -             | -                        | -              |
-| 2 NR + core        | done        | -             | -                        | -              |
-| 2 NR + core + 2 NR | done        | -             | -                        | -              |
+| two holding 2 Chain   | done        | -             | -                        | -              |
+| 2 Chain + core        | done        | -             | -                        | -              |
+| 2 Chain + core + 2 Chain | done        | -             | -                        | -              |
 
 - Improve global IK solve
     - [ ] Since search space is continous and has no jerks use PRM with high number of vertices to approx the solution
@@ -326,8 +321,8 @@ My game my rules ----------------- Physical Simulator --------------------- Real
 - [ ] Formulate and achieve relaxing poses/efficient transfers.
 - [ ] Understand jacobian transpose derivation properly
 - [ ] Understand neural network as an extension to jacobian transpose optimization.
-- [ ] 2 limb as 2 NR (non-learning, two simultaneous pivots)
-- [ ] 4 limb as 4 NR (general, multiple simultaneous pivots)
+- [ ] 2 limb as 2 Chain (non-learning, two simultaneous pivots)
+- [ ] 4 limb as 4 Chain (general, multiple simultaneous pivots)
 - [ ] Belay rope
 - [ ] Angle bound obstacles, replanning in known environment
 - [ ] Prismatic joints

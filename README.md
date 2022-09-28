@@ -18,11 +18,11 @@
 ![](./2.ceo_rl_and_random_sample_solves/github/12.gif)
 
 ```mermaid
-flowchart TD
-    problem --> config_space;
-    config_space --> finish_point_calculation;
-    finish_point_calculation --> obstacles;
-    obstacles --> path_planning;
-    path_planning --> interpolate;
-    interpolate --> animation;
+flowchart LR
+    problem --> config_space
+    config_space --> finish_point_calculation
+    finish_point_calculation --> obstacles
+    obstacles --> path_planning
+    path_planning --> interplate
+    interplate --> animation
 ```

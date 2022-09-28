@@ -19,10 +19,5 @@
 
 ```mermaid
 flowchart TD
-    problem --> config space
-    config space --> finish point calculation
-    finish point calculation --> obstacles
-    obstacles --> path planning
-    path planning --> interpolate
-    interpolate --> animation
+    problem --> config_space --> finish_point_calculation --> obstacles --> path_planning --> interpolate --> animation
 ```

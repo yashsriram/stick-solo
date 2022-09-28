@@ -306,19 +306,3 @@ My game my rules ----------------- Physical Simulator --------------------- Real
 | two holding 2 Chain   | done        | -             | -                        | -              |
 | 2 Chain + core        | done        | -             | -                        | -              |
 | 2 Chain + core + 2 Chain | done        | -             | -                        | -              |
-
-- Improve global IK solve
-    - [ ] Since search space is continous and has no jerks use PRM with high number of vertices to approx the solution
-
-- [ ] Optimizors; Policy gradient and extensions, Deep Q learning and extensions.
-- [ ] Formulate and achieve relaxing poses/efficient transfers.
-- [ ] Understand jacobian transpose derivation properly
-- [ ] Understand neural network as an extension to jacobian transpose optimization.
-- [ ] 2 limb as 2 Chain (non-learning, two simultaneous pivots)
-- [ ] 4 limb as 4 Chain (general, multiple simultaneous pivots)
-- [ ] Belay rope
-- [ ] Angle bound obstacles, replanning in known environment
-- [ ] Prismatic joints
-- [ ] Springy limbs
-- [ ] Spatial data structures
-- [ ] Unknown environment (note: the milestones can't be sampled they are part of environment)

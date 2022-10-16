@@ -15,43 +15,46 @@ impl GoalCouplePlugin {
 }
 
 impl Plugin for GoalCouplePlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(self.goal_couple.clone())
-            .add_startup_system(init_vis.system())
-            .add_system(interactive_goal_couple.system())
-            .add_system(flush_transforms.system());
+    fn build(&self, app: &mut App) {
+        app.insert_resource(self.goal_couple.clone())
+            .add_startup_system(init_vis)
+            .add_system(interactive_goal_couple)
+            .add_system(flush_transforms);
     }
 }
 
+#[derive(Component)]
 struct Goal0Marker;
+#[derive(Component)]
 struct Goal1Marker;
 
 fn init_vis(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     commands
-        .spawn(SpriteComponents {
+        .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                size: Vec2::new(
+                custom_size: Some(Vec2::new(
                     4.0 * SwitchableNR::GOAL_REACHED_SLACK,
                     4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                ),
-                resize_mode: SpriteResizeMode::Manual,
+                )),
+                color: Color::rgb(0.0, 1.0, 0.0),
+                ..Default::default()
             },
-            material: materials.add(Color::rgb(0.0, 1.0, 0.0).into()),
             ..Default::default()
         })
-        .with(Goal0Marker)
-        .spawn(SpriteComponents {
+        .insert(Goal0Marker);
+    commands
+        .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                size: Vec2::new(
+                custom_size: Some(Vec2::new(
                     4.0 * SwitchableNR::GOAL_REACHED_SLACK,
                     4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                ),
-                resize_mode: SpriteResizeMode::Manual,
+                )),
+                color: Color::rgb(0.0, 0.0, 1.0),
+                ..Default::default()
             },
-            material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
             ..Default::default()
         })
-        .with(Goal1Marker);
+        .insert(Goal1Marker);
 }
 
 fn interactive_goal_couple(

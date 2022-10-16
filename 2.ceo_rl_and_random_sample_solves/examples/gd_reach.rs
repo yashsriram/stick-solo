@@ -2,7 +2,6 @@ extern crate stick_solo;
 use bevy::prelude::*;
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
-    base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     goal_plugin::{Goal, GoalPlugin},
     pause_plugin::Pause,
@@ -15,15 +14,10 @@ use stick_solo::plan::gradient_descent::*;
 fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
-    App::build()
-        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_resource(WindowDescriptor {
-            width: 2000,
-            height: 1000,
-            ..Default::default()
-        })
-        .add_resource(RestTicks(0))
-        .add_plugins(BasePlugins)
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(RestTicks(0))
+        .add_plugins(DefaultPlugins)
         .add_plugin(CameraPlugin)
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
@@ -41,8 +35,7 @@ fn main() {
         .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.5, 0.5))))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_system(control.system())
-        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .add_system(control)
         .run();
 }
 

@@ -48,31 +48,32 @@ impl PathPlugin {
 }
 
 impl Plugin for PathPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(self.path.clone())
-            .add_startup_system(init_vis.system());
+    fn build(&self, app: &mut App) {
+        app.insert_resource(self.path.clone())
+            .add_startup_system(init_vis);
     }
 }
 
+#[derive(Component)]
 struct Vertex(usize);
 
 fn init_vis(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Assets<ColorMaterial>>) {
     // Vertices
     for (i, vertex) in path.0.iter().enumerate() {
         commands
-            .spawn(SpriteComponents {
+            .spawn_bundle(SpriteBundle {
                 sprite: Sprite {
-                    size: Vec2::new(
+                    custom_size: Some(Vec2::new(
                         4.0 * SwitchableNR::GOAL_REACHED_SLACK,
                         4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                    ),
-                    resize_mode: SpriteResizeMode::Manual,
+                    )),
+                    color: Color::rgba(0.4, 0.4, 0.4, 0.4),
+                    ..Default::default()
                 },
-                material: materials.add(Color::rgba(0.4, 0.4, 0.4, 0.4).into()),
                 transform: Transform::from_translation(Vec3::new(vertex[0], vertex[1], 0.0)),
                 ..Default::default()
             })
-            .with(Vertex(i));
+            .insert(Vertex(i));
     }
     // Edges
     let vertices_vec = path.0.iter().map(|&v| v).collect::<Vec<Vec2>>();
@@ -88,15 +89,15 @@ fn init_vis(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Asset
             translation
         };
         commands
-            .spawn(SpriteComponents {
+            .spawn_bundle(SpriteBundle {
                 sprite: Sprite {
-                    size: Vec2::new(length, 0.005),
-                    resize_mode: SpriteResizeMode::Manual,
+                    custom_size: Some(Vec2::new(length, 0.005)),
+                    color: Color::rgb(0.4, 0.4, 0.4),
+                    ..Default::default()
                 },
-                material: materials.add(Color::rgb(0.4, 0.4, 0.4).into()),
-                transform: transform,
+                transform,
                 ..Default::default()
             })
-            .with(Vertex(i));
+            .insert(Vertex(i));
     }
 }

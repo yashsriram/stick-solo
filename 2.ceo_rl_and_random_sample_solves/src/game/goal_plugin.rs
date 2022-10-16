@@ -14,27 +14,28 @@ impl GoalPlugin {
 }
 
 impl Plugin for GoalPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(self.goal.clone())
-            .add_startup_system(init_vis.system())
-            .add_system(interactive_goal.system())
-            .add_system(flush_transforms.system());
+    fn build(&self, app: &mut App) {
+        app.insert_resource(self.goal.clone())
+            .add_startup_system(init_vis)
+            .add_system(interactive_goal)
+            .add_system(flush_transforms);
     }
 }
 
+#[derive(Component)]
 struct GoalMarker;
 
 fn init_vis(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     commands
-        .spawn(SpriteComponents {
+        .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                size: Vec2::new(0.04, 0.04),
-                resize_mode: SpriteResizeMode::Manual,
+                custom_size: Some(Vec2::new(0.04, 0.04)),
+                color: Color::rgb(0.5, 0.5, 0.5),
+                ..Default::default()
             },
-            material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
             ..Default::default()
         })
-        .with(GoalMarker);
+        .insert(GoalMarker);
 }
 
 fn interactive_goal(keyboard_input: Res<Input<KeyCode>>, mut goal: ResMut<Goal>) {

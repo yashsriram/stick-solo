@@ -7,7 +7,7 @@ use ndarray::prelude::*;
 
 pub fn get_end_verticex_and_com(origin: &Vec2, ls: &Array1<f32>, qs: &Array1<f32>) -> (Vec2, Vec2) {
     let n = ls.len();
-    let mut com = Vec2::zero();
+    let mut com = Vec2::ZERO;
     let mut e1 = origin.clone();
     let mut cumulative_rotation = 0f32;
     for i in 0..n {
@@ -25,7 +25,7 @@ pub fn get_all_vertices_and_com(
     qs: &Array1<f32>,
 ) -> (Vec<Vec2>, Vec2) {
     let n = ls.len();
-    let mut com = Vec2::zero();
+    let mut com = Vec2::ZERO;
     let mut vertices = Vec::with_capacity(ls.len() + 1);
     vertices.push(origin.clone());
     let mut e1 = origin.clone();

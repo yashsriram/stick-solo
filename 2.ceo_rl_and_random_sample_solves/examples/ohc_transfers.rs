@@ -5,7 +5,6 @@ use std::{env, fs::File, io::BufReader};
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
-    base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     goal_couple_plugin::{GoalCouple, GoalCouplePlugin},
     one_holding_switchable_nr_couple_plugin::OneHoldingSwitchableNRCouplePlugin,
@@ -36,20 +35,15 @@ fn main() {
 
     // Visualize
     let world = left_holding_exp.world.clone();
-    App::build()
-        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_resource(WindowDescriptor {
-            width: 2000,
-            height: 1000,
-            ..Default::default()
-        })
-        .add_plugins(BasePlugins)
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .add_plugins(DefaultPlugins)
         .add_plugin(CameraPlugin)
-        .add_resource(FCNs {
+        .insert_resource(FCNs {
             left_holding: left_holding_exp.fcn,
             right_holding: right_holding_exp.fcn,
         })
-        .add_resource(GoalQsCouple(Array::zeros(0), Array::zeros(0)))
+        .insert_resource(GoalQsCouple(Array::zeros(0), Array::zeros(0)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
             OneHoldingSwitchableNRCouple::new(
                 &world.holding_side,
@@ -70,9 +64,8 @@ fn main() {
         .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_startup_system(initial_set_goal_qs_couple_system.system())
-        .add_system(control_system.system())
-        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .add_startup_system(initial_set_goal_qs_couple_system)
+        .add_system(control_system)
         .run();
 }
 

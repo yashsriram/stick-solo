@@ -48,7 +48,7 @@ impl SwitchableNR {
             assert!(ls[i] > 0.0, "Non-positive length argument.");
             assert!(
                 q_clamps[i].0 < q_clamps[i].1,
-                format!("Lower clamp greater than or equal to upper clamp.")
+                "Lower clamp greater than or equal to upper clamp."
             );
             assert!(q_clamps[i].0 <= qs[i], "Disobidient q arguement.");
             assert!(qs[i] <= q_clamps[i].1, "Disobidient q arguement.");
@@ -188,7 +188,7 @@ impl SwitchableNR {
     }
 
     pub fn get_center_of_mass(&self) -> Vec2 {
-        let mut com = Vec2::zero();
+        let mut com = Vec2::ZERO;
         let mut e1 = self.origin;
         let mut cumulative_rotation = 0f32;
         for i in 0..self.n {

@@ -2,7 +2,6 @@ extern crate stick_solo;
 use bevy::prelude::*;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
-    base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     path_plugin::{Path, PathPlugin},
     pause_plugin::Pause,
@@ -15,15 +14,10 @@ use stick_solo::plan::gradient_descent::*;
 fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
-    App::build()
-        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_resource(WindowDescriptor {
-            width: 2000,
-            height: 1000,
-            ..Default::default()
-        })
-        .add_resource(RestTicks(0))
-        .add_plugins(BasePlugins)
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(RestTicks(0))
+        .add_plugins(DefaultPlugins)
         .add_plugin(CameraPlugin)
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
@@ -41,8 +35,7 @@ fn main() {
         .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_system(control.system())
-        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .add_system(control)
         .run();
 }
 
@@ -101,11 +94,13 @@ fn control(
     let beta = 0.03 / take_end_to_given_goal.mapv(|e| e * e).sum().sqrt();
     let com = agent.get_center_of_mass();
     let origin = origin.clone();
-    agent.update(
+    agent.update(if rest_ticks.0 < 50 {
+        -1.0 * push_com_x_from_its_goal + -5.0 * push_com_y_upward
+    } else {
         beta * take_end_to_given_goal
             + -0.2 * push_com_x_from_its_goal
-            + -downward_push_coeff(&com, origin) * push_com_y_upward,
-    );
+            + -downward_push_coeff(&com, origin) * push_com_y_upward
+    });
 
     ticks.0 += 1;
     rest_ticks.0 += 1;

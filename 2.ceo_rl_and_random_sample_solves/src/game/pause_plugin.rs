@@ -5,9 +5,9 @@ pub struct Pause(pub bool);
 pub struct PausePlugin;
 
 impl Plugin for PausePlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(Pause(false))
-            .add_system(toggle_pause.system());
+    fn build(&self, app: &mut App) {
+        app.insert_resource(Pause(false))
+            .add_system(toggle_pause);
     }
 }
 

@@ -73,9 +73,9 @@ impl World {
 }
 
 impl Plugin for World {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(self.clone())
-            .add_startup_system(init_vis.system());
+    fn build(&self, app: &mut App) {
+        app.insert_resource(self.clone())
+            .add_startup_system(init_vis);
     }
 }
 
@@ -89,14 +89,13 @@ fn init_vis(
     let (min, max) = (min * scale, max * scale);
     let midpoint = world.origin + (min + max) / 2.0;
     let diff = max - min;
-    commands.spawn(SpriteComponents {
+    commands.spawn_bundle(SpriteBundle {
         sprite: Sprite {
-            size: Vec2::new(diff[0], diff[1]),
-            resize_mode: SpriteResizeMode::Manual,
+            custom_size: Some(Vec2::new(diff[0], diff[1])),
+            color: Color::rgba(1.0, 0.0, 0.0, 0.02),
+            ..Default::default()
         },
         transform: Transform::from_translation(Vec3::new(midpoint[0], midpoint[1], 0.0)),
-        material: materials.add(Color::rgba(1.0, 0.0, 0.0, 0.02).into()),
         ..Default::default()
     });
 }
-

@@ -3,7 +3,6 @@ use bevy::prelude::*;
 use ndarray::prelude::*;
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
-    base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     goal_plugin::{Goal, GoalPlugin},
     pause_plugin::Pause,
@@ -17,15 +16,10 @@ use stick_solo::plan::random_sampling::*;
 fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
-    App::build()
-        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_resource(WindowDescriptor {
-            width: 2000,
-            height: 1000,
-            ..Default::default()
-        })
-        .add_resource(GoalQs(Array::zeros(4)))
-        .add_plugins(BasePlugins)
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(GoalQs(Array::zeros(4)))
+        .add_plugins(DefaultPlugins)
         .add_plugin(CameraPlugin)
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, 0.1),
@@ -51,15 +45,14 @@ fn main() {
         .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.1, -0.5))))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_system(genetic_solve_from_current_state.system())
-        .add_system(interpolate.system())
-        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .add_system(genetic_solve_no_prior)
+        .add_system(interpolate)
         .run();
 }
 
 struct GoalQs(Array1<f32>);
 
-fn genetic_solve_from_current_state(
+fn genetic_solve_no_prior(
     agent: Res<SwitchableNR>,
     goal: Res<Goal>,
     mut goal_qs: ResMut<GoalQs>,
@@ -71,19 +64,17 @@ fn genetic_solve_from_current_state(
         || keyboard_input.pressed(KeyCode::S)
         || keyboard_input.pressed(KeyCode::D)
     {
-        let (n, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+        let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
         let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
             5.0 * (end.clone() - goal.clone()).length()
-                + 5.0 * com[1]
+                + com[1]
                 + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
         };
-        let (_min_loss, best_q) = from_current_state_random_sample_optimizer(
+        let (_min_loss, best_q) = no_prior_random_sample_optimizer(
             10_000,
-            2.0,
-            n,
             origin,
             ls,
-            qs,
+            qs[0],
             pivoting_side,
             q_clamps,
             &goal.0,

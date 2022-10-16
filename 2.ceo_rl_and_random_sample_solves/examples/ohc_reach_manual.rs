@@ -4,7 +4,6 @@ use ndarray::prelude::*;
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use stick_solo::act::switchable_nr::Side;
 use stick_solo::game::{
-    base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     goal_couple_plugin::{GoalCouple, GoalCouplePlugin},
     one_holding_switchable_nr_couple_plugin::OneHoldingSwitchableNRCouplePlugin,
@@ -19,16 +18,11 @@ use stick_solo::plan::*;
 fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
-    App::build()
-        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_resource(WindowDescriptor {
-            width: 2000,
-            height: 1000,
-            ..Default::default()
-        })
-        .add_plugins(BasePlugins)
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .add_plugins(DefaultPlugins)
         .add_plugin(CameraPlugin)
-        .add_resource(GoalQs(Array::zeros(2), Array::zeros(3)))
+        .insert_resource(GoalQs(Array::zeros(2), Array::zeros(3)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
             OneHoldingSwitchableNRCouple::new(
                 &Side::Right,
@@ -66,9 +60,8 @@ fn main() {
         // )))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_system(random_sample_solve.system())
-        .add_system(control.system())
-        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .add_system(random_sample_solve)
+        .add_system(control)
         .run();
 }
 

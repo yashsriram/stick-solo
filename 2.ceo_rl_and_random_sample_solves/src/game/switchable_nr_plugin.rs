@@ -12,15 +12,18 @@ impl SwitchableNRPlugin {
 }
 
 impl Plugin for SwitchableNRPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(self.agent.clone())
-            .add_startup_system(init_vis.system())
-            .add_system(flush_transforms.system());
+    fn build(&self, app: &mut App) {
+        app.insert_resource(self.agent.clone())
+            .add_startup_system(init_vis)
+            .add_system(flush_transforms);
     }
 }
 
+#[derive(Component)]
 struct Edge(usize);
+#[derive(Component)]
 struct Vertex(usize);
+#[derive(Component)]
 struct CenterOfMass;
 
 fn init_vis(
@@ -33,50 +36,50 @@ fn init_vis(
     // Edges
     for i in 0..n {
         commands
-            .spawn(SpriteComponents {
+            .spawn_bundle(SpriteBundle {
                 sprite: Sprite {
-                    size: Vec2::new(ls[i], thickness),
-                    resize_mode: SpriteResizeMode::Manual,
+                    custom_size: Some(Vec2::new(ls[i], thickness)),
+                    color: Color::rgb(1.0, 1.0, 1.0),
+                    ..Default::default()
                 },
-                material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
                 ..Default::default()
             })
-            .with(Edge(i));
+            .insert(Edge(i));
     }
     // Vertices
     commands
-        .spawn(SpriteComponents {
+        .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                size: Vec2::new(thickness * 2.0, thickness * 2.0),
-                resize_mode: SpriteResizeMode::Manual,
+                custom_size: Some(Vec2::new(thickness * 2.0, thickness * 2.0)),
+                color: Color::rgb(0.0, 0.0, 1.0),
+                ..Default::default()
             },
-            material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
             ..Default::default()
         })
-        .with(Vertex(0));
+        .insert(Vertex(0));
     for i in 0..n {
         commands
-            .spawn(SpriteComponents {
+            .spawn_bundle(SpriteBundle {
                 sprite: Sprite {
-                    size: Vec2::new(thickness * 2.0, thickness * 2.0),
-                    resize_mode: SpriteResizeMode::Manual,
+                    custom_size: Some(Vec2::new(thickness * 2.0, thickness * 2.0)),
+                    color: Color::rgb(0.0, 0.0, 1.0),
+                    ..Default::default()
                 },
-                material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
                 ..Default::default()
             })
-            .with(Vertex(i + 1));
+            .insert(Vertex(i + 1));
     }
     // Center of mass
     commands
-        .spawn(SpriteComponents {
+        .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                size: Vec2::new(0.04, 0.04),
-                resize_mode: SpriteResizeMode::Manual,
+                custom_size: Some(Vec2::new(0.04, 0.04)),
+                color: Color::rgb(1.0, 0.0, 0.0),
+                ..Default::default()
             },
-            material: materials.add(Color::rgb(1.0, 0.0, 0.0).into()),
             ..Default::default()
         })
-        .with(CenterOfMass);
+        .insert(CenterOfMass);
 }
 
 fn flush_transforms(
@@ -89,7 +92,7 @@ fn flush_transforms(
     let (_, _, ls, _, _, _) = agent.get_current_state();
     for (edge, mut sprite, mut transform) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
-        sprite.size = Vec2::new(ls[edge.0], agent.thickness());
+        sprite.custom_size = Some(Vec2::new(ls[edge.0], agent.thickness()));
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);

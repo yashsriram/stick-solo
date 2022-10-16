@@ -3,7 +3,6 @@ use bevy::prelude::*;
 use ndarray::prelude::*;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
-    base_plugins::BasePlugins,
     camera_plugin::CameraPlugin,
     path_plugin::{Path, PathPlugin},
     pause_plugin::Pause,
@@ -17,14 +16,9 @@ use stick_solo::plan::random_sampling::*;
 fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
-    App::build()
-        .add_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .add_resource(WindowDescriptor {
-            width: 2000,
-            height: 1000,
-            ..Default::default()
-        })
-        .add_plugins(BasePlugins)
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .add_plugins(DefaultPlugins)
         .add_plugin(CameraPlugin)
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
@@ -39,30 +33,31 @@ fn main() {
             Side::Left,
             0.01,
         )))
-        .add_resource(GoalQs(Array::zeros(4)))
+        .insert_resource(GoalQs(Array::zeros(4)))
         .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
-        .add_startup_system(set_first_goal.system())
-        .add_system(control.system())
-        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .add_startup_system(set_first_goal)
+        .add_system(control)
         .run();
 }
 
 struct GoalQs(Array1<f32>);
 
 fn set_first_goal(agent: ResMut<SwitchableNR>, path: ResMut<Path>, mut goal_qs: ResMut<GoalQs>) {
-    let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+    let (n, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
     let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
         5.0 * (end.clone() - goal.clone()).length()
             + 5.0 * com[1]
             + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
     };
-    let (_min_loss, best_q) = no_prior_random_sample_optimizer(
+    let (_min_loss, best_q) = from_current_state_random_sample_optimizer(
         10_000,
+        3.0,
+        n,
         origin,
         ls,
-        qs[0],
+        qs,
         pivoting_side,
         q_clamps,
         &path.0.front().unwrap().clone(),
@@ -86,26 +81,28 @@ fn control(
     if path.0.is_empty() {
         return;
     }
+    let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+        5.0 * (end.clone() - goal.clone()).length()
+            + 5.0 * com[1]
+            + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+    };
     let (_, origin, ls, qs, _, pivoting_side) = agent.get_current_state();
     let given_goal = path.0.front().unwrap().clone();
     let have_to_match = match pivoting_side {
         Side::Left => given_goal[0] - origin[0] < -SwitchableNR::GOAL_REACHED_SLACK,
         Side::Right => given_goal[0] - origin[0] > SwitchableNR::GOAL_REACHED_SLACK,
     };
-    let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
-        5.0 * (end.clone() - goal.clone()).length()
-            + 5.0 * com[1]
-            + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
-    };
     if have_to_match {
         path.0.push_front(origin.clone());
 
-        let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
-        let (_min_loss, best_q) = no_prior_random_sample_optimizer(
+        let (n, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+        let (_min_loss, best_q) = from_current_state_random_sample_optimizer(
             10_000,
+            3.0,
+            n,
             origin,
             ls,
-            qs[0],
+            qs,
             pivoting_side,
             q_clamps,
             &path.0.front().unwrap().clone(),
@@ -123,12 +120,14 @@ fn control(
         ticks.0 = 0;
 
         if path.0.len() > 0 {
-            let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
-            let (_min_loss, best_q) = no_prior_random_sample_optimizer(
+            let (n, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+            let (_min_loss, best_q) = from_current_state_random_sample_optimizer(
                 10_000,
+                3.0,
+                n,
                 origin,
                 ls,
-                qs[0],
+                qs,
                 pivoting_side,
                 q_clamps,
                 &path.0.front().unwrap().clone(),

@@ -84,26 +84,30 @@ fn init_vis(
 
 fn flush_transforms(
     agent: Res<SwitchableNR>,
-    mut edge_query: Query<(&Edge, &mut Sprite, &mut Transform)>,
-    mut vertex_query: Query<(&Vertex, &mut Transform)>,
-    mut com_query: Query<(&CenterOfMass, &mut Transform)>,
+    mut transforms_query: Query<&mut Transform>,
+    mut edge_query: Query<(Entity, &Edge, &mut Sprite)>,
+    mut vertex_query: Query<(Entity, &Vertex)>,
+    mut com_query: Query<(Entity, &CenterOfMass)>,
 ) {
     let transforms = agent.pose_to_transforms();
     let (_, _, ls, _, _, _) = agent.get_current_state();
-    for (edge, mut sprite, mut transform) in edge_query.iter_mut() {
+    for (entity, edge, mut sprite) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
         sprite.custom_size = Some(Vec2::new(ls[edge.0], agent.thickness()));
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
     }
     let vertex_positions = agent.get_all_vertices();
-    for (idx, mut transform) in vertex_query.iter_mut() {
+    for (entity, idx) in vertex_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = vertex_positions[idx.0][0];
         transform.translation[1] = vertex_positions[idx.0][1];
     }
     let com = agent.get_center_of_mass();
-    for (_, mut transform) in com_query.iter_mut() {
+    for (entity, _) in com_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = com[0];
         transform.translation[1] = com[1];
     }

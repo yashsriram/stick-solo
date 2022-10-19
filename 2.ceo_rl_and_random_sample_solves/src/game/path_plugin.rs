@@ -57,21 +57,23 @@ impl Plugin for PathPlugin {
 #[derive(Component)]
 struct Vertex(usize);
 
-fn init_vis(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn init_vis(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    path: Res<Path>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     // Vertices
     for (i, vertex) in path.0.iter().enumerate() {
         commands
-            .spawn_bundle(SpriteBundle {
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(
-                        4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                        4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                    )),
-                    color: Color::rgba(0.4, 0.4, 0.4, 0.4),
-                    ..Default::default()
-                },
+            .spawn_bundle(PbrBundle {
+                mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
+                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
+                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
+                )))),
+                material: materials.add(Color::rgba(0.4, 0.4, 0.4, 0.4).into()),
                 transform: Transform::from_translation(Vec3::new(vertex[0], vertex[1], 0.0)),
-                ..Default::default()
+                ..default()
             })
             .insert(Vertex(i));
     }
@@ -89,14 +91,11 @@ fn init_vis(mut commands: Commands, path: Res<Path>, mut materials: ResMut<Asset
             translation
         };
         commands
-            .spawn_bundle(SpriteBundle {
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(length, 0.005)),
-                    color: Color::rgb(0.4, 0.4, 0.4),
-                    ..Default::default()
-                },
+            .spawn_bundle(PbrBundle {
+                mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(length, 0.005)))),
+                material: materials.add(Color::rgb(0.4, 0.4, 0.4).into()),
                 transform,
-                ..Default::default()
+                ..default()
             })
             .insert(Vertex(i));
     }

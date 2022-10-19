@@ -28,31 +28,29 @@ struct Goal0Marker;
 #[derive(Component)]
 struct Goal1Marker;
 
-fn init_vis(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn init_vis(
+    mut commands: Commands,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+) {
     commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(
-                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                )),
-                color: Color::rgb(0.0, 1.0, 0.0),
-                ..Default::default()
-            },
-            ..Default::default()
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
+                4.0 * SwitchableNR::GOAL_REACHED_SLACK,
+                4.0 * SwitchableNR::GOAL_REACHED_SLACK,
+            )))),
+            material: materials.add(Color::GREEN.into()),
+            ..default()
         })
         .insert(Goal0Marker);
     commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(
-                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                )),
-                color: Color::rgb(0.0, 0.0, 1.0),
-                ..Default::default()
-            },
-            ..Default::default()
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
+                4.0 * SwitchableNR::GOAL_REACHED_SLACK,
+                4.0 * SwitchableNR::GOAL_REACHED_SLACK,
+            )))),
+            material: materials.add(Color::BLUE.into()),
+            ..default()
         })
         .insert(Goal1Marker);
 }
@@ -71,27 +69,30 @@ fn interactive_goal_couple(
         goal_couple.0[0] += 0.01;
     }
 
-    if keyboard_input.pressed(KeyCode::I) {
+    if keyboard_input.pressed(KeyCode::Up) {
         goal_couple.1[1] += 0.01;
-    } else if keyboard_input.pressed(KeyCode::K) {
+    } else if keyboard_input.pressed(KeyCode::Down) {
         goal_couple.1[1] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::J) {
+    } else if keyboard_input.pressed(KeyCode::Left) {
         goal_couple.1[0] -= 0.01;
-    } else if keyboard_input.pressed(KeyCode::L) {
+    } else if keyboard_input.pressed(KeyCode::Right) {
         goal_couple.1[0] += 0.01;
     }
 }
 
 fn flush_transforms(
     goal_couple: Res<GoalCouple>,
-    mut goal_0_query: Query<(&Goal0Marker, &mut Transform)>,
-    mut goal_1_query: Query<(&Goal1Marker, &mut Transform)>,
+    mut transforms_query: Query<&mut Transform>,
+    mut goal_0_query: Query<(Entity, &Goal0Marker)>,
+    mut goal_1_query: Query<(Entity, &Goal1Marker)>,
 ) {
-    for (_, mut transform) in goal_0_query.iter_mut() {
+    for (entity, _) in goal_0_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = goal_couple.0[0];
         transform.translation[1] = goal_couple.0[1];
     }
-    for (_, mut transform) in goal_1_query.iter_mut() {
+    for (entity, _) in goal_1_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = goal_couple.1[0];
         transform.translation[1] = goal_couple.1[1];
     }

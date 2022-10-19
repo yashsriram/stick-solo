@@ -13,17 +13,21 @@ impl Plugin for CameraPlugin {
 
 pub fn init_camera(mut commands: Commands) {
     commands.spawn_bundle(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_xyz(0.0, 0.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
-        // .with(FlyCamera {
-        //     key_up: KeyCode::Up,
-        //     key_down: KeyCode::Down,
-        //     key_left: KeyCode::Left,
-        //     key_right: KeyCode::Right,
-        //     key_forward: KeyCode::Plus,
-        //     key_backward: KeyCode::Minus,
-        //     sensitivity: 0.0,
-        //     ..Default::default()
-        // })
+    commands.spawn_bundle(PointLightBundle {
+        transform: Transform::from_xyz(0.0, 0.0, 4.0),
+        ..default()
+    });
+    // .with(FlyCamera {
+    //     key_up: KeyCode::Up,
+    //     key_down: KeyCode::Down,
+    //     key_left: KeyCode::Left,
+    //     key_right: KeyCode::Right,
+    //     key_forward: KeyCode::Plus,
+    //     key_backward: KeyCode::Minus,
+    //     sensitivity: 0.0,
+    //     ..Default::default()
+    // })
 }

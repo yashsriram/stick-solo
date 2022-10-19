@@ -29,7 +29,7 @@ fn main() {
         // Optimize
         let pi = std::f32::consts::PI;
         let wrapper = Wrapper(World {
-            holding_side: Side::Right,
+            holding_side: Side::Left,
             origin: Vec2::new(0.0, 0.0),
             holding_ls: vec![0.2, 0.2],
             holding_q_clamps: vec![(None, None), (Some(-pi), Some(-0.0))],

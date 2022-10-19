@@ -31,11 +31,9 @@ struct Vertex(usize);
 struct PartCenterOfMass;
 #[derive(Component)]
 struct TotalCenterOfMass;
-#[derive(Component)]
-#[derive(Default)]
+#[derive(Component, Default)]
 struct OriginalHolding;
-#[derive(Component)]
-#[derive(Default)]
+#[derive(Component, Default)]
 struct OriginalNonHolding;
 #[derive(Component)]
 struct Body(f32);
@@ -43,13 +41,15 @@ struct Body(f32);
 fn init_vis(
     mut commands: Commands,
     agent: Res<OneHoldingSwitchableNRCouple>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
     fn init<T: Default + Sync + Component>(
         agent: &SwitchableNR,
         commands: &mut Commands,
-        materials: &mut ResMut<Assets<ColorMaterial>>,
+        mut meshes: &mut ResMut<Assets<Mesh>>,
+        materials: &mut ResMut<Assets<StandardMaterial>>,
         _color: Color,
         asset_server: &AssetServer,
     ) {
@@ -59,13 +59,11 @@ fn init_vis(
         for i in 0..n {
             // let texture_handle = asset_server.load("sprites/bone.png");
             commands
-                .spawn_bundle(SpriteBundle {
-                    sprite: Sprite {
-                        custom_size: Some(Vec2::new(ls[i], thickness)),
-                        color: Color::RED,
-                        ..Default::default()
-                    },
-                    ..Default::default()
+                .spawn_bundle(PbrBundle {
+                    mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
+                    material: materials.add(Color::WHITE.into()),
+                    transform: Transform::default().with_scale(Vec3::new(ls[i], thickness, 1.0)),
+                    ..default()
                 })
                 .insert(Edge(i))
                 .insert(T::default());
@@ -99,6 +97,7 @@ fn init_vis(
     init::<OriginalHolding>(
         holding,
         &mut commands,
+        &mut meshes,
         &mut materials,
         Color::rgb(0.0, 1.0, 0.0),
         &asset_server,
@@ -107,26 +106,23 @@ fn init_vis(
     init::<OriginalNonHolding>(
         non_holding,
         &mut commands,
+        &mut meshes,
         &mut materials,
         Color::rgb(0.0, 0.0, 1.0),
         &asset_server,
     );
     // Origin
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(Vec2::new(
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
+        material: materials.add(Color::WHITE.into()),
+        transform: Transform::default()
+            .with_scale(Vec3::new(
                 4.0 * SwitchableNR::GOAL_REACHED_SLACK,
                 4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-            )),
-        color: Color::rgb(1.0, 1.0, 1.0),
-        ..Default::default()
-        },
-        transform: Transform::from_translation(Vec3::new(
-            holding_origin[0],
-            holding_origin[1],
-            0.0,
-        )),
-        ..Default::default()
+                1.0,
+            ))
+            .with_translation(Vec3::new(holding_origin[0], holding_origin[1], 0.0)),
+        ..default()
     });
     // COM
     // commands
@@ -145,41 +141,44 @@ fn init_vis(
     // Face
     // let texture_handle = asset_server.load("sprites/skull.png");
     commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(len / 4.0, len / 4.0)),
-                color: Color::rgb(0.5, 0.5, 0.5),
-                ..Default::default()
-            },
-            transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.01)),
-            ..Default::default()
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
+            material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+            transform: Transform::default()
+                .with_scale(Vec3::new(len / 4.0, len / 4.0, 1.0))
+                .with_translation(Vec3::new(0.0, 0.0, 0.01)),
+            ..default()
         })
         .insert(Body(len / 6.0));
 }
 
 fn flush_transforms_original_holding(
     agent: Res<OneHoldingSwitchableNRCouple>,
-    mut edge_query: Query<(&Edge, &mut Sprite, &mut Transform, &OriginalHolding)>,
-    mut vertex_query: Query<(&Vertex, &mut Transform, &OriginalHolding)>,
-    mut com_query: Query<(&PartCenterOfMass, &mut Transform, &OriginalHolding)>,
+    mut transforms_query: Query<&mut Transform>,
+    mut edge_query: Query<(Entity, &Edge, &OriginalHolding)>,
+    mut vertex_query: Query<(Entity, &Vertex, &OriginalHolding)>,
+    mut com_query: Query<(Entity, &PartCenterOfMass, &OriginalHolding)>,
 ) {
     let switchable_nr = agent.original_holding();
     let transforms = switchable_nr.pose_to_transforms();
     let (_, _, ls, _, _, _) = switchable_nr.get_current_state();
-    for (edge, mut sprite, mut transform, _) in edge_query.iter_mut() {
+    for (entity, edge, _) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
-        sprite.custom_size = Some(Vec2::new(ls[edge.0], switchable_nr.thickness()));
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
+        transform.scale = Vec3::new(ls[edge.0], switchable_nr.thickness(), 1.0);
     }
     let vertex_positions = switchable_nr.get_all_vertices();
-    for (idx, mut transform, _) in vertex_query.iter_mut() {
+    for (entity, idx, _) in vertex_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = vertex_positions[idx.0][0];
         transform.translation[1] = vertex_positions[idx.0][1];
     }
     let com = switchable_nr.get_center_of_mass();
-    for (_, mut transform, _) in com_query.iter_mut() {
+    for (entity, _, _) in com_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = com[0];
         transform.translation[1] = com[1];
     }
@@ -187,27 +186,31 @@ fn flush_transforms_original_holding(
 
 fn flush_transforms_original_non_holding(
     agent: Res<OneHoldingSwitchableNRCouple>,
-    mut edge_query: Query<(&Edge, &mut Sprite, &mut Transform, &OriginalNonHolding)>,
-    mut vertex_query: Query<(&Vertex, &mut Transform, &OriginalNonHolding)>,
-    mut com_query: Query<(&PartCenterOfMass, &mut Transform, &OriginalNonHolding)>,
+    mut transforms_query: Query<&mut Transform>,
+    mut edge_query: Query<(Entity, &Edge, &OriginalNonHolding)>,
+    mut vertex_query: Query<(Entity, &Vertex, &OriginalNonHolding)>,
+    mut com_query: Query<(Entity, &PartCenterOfMass, &OriginalNonHolding)>,
 ) {
     let switchable_nr = agent.original_non_holding();
     let transforms = switchable_nr.pose_to_transforms();
     let (_, _, ls, _, _, _) = switchable_nr.get_current_state();
-    for (edge, mut sprite, mut transform, _) in edge_query.iter_mut() {
+    for (entity, edge, _) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
-        sprite.custom_size = Some(Vec2::new(ls[edge.0], switchable_nr.thickness()));
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
+        transform.scale = Vec3::new(ls[edge.0], switchable_nr.thickness(), 1.0);
     }
     let vertex_positions = switchable_nr.get_all_vertices();
-    for (idx, mut transform, _) in vertex_query.iter_mut() {
+    for (entity, idx, _) in vertex_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = vertex_positions[idx.0][0];
         transform.translation[1] = vertex_positions[idx.0][1];
     }
     let com = switchable_nr.get_center_of_mass();
-    for (_, mut transform, _) in com_query.iter_mut() {
+    for (entity, _, _) in com_query.iter_mut() {
+        let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = com[0];
         transform.translation[1] = com[1];
     }

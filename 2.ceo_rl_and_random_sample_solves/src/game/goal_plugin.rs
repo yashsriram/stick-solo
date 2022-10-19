@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
 #[derive(Clone)]
 pub struct Goal(pub Vec2);
@@ -25,15 +25,16 @@ impl Plugin for GoalPlugin {
 #[derive(Component)]
 struct GoalMarker;
 
-fn init_vis(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn init_vis(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
     commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(Vec2::new(0.04, 0.04)),
-                color: Color::rgb(0.5, 0.5, 0.5),
-                ..Default::default()
-            },
-            ..Default::default()
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.04, 0.04)))),
+            material: materials.add(Color::GREEN.into()),
+            ..default()
         })
         .insert(GoalMarker);
 }

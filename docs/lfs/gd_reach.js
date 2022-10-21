@@ -1795,6 +1795,7 @@ async function init(input) {
     if (typeof input === 'undefined') {
         input = new URL('gd_reach_bg.wasm', import.meta.url);
     }
+    console.log(input);
     const imports = getImports();
 
     if (typeof input === 'string' || (typeof Request === 'function' && input instanceof Request) || (typeof URL === 'function' && input instanceof URL)) {

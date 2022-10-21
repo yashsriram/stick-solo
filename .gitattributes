@@ -1,4 +1,1 @@
-docs/lfs/csrs_gd_reach_bg.wasm filter=lfs diff=lfs merge=lfs -text
-docs/lfs/csrs_gd_reach.js filter=lfs diff=lfs merge=lfs -text
-docs/lfs/gd_reach_bg.wasm filter=lfs diff=lfs merge=lfs -text
-docs/lfs/gd_reach.js filter=lfs diff=lfs merge=lfs -text
+docs/lfs/*.wasm filter=lfs diff=lfs merge=lfs -text

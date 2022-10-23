@@ -79,11 +79,7 @@ impl Plugin for World {
     }
 }
 
-fn init_vis(
-    mut commands: Commands,
-    world: Res<World>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-) {
+fn init_vis(mut commands: Commands, world: Res<World>) {
     let (min, max) = world.unscaled_relative_goal_region;
     let scale = world.holding_ls.iter().sum::<f32>() + world.non_holding_ls.iter().sum::<f32>();
     let (min, max) = (min * scale, max * scale);

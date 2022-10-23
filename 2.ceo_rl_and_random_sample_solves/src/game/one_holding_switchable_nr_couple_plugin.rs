@@ -48,7 +48,7 @@ fn init_vis(
     fn init<T: Default + Sync + Component>(
         agent: &SwitchableNR,
         commands: &mut Commands,
-        mut meshes: &mut ResMut<Assets<Mesh>>,
+        meshes: &mut ResMut<Assets<Mesh>>,
         materials: &mut ResMut<Assets<StandardMaterial>>,
         _color: Color,
         asset_server: &AssetServer,
@@ -57,11 +57,11 @@ fn init_vis(
         let (n, _, ls, _, _, _) = agent.get_current_state();
         // Edges
         for i in 0..n {
-            // let texture_handle = asset_server.load("sprites/bone.png");
+            let texture_handle = asset_server.load("sprites/bone.png");
             commands
                 .spawn_bundle(PbrBundle {
                     mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
-                    material: materials.add(Color::WHITE.into()),
+                    material: materials.add(texture_handle.into()),
                     transform: Transform::default().with_scale(Vec3::new(ls[i], thickness, 1.0)),
                     ..default()
                 })
@@ -139,11 +139,11 @@ fn init_vis(
     let (n2, _, ls2, _, _, _) = agent.non_holding().get_current_state();
     let len = (ls1.sum() + ls2.sum()) / (n1 + n2) as f32 * 1.5;
     // Face
-    // let texture_handle = asset_server.load("sprites/skull.png");
+    let texture_handle = asset_server.load("sprites/skull.png");
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
-            material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+            material: materials.add(texture_handle.into()),
             transform: Transform::default()
                 .with_scale(Vec3::new(len / 4.0, len / 4.0, 1.0))
                 .with_translation(Vec3::new(0.0, 0.0, 0.01)),

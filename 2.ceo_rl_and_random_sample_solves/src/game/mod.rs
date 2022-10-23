@@ -1,4 +1,3 @@
-pub mod base_plugins;
 pub mod camera_plugin;
 pub mod goal_couple_plugin;
 pub mod goal_plugin;

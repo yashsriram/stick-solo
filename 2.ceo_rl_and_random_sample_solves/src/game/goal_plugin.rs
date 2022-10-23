@@ -1,4 +1,4 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::prelude::*;
 
 #[derive(Clone)]
 pub struct Goal(pub Vec2);

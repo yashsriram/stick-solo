@@ -21,8 +21,8 @@ fn main() {
         .add_plugin(CameraPlugin)
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
-            &[0.2, 0.2, 0.2, 0.2],
-            &[0.0, 0.0, 2.0, 0.0],
+            &[0.2, 0.4, 0.4, 0.2],
+            &[-1.0, 0.1, 2.0, 0.1],
             &[
                 (-inf, inf),
                 (0.0, pi * 0.5),
@@ -32,7 +32,7 @@ fn main() {
             Side::Left,
             0.01,
         )))
-        .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.5, 0.5))))
+        .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.5, 0.0))))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(control)

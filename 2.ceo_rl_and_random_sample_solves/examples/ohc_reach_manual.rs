@@ -33,7 +33,7 @@ fn main() {
                 &[0.2, 0.2, 0.1],
                 &[-0.1, -0.1, -0.1],
                 &[(-inf, inf), (-pi, 0.0), (-pi / 6.0, 0.0)],
-                0.01,
+                0.05,
             ),
         ))
         .add_plugin(GoalCouplePlugin::new(GoalCouple(

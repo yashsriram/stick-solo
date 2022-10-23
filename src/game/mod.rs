@@ -1,4 +1,3 @@
-pub mod camera_plugin;
 pub mod goal_couple_plugin;
 pub mod goal_plugin;
 pub mod one_holding_switchable_nr_couple_plugin;

@@ -32,7 +32,6 @@ fn init_vis(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let thickness = agent.thickness();
     let (n, _, ls, _, _, _) = agent.get_current_state();
     // Edges
     for i in 0..n {
@@ -40,7 +39,7 @@ fn init_vis(
             .spawn_bundle(PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
                 material: materials.add(Color::WHITE.into()),
-                transform: Transform::default().with_scale(Vec3::new(ls[i], thickness, 1.0)),
+                transform: Transform::default().with_scale(Vec3::new(ls[i], 0.01, 1.0)),
                 ..default()
             })
             .insert(Edge(i));
@@ -49,8 +48,8 @@ fn init_vis(
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
-                thickness * 2.0,
-                thickness * 2.0,
+                0.01 * 2.0,
+                0.01 * 2.0,
             )))),
             material: materials.add(Color::BLUE.into()),
             ..default()
@@ -60,8 +59,8 @@ fn init_vis(
         commands
             .spawn_bundle(PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
-                    thickness * 2.0,
-                    thickness * 2.0,
+                    0.01 * 2.0,
+                    0.01 * 2.0,
                 )))),
                 material: materials.add(Color::BLUE.into()),
                 ..default()
@@ -92,7 +91,7 @@ fn flush_transforms(
         let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
-        transform.scale = Vec3::new(ls[edge.0], agent.thickness(), 1.0);
+        transform.scale = Vec3::new(ls[edge.0], 0.01, 1.0);
         transform.rotation = Quat::from_rotation_z(angle);
     }
     let vertex_positions = agent.get_all_vertices();

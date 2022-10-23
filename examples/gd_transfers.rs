@@ -2,7 +2,6 @@ extern crate stick_solo;
 use bevy::prelude::*;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
-    camera_plugin::CameraPlugin,
     path_plugin::{Path, PathPlugin},
     pause_plugin::Pause,
     pause_plugin::PausePlugin,
@@ -18,7 +17,16 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(RestTicks(0))
         .add_plugins(DefaultPlugins)
-        .add_plugin(CameraPlugin)
+        .add_startup_system(|mut commands: Commands| {
+            commands.spawn_bundle(Camera3dBundle {
+                transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
+                ..default()
+            });
+            commands.spawn_bundle(PointLightBundle {
+                transform: Transform::from_xyz(0.0, 0.0, 4.0),
+                ..default()
+            });
+        })
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
             &[0.2, 0.2, 0.2, 0.2],

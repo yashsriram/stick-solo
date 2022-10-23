@@ -15,9 +15,8 @@ fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
     App::new()
-        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .insert_resource(RestTicks(0))
         .add_plugins(DefaultPlugins)
+        .insert_resource(ClearColor(Color::BLACK))
         .add_plugin(CameraPlugin)
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, 0.0),
@@ -34,14 +33,11 @@ fn main() {
         .run();
 }
 
-struct RestTicks(usize);
-
 fn control(
     mut agent: ResMut<SwitchableNR>,
     pause: Res<Pause>,
     goal: Res<Goal>,
     mut ticks: ResMut<Ticks>,
-    mut rest_ticks: ResMut<RestTicks>,
 ) {
     // Pause => pause everything
     if pause.0 {
@@ -62,5 +58,4 @@ fn control(
     agent.update(take_end_to_given_goal + -0.2 * push_com_x_from_its_goal);
 
     ticks.0 += 1;
-    rest_ticks.0 += 1;
 }

@@ -53,7 +53,6 @@ fn main() {
             &[0.0; 6],
             &[(-inf, inf); 6],
             Side::Left,
-            0.02,
         ))
         .add_startup_system(
             |mut commands: Commands,

@@ -20,7 +20,6 @@ impl OneHoldingSwitchableNRCouple {
         ls_non_holding: &[f32],
         qs_non_holding: &[f32],
         q_clamps_non_holding: &[(f32, f32)],
-        thickness: f32,
     ) -> Self {
         let holding = SwitchableNR::new(
             origin_holding,
@@ -28,7 +27,6 @@ impl OneHoldingSwitchableNRCouple {
             qs_holding,
             q_clamps_holding,
             holding_side.clone(),
-            thickness,
         );
         let origin_non_holding = holding.get_last_vertex();
         let non_holding = SwitchableNR::new(
@@ -37,11 +35,10 @@ impl OneHoldingSwitchableNRCouple {
             qs_non_holding,
             q_clamps_non_holding,
             holding_side.clone(),
-            thickness,
         );
         OneHoldingSwitchableNRCouple {
-            holding: holding,
-            non_holding: non_holding,
+            holding,
+            non_holding,
             is_holding_as_initialized: true,
         }
     }

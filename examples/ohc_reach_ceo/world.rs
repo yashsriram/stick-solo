@@ -31,7 +31,6 @@ impl Reward for Wrapper {
                 &self.0.non_holding_ls,
                 &self.0.sample_non_holding_qs(),
                 &self.0.non_holding_q_clamps(),
-                0.01,
             );
             let holding_origin = agent.holding().get_current_state().1.clone();
             let non_holding_goal = self.0.sample_goal();

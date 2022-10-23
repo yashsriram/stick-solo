@@ -56,7 +56,6 @@ fn sample_holding_goals(
         &world.non_holding_ls,
         &world.sample_non_holding_qs(),
         &world.non_holding_q_clamps(),
-        0.01,
     );
     let fcn = experiment.fcn;
     println!(

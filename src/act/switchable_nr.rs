@@ -17,8 +17,6 @@ pub struct SwitchableNR {
     qs: Array1<f32>,
     q_clamps: Array1<(f32, f32)>,
     pivoting_side: Side,
-    // Vis
-    thickness: f32,
 }
 
 impl SwitchableNR {
@@ -31,7 +29,6 @@ impl SwitchableNR {
         qs: &[f32],
         q_clamps: &[(f32, f32)],
         pivoting_side: Side,
-        thickness: f32,
     ) -> Self {
         assert!(ls.len() > 0, "Zero links argument.");
         assert_eq!(
@@ -57,15 +54,13 @@ impl SwitchableNR {
             q_clamps[0] == (-f32::INFINITY, f32::INFINITY),
             "First q clamp has to be (-inf, inf)."
         );
-        assert!(thickness > 0.0, "Non-positive thickness argument.");
         SwitchableNR {
             n: ls.len(),
-            origin: origin,
+            origin,
             ls: arr1(ls),
             qs: arr1(qs),
             q_clamps: arr1(q_clamps),
-            pivoting_side: pivoting_side,
-            thickness: thickness,
+            pivoting_side,
         }
     }
 
@@ -102,10 +97,6 @@ impl SwitchableNR {
             Side::Left => Side::Right,
             Side::Right => Side::Left,
         };
-    }
-
-    pub fn thickness(&self) -> f32 {
-        self.thickness
     }
 
     pub fn get_current_state(

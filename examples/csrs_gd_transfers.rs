@@ -45,7 +45,6 @@ fn main() {
                 (0.0, pi * 0.5),
             ],
             Side::Left,
-            0.01,
         ))
         .insert_resource(GoalQs(Array::zeros(4)))
         .add_plugin(PathPlugin::new(Path::default()))

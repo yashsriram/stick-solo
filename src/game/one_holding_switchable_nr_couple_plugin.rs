@@ -53,7 +53,6 @@ fn init_vis(
         _color: Color,
         asset_server: &AssetServer,
     ) {
-        let thickness = agent.thickness();
         let (n, _, ls, _, _, _) = agent.get_current_state();
         // Edges
         for i in 0..n {
@@ -62,7 +61,7 @@ fn init_vis(
                 .spawn_bundle(PbrBundle {
                     mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
                     material: materials.add(texture_handle.into()),
-                    transform: Transform::default().with_scale(Vec3::new(ls[i], thickness, 1.0)),
+                    transform: Transform::default().with_scale(Vec3::new(ls[i], 0.05, 1.0)),
                     ..default()
                 })
                 .insert(Edge(i))
@@ -168,7 +167,7 @@ fn flush_transforms_original_holding(
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
-        transform.scale = Vec3::new(ls[edge.0], switchable_nr.thickness(), 1.0);
+        transform.scale = Vec3::new(ls[edge.0], 0.05, 1.0);
     }
     let vertex_positions = switchable_nr.get_all_vertices();
     for (entity, idx, _) in vertex_query.iter_mut() {
@@ -200,7 +199,7 @@ fn flush_transforms_original_non_holding(
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
         transform.rotation = Quat::from_rotation_z(angle);
-        transform.scale = Vec3::new(ls[edge.0], switchable_nr.thickness(), 1.0);
+        transform.scale = Vec3::new(ls[edge.0], 0.05, 1.0);
     }
     let vertex_positions = switchable_nr.get_all_vertices();
     for (entity, idx, _) in vertex_query.iter_mut() {

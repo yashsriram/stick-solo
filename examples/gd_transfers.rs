@@ -44,7 +44,6 @@ fn main() {
                 (0.0, pi * 0.5),
             ],
             Side::Left,
-            0.01,
         ))
         .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)

@@ -10,27 +10,22 @@ on:
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+# permissions:
+#   contents: read
+#   pages: write
+#   id-token: write
 
 jobs:
   build:
-    name: Publish site
+    name: Ah I will do some useful stuff now
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout main
+    - name: Checkout
       uses: actions/checkout@v3.0.0
       with:
           lfs: true
           token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build and deploy
+    - name: Zola build and deploy
       uses: shalzz/zola-deploy-action@v0.16.1
       env:
         PAGES_BRANCH: gh-pages

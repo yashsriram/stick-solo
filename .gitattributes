@@ -1,1 +1,1 @@
-docs/lfs/*.wasm filter=lfs diff=lfs merge=lfs -text
+website/static/ filter=lfs diff=lfs merge=lfs -text

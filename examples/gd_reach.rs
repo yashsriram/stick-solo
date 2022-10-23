@@ -2,13 +2,15 @@ extern crate stick_solo;
 use bevy::prelude::*;
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
-    goal_plugin::{Goal, GoalPlugin},
     pause_plugin::Pause,
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
     switchable_nr_plugin::SwitchableNRPlugin,
 };
 use stick_solo::plan::gradient_descent::*;
+
+#[derive(Component)]
+struct Goal;
 
 fn main() {
     let inf = f32::INFINITY;
@@ -26,6 +28,35 @@ fn main() {
                 ..default()
             });
         })
+        .add_startup_system(
+            |mut commands: Commands,
+             mut meshes: ResMut<Assets<Mesh>>,
+             mut materials: ResMut<Assets<StandardMaterial>>| {
+                commands
+                    .spawn_bundle(PbrBundle {
+                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.04, 0.04)))),
+                        transform: Transform::default().with_translation(Vec3::new(0.3, 0.4, 0.0)),
+                        material: materials.add(Color::GREEN.into()),
+                        ..default()
+                    })
+                    .insert(Goal);
+            },
+        )
+        .add_system(
+            |keyboard_input: Res<Input<KeyCode>>,
+             mut goal_query: Query<(&Goal, &mut Transform)>| {
+                let (_, mut transform) = goal_query.single_mut();
+                if keyboard_input.pressed(KeyCode::W) {
+                    transform.translation.y += 0.01;
+                } else if keyboard_input.pressed(KeyCode::S) {
+                    transform.translation.y -= 0.01;
+                } else if keyboard_input.pressed(KeyCode::A) {
+                    transform.translation.x -= 0.01;
+                } else if keyboard_input.pressed(KeyCode::D) {
+                    transform.translation.x += 0.01;
+                }
+            },
+        )
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, 0.0),
             &[0.2; 6],
@@ -34,7 +65,6 @@ fn main() {
             Side::Left,
             0.02,
         )))
-        .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.5, 0.2))))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(control)
@@ -44,7 +74,8 @@ fn main() {
 fn control(
     mut agent: ResMut<SwitchableNR>,
     pause: Res<Pause>,
-    goal: Res<Goal>,
+    transforms: Query<&mut Transform>,
+    goal: Query<(Entity, &Goal)>,
     mut ticks: ResMut<Ticks>,
 ) {
     // Pause => pause everything
@@ -52,13 +83,14 @@ fn control(
         return;
     }
     let (_, origin, ls, qs, _, _) = agent.get_current_state();
-    let given_goal = goal.0;
+    let (goal, _) = goal.single();
+    let goal_transform = transforms.get(goal).unwrap();
 
     let (take_end_to_given_goal, push_com_x_from_its_goal, _) = gradient_descent(
         origin,
         ls,
         qs,
-        &given_goal,
+        &Vec2::new(goal_transform.translation.x, goal_transform.translation.y),
         EndControl::JacobianTranspose,
         COMXGoalType::PivotGoalMidpoint,
     );

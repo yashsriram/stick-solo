@@ -3,7 +3,6 @@ use bevy::prelude::*;
 use ndarray::prelude::*;
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
-    goal_plugin::{Goal, GoalPlugin},
     pause_plugin::Pause,
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
@@ -11,6 +10,9 @@ use stick_solo::game::{
 };
 use stick_solo::plan::gradient_descent::*;
 use stick_solo::plan::random_sampling::*;
+
+#[derive(Component)]
+struct Goal;
 
 fn main() {
     let inf = f32::INFINITY;
@@ -29,6 +31,35 @@ fn main() {
                 ..default()
             });
         })
+        .add_startup_system(
+            |mut commands: Commands,
+             mut meshes: ResMut<Assets<Mesh>>,
+             mut materials: ResMut<Assets<StandardMaterial>>| {
+                commands
+                    .spawn_bundle(PbrBundle {
+                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.04, 0.04)))),
+                        material: materials.add(Color::GREEN.into()),
+                        ..default()
+                    })
+                    .insert(Goal);
+            },
+        )
+        .add_system(
+            |keyboard_input: Res<Input<KeyCode>>,
+             mut goal_query: Query<(&Goal, &mut Transform)>| {
+                for (_, mut transform) in goal_query.iter_mut() {
+                    if keyboard_input.pressed(KeyCode::W) {
+                        transform.translation.y += 0.01;
+                    } else if keyboard_input.pressed(KeyCode::S) {
+                        transform.translation.y -= 0.01;
+                    } else if keyboard_input.pressed(KeyCode::A) {
+                        transform.translation.x -= 0.01;
+                    } else if keyboard_input.pressed(KeyCode::D) {
+                        transform.translation.x += 0.01;
+                    }
+                }
+            },
+        )
         .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
             Vec2::new(0.0, 0.1),
             &[0.2, 0.2, 0.2, 0.2],
@@ -50,7 +81,6 @@ fn main() {
             Side::Left,
             0.01,
         )))
-        .add_plugin(GoalPlugin::new(Goal(Vec2::new(0.1, -0.5))))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(genetic_solve_no_prior)
@@ -62,8 +92,9 @@ struct GoalQs(Array1<f32>);
 
 fn genetic_solve_no_prior(
     agent: Res<SwitchableNR>,
-    goal: Res<Goal>,
     mut goal_qs: ResMut<GoalQs>,
+    transforms: Query<&mut Transform>,
+    goal: Query<(Entity, &Goal)>,
     mut ticks: ResMut<Ticks>,
     keyboard_input: Res<Input<KeyCode>>,
 ) {
@@ -73,11 +104,8 @@ fn genetic_solve_no_prior(
         || keyboard_input.pressed(KeyCode::D)
     {
         let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
-        let loss_fn = |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
-            5.0 * (end.clone() - goal.clone()).length()
-                + com[1]
-                + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
-        };
+        let (goal, _) = goal.single();
+        let goal_transform = transforms.get(goal).unwrap();
         let (_min_loss, best_q) = no_prior_random_sample_optimizer(
             10_000,
             origin,
@@ -85,8 +113,12 @@ fn genetic_solve_no_prior(
             qs[0],
             pivoting_side,
             q_clamps,
-            &goal.0,
-            loss_fn,
+            &Vec2::new(goal_transform.translation.x, goal_transform.translation.y),
+            |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+                5.0 * (end.clone() - goal.clone()).length()
+                    + com[1]
+                    + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+            },
         );
         // println!("{:?}", min_loss);
         // println!("{:?}", best_q[0]);
@@ -98,7 +130,8 @@ fn genetic_solve_no_prior(
 fn interpolate(
     mut agent: ResMut<SwitchableNR>,
     pause: Res<Pause>,
-    goal: Res<Goal>,
+    transforms: Query<&mut Transform>,
+    goal: Query<(Entity, &Goal)>,
     mut ticks: ResMut<Ticks>,
     goal_qs: Res<GoalQs>,
 ) {
@@ -110,7 +143,9 @@ fn interpolate(
 
     let global_delta_qs = &goal_qs.0 - qs;
 
-    let given_goal = goal.0;
+    let (goal, _) = goal.single();
+    let goal_transform = transforms.get(goal).unwrap();
+    let given_goal = Vec2::new(goal_transform.translation.x, goal_transform.translation.y);
     let (take_end_to_given_goal, push_com_x_from_its_goal, push_com_y_upward) = gradient_descent(
         origin,
         ls,

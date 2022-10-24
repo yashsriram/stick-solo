@@ -195,14 +195,11 @@ impl SwitchableNR {
     pub fn pose_to_transforms(&self) -> Vec<(Vec2, f32)> {
         let mut transforms = Vec::with_capacity(self.n);
         let mut e1 = self.origin;
-        let mut cumulative_rotation = 0f32;
+        let mut cum_rot = 0f32;
         for i in 0..self.n {
-            cumulative_rotation += self.qs[i];
-            let e2 =
-                e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * self.ls[i];
-            let midpoint = (e1 + e2) / 2.0;
-            transforms.push((midpoint, cumulative_rotation));
-            e1 = e2;
+            cum_rot += self.qs[i];
+            transforms.push((e1, cum_rot));
+            e1 = e1 + Vec2::new(cum_rot.cos(), cum_rot.sin()) * self.ls[i];
         }
         transforms
     }

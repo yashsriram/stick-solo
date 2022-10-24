@@ -9,6 +9,7 @@ use stick_solo::game::{
 };
 use stick_solo::plan::gradient_descent::*;
 use stick_solo::plan::random_sampling::*;
+use stick_solo::AxesHuggingUnitSquare;
 
 #[derive(Component)]
 struct Goal;
@@ -59,7 +60,7 @@ fn main() {
                 for i in 0..n {
                     commands
                         .spawn_bundle(PbrBundle {
-                            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
+                            mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)),
                             material: materials.add(Color::WHITE.into()),
                             transform: Transform::default().with_scale(Vec3::new(ls[i], 0.01, 1.0)),
                             ..default()

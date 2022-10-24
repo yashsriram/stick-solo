@@ -1,5 +1,6 @@
 use crate::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use crate::act::switchable_nr::*;
+use crate::AxesHuggingUnitSquare;
 use bevy::prelude::*;
 
 pub struct OneHoldingSwitchableNRCouplePlugin {
@@ -59,7 +60,7 @@ fn init_vis(
             let texture_handle = asset_server.load("sprites/bone.png");
             commands
                 .spawn_bundle(PbrBundle {
-                    mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(1.0, 1.0)))),
+                    mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)),
                     material: materials.add(texture_handle.into()),
                     transform: Transform::default().with_scale(Vec3::new(ls[i], 0.05, 1.0)),
                     ..default()

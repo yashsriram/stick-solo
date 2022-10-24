@@ -2,14 +2,20 @@ extern crate stick_solo;
 use bevy::prelude::*;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
-    camera_plugin::CameraPlugin,
     path_plugin::{Path, PathPlugin},
     pause_plugin::Pause,
     pause_plugin::PausePlugin,
     status_bar_plugin::{StatusBarPlugin, Ticks},
-    switchable_nr_plugin::SwitchableNRPlugin,
 };
 use stick_solo::plan::gradient_descent::*;
+use stick_solo::AxesHuggingUnitSquare;
+
+#[derive(Component)]
+struct Edge(usize);
+#[derive(Component)]
+struct Vertex(usize);
+#[derive(Component)]
+struct CenterOfMass;
 
 fn main() {
     let inf = f32::INFINITY;
@@ -18,8 +24,17 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(RestTicks(0))
         .add_plugins(DefaultPlugins)
-        .add_plugin(CameraPlugin)
-        .add_plugin(SwitchableNRPlugin::new(SwitchableNR::new(
+        .add_startup_system(|mut commands: Commands| {
+            commands.spawn_bundle(Camera3dBundle {
+                transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
+                ..default()
+            });
+            commands.spawn_bundle(PointLightBundle {
+                transform: Transform::from_xyz(0.0, 0.0, 4.0),
+                ..default()
+            });
+        })
+        .insert_resource(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
             &[0.2, 0.2, 0.2, 0.2],
             &[-2.0, 0.0, 2.0, 0.0],
@@ -30,11 +45,90 @@ fn main() {
                 (0.0, pi * 0.5),
             ],
             Side::Left,
-            0.01,
-        )))
+        ))
         .add_plugin(PathPlugin::new(Path::default()))
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
+        .add_startup_system(
+            |mut commands: Commands,
+             agent: Res<SwitchableNR>,
+             mut meshes: ResMut<Assets<Mesh>>,
+             mut materials: ResMut<Assets<StandardMaterial>>| {
+                let (n, _, ls, _, _, _) = agent.get_current_state();
+                // Edges
+                for i in 0..n {
+                    commands
+                        .spawn_bundle(PbrBundle {
+                            mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)),
+                            material: materials.add(Color::WHITE.into()),
+                            transform: Transform::default().with_scale(Vec3::new(ls[i], 0.01, 1.0)),
+                            ..default()
+                        })
+                        .insert(Edge(i));
+                }
+                // Vertices
+                commands
+                    .spawn_bundle(PbrBundle {
+                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
+                            0.01 * 2.0,
+                            0.01 * 2.0,
+                        )))),
+                        material: materials.add(Color::BLUE.into()),
+                        ..default()
+                    })
+                    .insert(Vertex(0));
+                for i in 0..n {
+                    commands
+                        .spawn_bundle(PbrBundle {
+                            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
+                                0.01 * 2.0,
+                                0.01 * 2.0,
+                            )))),
+                            material: materials.add(Color::BLUE.into()),
+                            ..default()
+                        })
+                        .insert(Vertex(i + 1));
+                }
+                // Center of mass
+                commands
+                    .spawn_bundle(PbrBundle {
+                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.04, 0.04)))),
+                        material: materials.add(Color::RED.into()),
+                        ..default()
+                    })
+                    .insert(CenterOfMass);
+            },
+        )
+        .add_system(
+            |agent: Res<SwitchableNR>,
+             mut transforms_query: Query<&mut Transform>,
+             mut edge_query: Query<(Entity, &Edge)>,
+             mut vertex_query: Query<(Entity, &Vertex)>,
+             mut com_query: Query<(Entity, &CenterOfMass)>| {
+                let transforms = agent.pose_to_transforms();
+                let (_, _, ls, _, _, _) = agent.get_current_state();
+                for (entity, edge) in edge_query.iter_mut() {
+                    let (midpoint, angle) = transforms[edge.0];
+                    let mut transform = transforms_query.get_mut(entity).unwrap();
+                    transform.translation[0] = midpoint[0];
+                    transform.translation[1] = midpoint[1];
+                    transform.scale = Vec3::new(ls[edge.0], 0.01, 1.0);
+                    transform.rotation = Quat::from_rotation_z(angle);
+                }
+                let vertex_positions = agent.get_all_vertices();
+                for (entity, idx) in vertex_query.iter_mut() {
+                    let mut transform = transforms_query.get_mut(entity).unwrap();
+                    transform.translation[0] = vertex_positions[idx.0][0];
+                    transform.translation[1] = vertex_positions[idx.0][1];
+                }
+                let com = agent.get_center_of_mass();
+                for (entity, _) in com_query.iter_mut() {
+                    let mut transform = transforms_query.get_mut(entity).unwrap();
+                    transform.translation[0] = com[0];
+                    transform.translation[1] = com[1];
+                }
+            },
+        )
         .add_system(control)
         .run();
 }

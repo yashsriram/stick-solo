@@ -4,7 +4,6 @@ use ndarray::prelude::*;
 use stick_solo::act::one_holding_switchable_nr_couple::OneHoldingSwitchableNRCouple;
 use stick_solo::act::switchable_nr::Side;
 use stick_solo::game::{
-    camera_plugin::CameraPlugin,
     goal_couple_plugin::{GoalCouple, GoalCouplePlugin},
     one_holding_switchable_nr_couple_plugin::OneHoldingSwitchableNRCouplePlugin,
     pause_plugin::Pause,
@@ -21,7 +20,16 @@ fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .add_plugins(DefaultPlugins)
-        .add_plugin(CameraPlugin)
+        .add_startup_system(|mut commands: Commands| {
+            commands.spawn_bundle(Camera3dBundle {
+                transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
+                ..default()
+            });
+            commands.spawn_bundle(PointLightBundle {
+                transform: Transform::from_xyz(0.0, 0.0, 4.0),
+                ..default()
+            });
+        })
         .insert_resource(GoalQs(Array::zeros(2), Array::zeros(3)))
         .add_plugin(OneHoldingSwitchableNRCouplePlugin::new(
             OneHoldingSwitchableNRCouple::new(
@@ -33,7 +41,6 @@ fn main() {
                 &[0.2, 0.2, 0.1],
                 &[-0.1, -0.1, -0.1],
                 &[(-inf, inf), (-pi, 0.0), (-pi / 6.0, 0.0)],
-                0.05,
             ),
         ))
         .add_plugin(GoalCouplePlugin::new(GoalCouple(

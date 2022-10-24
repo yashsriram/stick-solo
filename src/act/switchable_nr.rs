@@ -17,8 +17,6 @@ pub struct SwitchableNR {
     qs: Array1<f32>,
     q_clamps: Array1<(f32, f32)>,
     pivoting_side: Side,
-    // Vis
-    thickness: f32,
 }
 
 impl SwitchableNR {
@@ -31,7 +29,6 @@ impl SwitchableNR {
         qs: &[f32],
         q_clamps: &[(f32, f32)],
         pivoting_side: Side,
-        thickness: f32,
     ) -> Self {
         assert!(ls.len() > 0, "Zero links argument.");
         assert_eq!(
@@ -57,15 +54,13 @@ impl SwitchableNR {
             q_clamps[0] == (-f32::INFINITY, f32::INFINITY),
             "First q clamp has to be (-inf, inf)."
         );
-        assert!(thickness > 0.0, "Non-positive thickness argument.");
         SwitchableNR {
             n: ls.len(),
-            origin: origin,
+            origin,
             ls: arr1(ls),
             qs: arr1(qs),
             q_clamps: arr1(q_clamps),
-            pivoting_side: pivoting_side,
-            thickness: thickness,
+            pivoting_side,
         }
     }
 
@@ -102,10 +97,6 @@ impl SwitchableNR {
             Side::Left => Side::Right,
             Side::Right => Side::Left,
         };
-    }
-
-    pub fn thickness(&self) -> f32 {
-        self.thickness
     }
 
     pub fn get_current_state(
@@ -204,14 +195,11 @@ impl SwitchableNR {
     pub fn pose_to_transforms(&self) -> Vec<(Vec2, f32)> {
         let mut transforms = Vec::with_capacity(self.n);
         let mut e1 = self.origin;
-        let mut cumulative_rotation = 0f32;
+        let mut cum_rot = 0f32;
         for i in 0..self.n {
-            cumulative_rotation += self.qs[i];
-            let e2 =
-                e1 + Vec2::new(cumulative_rotation.cos(), cumulative_rotation.sin()) * self.ls[i];
-            let midpoint = (e1 + e2) / 2.0;
-            transforms.push((midpoint, cumulative_rotation));
-            e1 = e2;
+            cum_rot += self.qs[i];
+            transforms.push((e1, cum_rot));
+            e1 = e1 + Vec2::new(cum_rot.cos(), cum_rot.sin()) * self.ls[i];
         }
         transforms
     }

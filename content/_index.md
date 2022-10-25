@@ -1,0 +1,3 @@
++++
+title = "stick solo website"
++++

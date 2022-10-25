@@ -33,13 +33,13 @@ jobs:
       - name: Build and deploy
         uses: shalzz/zola-deploy-action@v0.16.1
         env:
-          BUILD_DIR: './website'
+          BUILD_DIR: '.'
           BUILD_ONLY: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: './website/public'
+          path: './public'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1

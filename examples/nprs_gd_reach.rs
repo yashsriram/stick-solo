@@ -100,52 +100,6 @@ fn main() {
                     .insert(CenterOfMass);
             },
         )
-        .add_system(
-            |agent: Res<SwitchableNR>,
-             mut transforms_query: Query<&mut Transform>,
-             mut edge_query: Query<(Entity, &Edge)>,
-             mut vertex_query: Query<(Entity, &Vertex)>,
-             mut com_query: Query<(Entity, &CenterOfMass)>| {
-                let transforms = agent.pose_to_transforms();
-                let (_, _, ls, _, _, _) = agent.get_current_state();
-                for (entity, edge) in edge_query.iter_mut() {
-                    let (midpoint, angle) = transforms[edge.0];
-                    let mut transform = transforms_query.get_mut(entity).unwrap();
-                    transform.translation[0] = midpoint[0];
-                    transform.translation[1] = midpoint[1];
-                    transform.scale = Vec3::new(ls[edge.0], 0.01, 1.0);
-                    transform.rotation = Quat::from_rotation_z(angle);
-                }
-                let vertex_positions = agent.get_all_vertices();
-                for (entity, idx) in vertex_query.iter_mut() {
-                    let mut transform = transforms_query.get_mut(entity).unwrap();
-                    transform.translation[0] = vertex_positions[idx.0][0];
-                    transform.translation[1] = vertex_positions[idx.0][1];
-                }
-                let com = agent.get_center_of_mass();
-                for (entity, _) in com_query.iter_mut() {
-                    let mut transform = transforms_query.get_mut(entity).unwrap();
-                    transform.translation[0] = com[0];
-                    transform.translation[1] = com[1];
-                }
-            },
-        )
-        .add_system(
-            |keyboard_input: Res<Input<KeyCode>>,
-             mut goal_query: Query<(&Goal, &mut Transform)>| {
-                for (_, mut transform) in goal_query.iter_mut() {
-                    if keyboard_input.pressed(KeyCode::W) {
-                        transform.translation.y += 0.01;
-                    } else if keyboard_input.pressed(KeyCode::S) {
-                        transform.translation.y -= 0.01;
-                    } else if keyboard_input.pressed(KeyCode::A) {
-                        transform.translation.x -= 0.01;
-                    } else if keyboard_input.pressed(KeyCode::D) {
-                        transform.translation.x += 0.01;
-                    }
-                }
-            },
-        )
         .insert_resource(SwitchableNR::new(
             Vec2::new(0.0, 0.1),
             &[0.2, 0.2, 0.2, 0.2],
@@ -169,28 +123,40 @@ fn main() {
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(genetic_solve_no_prior)
-        .add_system(interpolate)
         .run();
 }
 
 struct GoalQs(Array1<f32>);
 
 fn genetic_solve_no_prior(
-    agent: Res<SwitchableNR>,
     mut goal_qs: ResMut<GoalQs>,
-    transforms: Query<&mut Transform>,
+    mut transforms: Query<&mut Transform>,
     goal: Query<(Entity, &Goal)>,
     mut ticks: ResMut<Ticks>,
     keyboard_input: Res<Input<KeyCode>>,
+    mut agent: ResMut<SwitchableNR>,
+    pause: Res<Pause>,
+    mut edge_query: Query<(Entity, &Edge)>,
+    mut vertex_query: Query<(Entity, &Vertex)>,
+    mut com_query: Query<(Entity, &CenterOfMass)>,
 ) {
+    let (goal, _) = goal.single();
+    let mut goal_transform = transforms.get_mut(goal).unwrap();
+    if keyboard_input.pressed(KeyCode::W) {
+        goal_transform.translation.y += 0.01;
+    } else if keyboard_input.pressed(KeyCode::S) {
+        goal_transform.translation.y -= 0.01;
+    } else if keyboard_input.pressed(KeyCode::A) {
+        goal_transform.translation.x -= 0.01;
+    } else if keyboard_input.pressed(KeyCode::D) {
+        goal_transform.translation.x += 0.01;
+    }
     if keyboard_input.pressed(KeyCode::W)
         || keyboard_input.pressed(KeyCode::A)
         || keyboard_input.pressed(KeyCode::S)
         || keyboard_input.pressed(KeyCode::D)
     {
         let (_, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
-        let (goal, _) = goal.single();
-        let goal_transform = transforms.get(goal).unwrap();
         let (_min_loss, best_q) = no_prior_random_sample_optimizer(
             10_000,
             origin,
@@ -210,32 +176,17 @@ fn genetic_solve_no_prior(
         goal_qs.0 = best_q;
         ticks.0 = 0;
     }
-}
-
-fn interpolate(
-    mut agent: ResMut<SwitchableNR>,
-    pause: Res<Pause>,
-    transforms: Query<&mut Transform>,
-    goal: Query<(Entity, &Goal)>,
-    mut ticks: ResMut<Ticks>,
-    goal_qs: Res<GoalQs>,
-) {
     // Pause => pause everything
     if pause.0 {
         return;
     }
     let (_, origin, ls, qs, _, _) = agent.get_current_state();
-
     let global_delta_qs = &goal_qs.0 - qs;
-
-    let (goal, _) = goal.single();
-    let goal_transform = transforms.get(goal).unwrap();
-    let given_goal = Vec2::new(goal_transform.translation.x, goal_transform.translation.y);
     let (take_end_to_given_goal, push_com_x_from_its_goal, push_com_y_upward) = gradient_descent(
         origin,
         ls,
         qs,
-        &given_goal,
+        &Vec2::new(goal_transform.translation.x, goal_transform.translation.y),
         EndControl::JacobianTranspose,
         COMXGoalType::PivotGoalMidpoint,
     );
@@ -251,5 +202,27 @@ fn interpolate(
             + delta * -push_com_y_upward,
     );
 
+    let current_transforms = agent.pose_to_transforms();
+    let (_, _, ls, _, _, _) = agent.get_current_state();
+    for (entity, edge) in edge_query.iter_mut() {
+        let (midpoint, angle) = current_transforms[edge.0];
+        let mut transform = transforms.get_mut(entity).unwrap();
+        transform.translation[0] = midpoint[0];
+        transform.translation[1] = midpoint[1];
+        transform.scale = Vec3::new(ls[edge.0], 0.01, 1.0);
+        transform.rotation = Quat::from_rotation_z(angle);
+    }
+    let vertex_positions = agent.get_all_vertices();
+    for (entity, idx) in vertex_query.iter_mut() {
+        let mut transform = transforms.get_mut(entity).unwrap();
+        transform.translation[0] = vertex_positions[idx.0][0];
+        transform.translation[1] = vertex_positions[idx.0][1];
+    }
+    let com = agent.get_center_of_mass();
+    for (entity, _) in com_query.iter_mut() {
+        let mut transform = transforms.get_mut(entity).unwrap();
+        transform.translation[0] = com[0];
+        transform.translation[1] = com[1];
+    }
     ticks.0 += 1;
 }

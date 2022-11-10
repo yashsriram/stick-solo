@@ -3,19 +3,18 @@
 ## description
 - Simple planning methods for 2D stick-figure free-solo climbing agents.
 - This problem is studied under couple of my projects listed here.
-    - `1.gradient_descent_ik` uses gradient descent based approach.
-    - `2.ceo_rl_and_random_sample_solves` builds on previous one, adding random sample solves and cross-entropy method based rl.
-- For more details on a project, just click on it.
+    1. Uses gradient descent based approach.
+    1. Builds on previous one, adding random sample solves and cross-entropy method based rl.
 
 ### showcase
 
-- The tour of `1.gradient_descent_ik`. Link to youtube video. Click to play.
+- The tour of 1. Link to youtube video. Click to play.
 
 [![](http://img.youtube.com/vi/bZg6pS2gGPw/0.jpg)](https://www.youtube.com/watch?v=bZg6pS2gGPw)
 
-- The final result of `2.ceo_rl_and_random_sample_solves`.
+- The final result of 2.
 
-![](./static/12.gif)
+![](./static/image/12.gif)
 
 ```mermaid
 flowchart LR
@@ -81,76 +80,76 @@ flowchart LR
 
 | Gradient descent IK control | Neural network IK control |
 | --- | --- |
-| ![](./static/0.1.ik.gif) | ![](./static/0.2.ceo.gif) |
+| ![](./static/image/0.1.ik.gif) | ![](./static/image/0.2.ceo.gif) |
 | Has smooth control | Has noisy control and difficult to train generally |
 
 Therefore direct neural-network IK control is not used.
 
 - Baseline.
 
-![](./static/1.jt.gif)
+![](./static/image/1.jt.gif)
 
-![](./static/2.cc.gif)
+![](./static/image/2.cc.gif)
 
 - New system intro.
 
-![](./static/3.0.intro.gif)
+![](./static/image/3.0.intro.gif)
 
 - Effect of center of mass term in gradient descent IK.
 
-![](./static/3.1.com.gif)
+![](./static/image/3.1.com.gif)
 
 | Local minima problem | Its solution |
 | --- | --- |
-| ![](./static/4.0.local_minima.gif) | ![](./static/4.1.solve_local_minima.gif) |
+| ![](./static/image/4.0.local_minima.gif) | ![](./static/image/4.1.solve_local_minima.gif) |
 
 | Cartwheeling problem | Its solution |
 | --- | --- |
-| ![](./static/5.0.wrong_side.gif) | ![](./static/5.1.solve_wrong_side.gif) |
+| ![](./static/image/5.0.wrong_side.gif) | ![](./static/image/5.1.solve_wrong_side.gif) |
 
 - Due to inherent usage of randomness, different motion is produced for same scenarios.
 
-![](./static/6.4.out.gif)
+![](./static/image/6.4.out.gif)
 
-![](./static/6.jpg)
+![](./static/image/6.jpg)
 
 - Switching pivot to continue on a path.
 
-![](./static/7.1.switching_success.gif)
+![](./static/image/7.1.switching_success.gif)
 
 - Failure case of switching pivot.
 
-![](./static/7.2.switching_failure.gif)
+![](./static/image/7.2.switching_failure.gif)
 
 - Matching hands (when needed) + switching pivot solves the problem.
 
-![](./static/7.3.matching.gif)
+![](./static/image/7.3.matching.gif)
 
 - Chain as two limb agent on a climbing route: Vanilla gradient-descent control.
 
-![](./static/8.1.gd.gif)
+![](./static/image/8.1.gd.gif)
 
 - Chain as two limb agent on a climbing route: Relax on every hold + gradient-descent control.
 
-![](./static/8.2.relax.gif)
+![](./static/image/8.2.relax.gif)
 
 - Chain as two limb agent on a climbing route: No-prior random-sample near-global solve + gradient-descent snapping control.
 
-![](./static/8.3.nprs.gif)
+![](./static/image/8.3.nprs.gif)
 
 - Chain as two limb agent on a climbing route: Current-state random-sample near-global solve + gradient-descent snapping control.
 
-![](./static/8.4.csrs.gif)
+![](./static/image/8.4.csrs.gif)
 
 - Large N with small lengths can model a worm.
 
-![](./static/9.worm.gif)
+![](./static/image/9.worm.gif)
 
 - Pinned Chain couple as two limb agent.
     - Manual neck and reaching hand goal control.
     - No-prior random-sample near-global solve + gradient-descent snapping IK control.
 
-![](./static/10.ohc_reach.gif)
+![](./static/image/10.ohc_reach.gif)
 
 - Pinned Chain couple as two limb agent.
     - Holding with left arm.
@@ -158,7 +157,7 @@ Therefore direct neural-network IK control is not used.
     - Cross-entropy optimized network neck control.
     - No-prior random-sample near-global solve + gradient-descent snapping IK control.
 
-![](./static/11.1.gif)
+![](./static/image/11.1.gif)
 
 - Pinned Chain couple as two limb agent.
     - Holding with right arm.
@@ -166,7 +165,7 @@ Therefore direct neural-network IK control is not used.
     - Cross-entropy optimized network neck control.
     - No-prior random-sample near-global solve + gradient-descent snapping IK control.
 
-![](./static/11.2.gif)
+![](./static/image/11.2.gif)
 
 - Visualizing neural network policy for neck using texture map distortion method.
     - Input to network is lengths of agent links and reaching hand goal.
@@ -175,18 +174,18 @@ Therefore direct neural-network IK control is not used.
     - Left map shows original texture with linear mapping y = x.
     - Right map shows texture distorted using policy y = f(x).
 
-![](./static/11.3.gif)
+![](./static/image/11.3.gif)
 
 - Cross-entropy optimization can be parallelized. Time taken for optimization is shown for number of CPU cores.
 
-![](./static/parallelization.png)
+![](./static/image/parallelization.png)
 
 - Pinned Chain couple as two limb agent.
     - Manual reaching hand goal control (derived from given path).
     - Cross-entropy optimized network neck control.
     - No-prior random-sample near-global solve + gradient-descent snapping IK control.
 
-![](./static/12.gif)
+![](./static/image/12.gif)
 
 ## roadmap
 - Problems solved until now are documented in `report.pdf`.

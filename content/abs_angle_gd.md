@@ -1,4 +1,6 @@
 +++
+[extra]
+wasm_example = "gd_reach"
 +++
 
 # absolute angle formulation

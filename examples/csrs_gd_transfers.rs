@@ -1,4 +1,5 @@
 extern crate stick_solo;
+use bevy::asset::AssetServerSettings;
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use stick_solo::act::switchable_nr::*;
@@ -24,6 +25,10 @@ fn main() {
     let pi = std::f32::consts::PI;
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(AssetServerSettings {
+            asset_folder: "static/assets".to_string(),
+            watch_for_changes: false,
+        })
         .add_plugins(DefaultPlugins)
         .add_startup_system(|mut commands: Commands| {
             commands.spawn_bundle(Camera3dBundle {

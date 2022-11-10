@@ -1,4 +1,5 @@
 extern crate stick_solo;
+use bevy::asset::AssetServerSettings;
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
@@ -24,6 +25,10 @@ fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
     App::new()
+        .insert_resource(AssetServerSettings {
+            asset_folder: "static/assets".to_string(),
+            watch_for_changes: false,
+        })
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(GoalQs(Array::zeros(4)))
         .add_plugins(DefaultPlugins)

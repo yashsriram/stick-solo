@@ -1,4 +1,5 @@
 extern crate stick_solo;
+use bevy::asset::AssetServerSettings;
 use bevy::prelude::*;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
@@ -22,6 +23,10 @@ fn main() {
     let pi = std::f32::consts::PI;
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(AssetServerSettings {
+            asset_folder: "static/assets".to_string(),
+            watch_for_changes: false,
+        })
         .insert_resource(RestTicks(0))
         .add_plugins(DefaultPlugins)
         .add_startup_system(|mut commands: Commands| {

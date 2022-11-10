@@ -1,6 +1,7 @@
 extern crate stick_solo;
 mod world;
 
+use bevy::asset::AssetServerSettings;
 use bevy::prelude::*;
 use ndarray::prelude::*;
 use std::{env, fs::File, io::BufReader};
@@ -103,6 +104,10 @@ fn main() {
     let world = exp.world.clone();
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
+        .insert_resource(AssetServerSettings {
+            asset_folder: "static/assets".to_string(),
+            watch_for_changes: false,
+        })
         .add_plugins(DefaultPlugins)
         .add_startup_system(|mut commands: Commands| {
             commands.spawn_bundle(Camera3dBundle {

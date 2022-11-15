@@ -1,5 +1,9 @@
 # stick-solo
 
+https://yashsriram.github.io/stick-solo/
+
+
+
 ## description
 - Simple planning methods for 2D stick-figure free-solo climbing agents.
 - This problem is studied under couple of my projects listed here.

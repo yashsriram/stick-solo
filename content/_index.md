@@ -23,7 +23,7 @@ shows examples of such agents. These are used to model individual limbs.
 A \(q\) assignment of a 2R agent is show in figure 
 
 ![\(q\) or \(\theta\) assignment for a 2R
-agent.<span label="fig:2R"></span>](/images/2R.png)
+agent.<span label="fig:2R"></span>](images/2R.png)
 
 ## Tree of NR chains agent
 
@@ -178,7 +178,7 @@ effect of this term is illustrated in figure
 
 ![Left agent has no com control, therefore stays in a tilted position.
 Right agent has com control, therefore swings
-downward.](/images/com_effect.jpg)
+downward.](images/com_effect.jpg)
 
 <span id="fig:com_effect" label="fig:com_effect">\[fig:com\_effect\]</span>
 
@@ -221,15 +221,15 @@ can soften the requirement to solve for arbitrarily close globally
 optimal solves.
 
 ![Top 3 one motion, Bottom 3 one motion. Agent crosses arms to get stuck
-in a local minima pose.](/images/1.a.jpg) ![Top 3 one motion, Bottom 3
+in a local minima pose.](images/1.a.jpg) ![Top 3 one motion, Bottom 3
 one motion. Agent crosses arms to get stuck in a local minima
-pose.](/images/1.b.jpg) ![Top 3 one motion, Bottom 3 one motion. Agent
-crosses arms to get stuck in a local minima pose.](/images/1.c.jpg)  
+pose.](images/1.b.jpg) ![Top 3 one motion, Bottom 3 one motion. Agent
+crosses arms to get stuck in a local minima pose.](images/1.c.jpg)  
 ![Top 3 one motion, Bottom 3 one motion. Agent crosses arms to get stuck
-in a local minima pose.](/images/2.a.jpg) ![Top 3 one motion, Bottom 3
+in a local minima pose.](images/2.a.jpg) ![Top 3 one motion, Bottom 3
 one motion. Agent crosses arms to get stuck in a local minima
-pose.](/images/2.b.jpg) ![Top 3 one motion, Bottom 3 one motion. Agent
-crosses arms to get stuck in a local minima pose.](/images/2.c.jpg)
+pose.](images/2.b.jpg) ![Top 3 one motion, Bottom 3 one motion. Agent
+crosses arms to get stuck in a local minima pose.](images/2.c.jpg)
 
 <span id="fig:local_minima" label="fig:local_minima">\[fig:local\_minima\]</span>
 
@@ -308,13 +308,13 @@ illustrated in figure .
 
 ![Left hand pivoting agent makes a cartwheel in attempt to reach the
 goal, because constraints cannot be enforced on
-\(q_1\).<span label="fig:cartwheel"></span>](/images/cw1.jpg) ![Left
+\(q_1\).<span label="fig:cartwheel"></span>](images/cw1.jpg) ![Left
 hand pivoting agent makes a cartwheel in attempt to reach the goal,
 because constraints cannot be enforced on
-\(q_1\).<span label="fig:cartwheel"></span>](/images/cw2.jpg) ![Left
+\(q_1\).<span label="fig:cartwheel"></span>](images/cw2.jpg) ![Left
 hand pivoting agent makes a cartwheel in attempt to reach the goal,
 because constraints cannot be enforced on
-\(q_1\).<span label="fig:cartwheel"></span>](/images/cw3.jpg)
+\(q_1\).<span label="fig:cartwheel"></span>](images/cw3.jpg)
 
 This can be solved by only sampling certain range of \(q_1\) values
 while performing globally optimal solves.
@@ -334,20 +334,20 @@ hands.
 This is illustrated in figure 
 
 ![Switching pivots for alternating hands results in local minima
-pose.<span label="fig:sf"></span>](/images/sf1.jpg) ![Switching pivots
+pose.<span label="fig:sf"></span>](images/sf1.jpg) ![Switching pivots
 for alternating hands results in local minima
-pose.<span label="fig:sf"></span>](/images/sf2.jpg) ![Switching pivots
+pose.<span label="fig:sf"></span>](images/sf2.jpg) ![Switching pivots
 for alternating hands results in local minima
-pose.<span label="fig:sf"></span>](/images/sf3.jpg)
+pose.<span label="fig:sf"></span>](images/sf3.jpg)
 
 ![Switching pivots + matching hands avoids local minima
-pose.<span label="fig:m"></span>](/images/m1.jpg) ![Switching pivots +
+pose.<span label="fig:m"></span>](images/m1.jpg) ![Switching pivots +
 matching hands avoids local minima
-pose.<span label="fig:m"></span>](/images/m2.jpg) ![Switching pivots +
+pose.<span label="fig:m"></span>](images/m2.jpg) ![Switching pivots +
 matching hands avoids local minima
-pose.<span label="fig:m"></span>](/images/m3.jpg) ![Switching pivots +
+pose.<span label="fig:m"></span>](images/m3.jpg) ![Switching pivots +
 matching hands avoids local minima
-pose.<span label="fig:m"></span>](/images/m4.jpg)
+pose.<span label="fig:m"></span>](images/m4.jpg)
 
 ## Formulating \(2 \times 2R\) limb coordination as an RL problem
 
@@ -435,7 +435,7 @@ cores for the parameters given in the table as illustrated in
 Cross entropy optimizer parameters.<span label="tab:ceo"></span>
 
 ![Speedup of cross entropy optimization using CPU
-parallelization.<span label="fig:speedup"></span>](/images/parallelization.png)
+parallelization.<span label="fig:speedup"></span>](images/parallelization.png)
 
 #### Left and right holding networks
 
@@ -459,48 +459,48 @@ the design and debugging of reward function, optimizer and the network.
 ![For the left holding network, distance of neck goal w.r.t hand goal.
 Left side shows zoomed out graph, right side shows zoomed in graph.
 Notice the valley of good predictions among the hills of random
-noise.<span label="fig:lm"></span>](/images/left/zoomed_out.png) ![For
+noise.<span label="fig:lm"></span>](images/left/zoomed_out.png) ![For
 the left holding network, distance of neck goal w.r.t hand goal. Left
 side shows zoomed out graph, right side shows zoomed in graph. Notice
 the valley of good predictions among the hills of random
-noise.<span label="fig:lm"></span>](/images/left/zoomed_in.png)
+noise.<span label="fig:lm"></span>](images/left/zoomed_in.png)
 
 ![For the left holding network, direction of neck goal w.r.t. hand
-goal.<span label="fig:ld"></span>](/images/left/direction.png)
+goal.<span label="fig:ld"></span>](images/left/direction.png)
 
 ![For the left holding network, texture distortion map. On the left side
 is the original texture, on the right is the mapped texture. Notice the
 smooth predictions in the trained region (right) and noisy predictions
 in the untrained region (left). Pivot is in the
-center.<span label="fig:lt"></span>](/images/left/original.png) ![For
+center.<span label="fig:lt"></span>](images/left/original.png) ![For
 the left holding network, texture distortion map. On the left side is
 the original texture, on the right is the mapped texture. Notice the
 smooth predictions in the trained region (right) and noisy predictions
 in the untrained region (left). Pivot is in the
-center.<span label="fig:lt"></span>](/images/left/mapped.png)
+center.<span label="fig:lt"></span>](images/left/mapped.png)
 
 ![For the right holding network, distance of neck goal w.r.t hand goal.
 Left side shows zoomed out graph, right side shows zoomed in graph.
 Notice the valley of good predictions among the hills of random
-noise.<span label="fig:rm"></span>](/images/right/zoomed_out.png) ![For
+noise.<span label="fig:rm"></span>](images/right/zoomed_out.png) ![For
 the right holding network, distance of neck goal w.r.t hand goal. Left
 side shows zoomed out graph, right side shows zoomed in graph. Notice
 the valley of good predictions among the hills of random
-noise.<span label="fig:rm"></span>](/images/right/zoomed_in.png)
+noise.<span label="fig:rm"></span>](images/right/zoomed_in.png)
 
 ![For the right holding network, direction of neck goal w.r.t. hand
-goal.<span label="fig:rd"></span>](/images/right/direction.png)
+goal.<span label="fig:rd"></span>](images/right/direction.png)
 
 ![For the right holding network, texture distortion map. On the left
 side is the original texture, on the right is the mapped texture. Notice
 the smooth predictions in the trained region (left) and noisy
 predictions in the untrained region (right). Pivot is in the
-center.<span label="fig:rt"></span>](/images/right/original.png) ![For
+center.<span label="fig:rt"></span>](images/right/original.png) ![For
 the right holding network, texture distortion map. On the left side is
 the original texture, on the right is the mapped texture. Notice the
 smooth predictions in the trained region (left) and noisy predictions in
 the untrained region (right). Pivot is in the
-center.<span label="fig:rt"></span>](/images/right/mapped.png)
+center.<span label="fig:rt"></span>](images/right/mapped.png)
 
 # experiments and results
 
@@ -521,7 +521,7 @@ shown in figure .
 ![Standard climbing route: grey points represent holds, edges represent
 path. Route: left circle counter clockwise, right circle clockwise and
 then square in
-clockwise.<span label="fig:route"></span>](/images/route.jpg)
+clockwise.<span label="fig:route"></span>](images/route.jpg)
 
 1.  Vanilla gradient descent is simple but quickly gets stuck in local
     minima pose and cannot proceed.

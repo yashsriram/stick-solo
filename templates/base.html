@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" type="image/jpg" href="/static/logo.png"/>
+    <title>Stick figure Free solo Climbing Agents</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        processEnvironments: false,
+      },
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
+    <link rel="icon" type="image/x-icon" href="/logo.png">
+    {% block headers %}{% endblock headers %}
+  </head>
+  <body>
+    <header>
+    <nav>
+        <ul>
+        <li><a href="/report.pdf">report</a></li>
+        </ul>
+    </nav>
+    </header>
+    {% block content %}{% endblock content %}
+  </body>
+</html>

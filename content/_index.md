@@ -1,17 +1,20 @@
 +++
 +++
 
-# introduction
+# Stick Solo
+Motion planning for [stick figure](https://en.wikipedia.org/wiki/Free_solo_climbing) agents for [free solo climbing](https://en.wikipedia.org/wiki/Free_solo_climbing) on a 2D wall.
+Starting from a initial [hold](https://en.wikipedia.org/wiki/Climbing_hold) the task is to reach a finish hold in a natural looking motion.
+Stick figures are modeled as rigid links connected by revolute joints.
+We show that using __joint angle constraints__ and __center of mass__ term in addtion to distance cost gradient descent IK achieves significantly better natural motion.
+Local minima poses are avoided by using sample based near globally-optimal IK.
+These coupled with gradient descent make the agent reach snap to holds reliably.
+By switching pivots and matching hands the agent can easily navigate a given climbing route.
+The neck goal for $2 \times 2R$ agent is predicted by a cross-entropy optimized fully connected network.
+The full policy is also visualized nicely.
+Using these methods both models achieve reliable and natural motion to reach finish holds.
+Moreover these methods can be applied generally to any tree of chains agent, including a full two arm, two leg human-like agent.
 
-The problem considered in this work is the task of wall climbing by
-stick-figure agents. The goals are
-
-1.  To model human-like motion using simple heuristics.
-
-2.  To generate a controller for a given agent so that it reaches the
-    finish hold.
-
-All motion, environment and agents are in 2D.
+[Report](report.pdf)
 
 ## NR chain agent
 

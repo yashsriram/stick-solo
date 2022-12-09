@@ -1,6 +1,4 @@
 +++
-[extra]
-wasm_example = "gd_reach"
 +++
 
 # absolute angle formulation
@@ -51,3 +49,10 @@ $$
 = - \alpha l_i cos(\theta_i)(\Sigma l_i sin(\theta_i) - G_y)- l_i sin(\theta_i)(\Sigma l_i cos(\theta_i)  - G_x)
 $$
 
+
+<script type="module">
+  import init from '/wasm-bindgen/gd_reach.js'
+  init()
+</script>
+
+<canvas id="interactive_example"></canvas>

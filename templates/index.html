@@ -2,4 +2,11 @@
 
 {% block content %}
     {{ section.content | safe }}
+    {{ section.path }}
+
+    <ol>
+    {% for page in section.pages %}
+    <li><a href="{{ page.permalink }}">{{ page.slug }}</a></li>
+    {% endfor %}
+    </ol>
 {% endblock content %}

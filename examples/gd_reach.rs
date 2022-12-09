@@ -1,5 +1,4 @@
 extern crate stick_solo;
-use bevy::asset::AssetServerSettings;
 use bevy::prelude::*;
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
@@ -21,14 +20,14 @@ struct CenterOfMass;
 
 fn main() {
     let inf = f32::INFINITY;
-    let pi = std::f32::consts::PI;
     App::new()
-        .insert_resource(AssetServerSettings {
-            asset_folder: "static/assets".to_string(),
-            watch_for_changes: false,
+        .insert_resource(WindowDescriptor {
+            canvas: Some("#interactive_example".to_string()),
+            fit_canvas_to_parent: true,
+            ..default()
         })
-        .add_plugins(DefaultPlugins)
         .insert_resource(ClearColor(Color::BLACK))
+        .add_plugins(DefaultPlugins)
         .add_startup_system(|mut commands: Commands| {
             commands.spawn_bundle(Camera3dBundle {
                 transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -140,11 +139,14 @@ fn main() {
                 let (_, mut transform) = goal_query.single_mut();
                 if keyboard_input.pressed(KeyCode::W) {
                     transform.translation.y += 0.01;
-                } else if keyboard_input.pressed(KeyCode::S) {
+                }
+                if keyboard_input.pressed(KeyCode::S) {
                     transform.translation.y -= 0.01;
-                } else if keyboard_input.pressed(KeyCode::A) {
+                }
+                if keyboard_input.pressed(KeyCode::A) {
                     transform.translation.x -= 0.01;
-                } else if keyboard_input.pressed(KeyCode::D) {
+                }
+                if keyboard_input.pressed(KeyCode::D) {
                     transform.translation.x += 0.01;
                 }
             },

@@ -1,12 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% if page.extra.wasm_example %}
-    <script type="module">
-      import init from '/wasm-bindgen/{{ page.extra.wasm_example }}.js'
-      init()
-    </script>
-    {% endif %}
     {{ page.content | safe }}
 {% endblock content %}
 

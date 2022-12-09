@@ -2,8 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <link rel="shortcut icon" type="image/jpg" href="/static/logo.png"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stick figure Free solo Climbing Agents</title>
+    <link rel="icon" type="image/x-icon" href="logo.png">
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>
     MathJax = {
@@ -14,12 +17,37 @@
     };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
-    <link rel="icon" type="image/x-icon" href="logo.png">
-    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
+
+    <style>
+      canvas {
+        background: linear-gradient(
+          135deg,
+          white 0%,
+          white 49%,
+          black 49%,
+          black 51%,
+          white 51%,
+          white 100%
+        );
+        background-repeat: repeat;
+        background-size: 20px 20px;
+      }
+    </style>
+
     {% block headers %}{% endblock headers %}
   </head>
   <body>
+    <header>
+        <nav>
+            <a href="https://yashsriram.github.io/stick-solo/"><h1>Stick Solo 🧗</h1></a>
+            <ul>
+                <li><a href="https://yashsriram.github.io/stick-solo/report.pdf">Report</a></li>
+                <li><a href="https://github.com/yashsriram/stick-solo">Code</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
     {% block content %}{% endblock content %}
+    </main>
   </body>
 </html>

@@ -1,5 +1,9 @@
 extern crate stick_solo;
-use bevy::prelude::*;
+use bevy::{
+    input::mouse::{MouseButtonInput, MouseMotion, MouseWheel},
+    prelude::*,
+    window::CursorMoved,
+};
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
     pause_plugin::Pause,
@@ -22,6 +26,8 @@ fn main() {
     let inf = f32::INFINITY;
     App::new()
         .insert_resource(WindowDescriptor {
+            width: 500.0,
+            height: 100.0,
             canvas: Some("#interactive_example".to_string()),
             fit_canvas_to_parent: true,
             ..default()
@@ -154,6 +160,7 @@ fn main() {
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(control)
+        .add_system(print_mouse_events_system)
         .run();
 }
 
@@ -184,4 +191,22 @@ fn control(
     agent.update(take_end_to_given_goal + -0.2 * push_com_x_from_its_goal);
 
     ticks.0 += 1;
+}
+
+fn print_mouse_events_system(
+    mut mouse_button_input_events: EventReader<MouseButtonInput>,
+    mut mouse_motion_events: EventReader<MouseMotion>,
+    mut cursor_moved_events: EventReader<CursorMoved>,
+) {
+    for event in mouse_button_input_events.iter() {
+        info!("{:?}", event);
+    }
+
+    for event in mouse_motion_events.iter() {
+        info!("{:?}", event);
+    }
+
+    for event in cursor_moved_events.iter() {
+        info!("{:?}", event);
+    }
 }

@@ -1,7 +1,11 @@
 +++
 +++
 
-# absolute angle formulation
+
+<details>
+<summary>
+gradient descent reach
+</summary>
 
 The robotic arm dynamics can be formulated as the end postion in terms of lenghts and orientation of each arm.
 
@@ -49,6 +53,7 @@ $$
 = - \alpha l_i cos(\theta_i)(\Sigma l_i sin(\theta_i) - G_y)- l_i sin(\theta_i)(\Sigma l_i cos(\theta_i)  - G_x)
 $$
 
+</details>
 
 <script type="module">
   import init from '/wasm-bindgen/gd_reach.js'

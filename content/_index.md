@@ -9,3 +9,11 @@
 - Introduces angle constrains and center-of-mass term for more natural motion.
 - Explores sample-based methods to prune local minima.
 - Illustrates the need and power of learning-based neck-position prediction for a two-arm agent.
+
+<canvas id="interactive_example"></canvas>
+
+<script type="module">
+import init from './wasm-bindgen/gd_reach.js'
+init()
+</script>
+

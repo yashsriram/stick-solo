@@ -2,6 +2,7 @@ extern crate stick_solo;
 use bevy::{
     input::mouse::{MouseButtonInput, MouseMotion, MouseWheel},
     prelude::*,
+    sprite::MaterialMesh2dBundle,
     window::CursorMoved,
 };
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
@@ -35,23 +36,25 @@ fn main() {
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .add_startup_system(|mut commands: Commands| {
-            commands.spawn_bundle(Camera3dBundle {
-                transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
-                ..default()
-            });
-            commands.spawn_bundle(PointLightBundle {
-                transform: Transform::from_xyz(0.0, 0.0, 4.0),
-                ..default()
-            });
+            commands.spawn_bundle(Camera2dBundle::default());
+            // commands.spawn_bundle(Camera3dBundle {
+            //     transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
+            //     ..default()
+            // });
+            // commands.spawn_bundle(PointLightBundle {
+            //     transform: Transform::from_xyz(0.0, 0.0, 4.0),
+            //     ..default()
+            // });
         })
         .add_startup_system(
             |mut commands: Commands,
              mut meshes: ResMut<Assets<Mesh>>,
-             mut materials: ResMut<Assets<StandardMaterial>>| {
+             mut materials: ResMut<Assets<ColorMaterial>>| {
                 commands
-                    .spawn_bundle(PbrBundle {
-                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.04, 0.04)))),
-                        transform: Transform::default().with_translation(Vec3::new(0.3, 0.4, 0.0)),
+                    .spawn_bundle(MaterialMesh2dBundle {
+                        mesh: meshes
+                            .add(Mesh::from(shape::Quad::new(Vec2::new(8., 8.))))
+                            .into(),
                         material: materials.add(Color::GREEN.into()),
                         ..default()
                     })
@@ -60,7 +63,7 @@ fn main() {
         )
         .insert_resource(SwitchableNR::new(
             Vec2::new(0.0, 0.0),
-            &[0.2; 6],
+            &[32.; 6],
             &[0.0; 6],
             &[(-inf, inf); 6],
             Side::Left,
@@ -69,31 +72,35 @@ fn main() {
             |mut commands: Commands,
              agent: Res<SwitchableNR>,
              mut meshes: ResMut<Assets<Mesh>>,
-             mut materials: ResMut<Assets<StandardMaterial>>| {
+             mut materials: ResMut<Assets<ColorMaterial>>| {
                 let (n, _, ls, _, _, _) = agent.get_current_state();
                 // Edges
                 for i in 0..n {
                     commands
-                        .spawn_bundle(PbrBundle {
-                            mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)),
+                        .spawn_bundle(MaterialMesh2dBundle {
+                            mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)).into(),
                             material: materials.add(Color::WHITE.into()),
-                            transform: Transform::default().with_scale(Vec3::new(ls[i], 0.01, 1.0)),
+                            transform: Transform::default().with_scale(Vec3::new(ls[i], 10., 1.0)),
                             ..default()
                         })
                         .insert(Edge(i));
                 }
                 // Vertices
                 commands
-                    .spawn_bundle(PbrBundle {
-                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.02, 0.02)))),
+                    .spawn_bundle(MaterialMesh2dBundle {
+                        mesh: meshes
+                            .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
+                            .into(),
                         material: materials.add(Color::BLUE.into()),
                         ..default()
                     })
                     .insert(Vertex(0));
                 for i in 0..n {
                     commands
-                        .spawn_bundle(PbrBundle {
-                            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.02, 0.02)))),
+                        .spawn_bundle(MaterialMesh2dBundle {
+                            mesh: meshes
+                                .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
+                                .into(),
                             material: materials.add(Color::BLUE.into()),
                             ..default()
                         })
@@ -101,8 +108,10 @@ fn main() {
                 }
                 // Center of mass
                 commands
-                    .spawn_bundle(PbrBundle {
-                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.04, 0.04)))),
+                    .spawn_bundle(MaterialMesh2dBundle {
+                        mesh: meshes
+                            .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
+                            .into(),
                         material: materials.add(Color::RED.into()),
                         ..default()
                     })
@@ -160,7 +169,7 @@ fn main() {
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(control)
-        .add_system(print_mouse_events_system)
+        .add_system(set_goal_using_mouse_click)
         .run();
 }
 
@@ -193,20 +202,26 @@ fn control(
     ticks.0 += 1;
 }
 
-fn print_mouse_events_system(
-    mut mouse_button_input_events: EventReader<MouseButtonInput>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
-    mut cursor_moved_events: EventReader<CursorMoved>,
+fn set_goal_using_mouse_click(
+    mouse_button_input: Res<Input<MouseButton>>,
+    mut windows: ResMut<Windows>,
+    mut goal_query: Query<(&Goal, &mut Transform)>,
 ) {
-    for event in mouse_button_input_events.iter() {
-        info!("{:?}", event);
-    }
-
-    for event in mouse_motion_events.iter() {
-        info!("{:?}", event);
-    }
-
-    for event in cursor_moved_events.iter() {
-        info!("{:?}", event);
+    if mouse_button_input.just_pressed(MouseButton::Left) {
+        let window = windows.primary_mut();
+        if let Some(cursor) = window.physical_cursor_position() {
+            let w = window.physical_width();
+            let h = window.physical_height();
+            let (x_hat, y_hat) = (
+                cursor.x as f32 - w as f32 / 2.0,
+                cursor.y as f32 - h as f32 / 2.0,
+            );
+            info!("{:?}", (w, h, cursor.x, cursor.y));
+            info!("{:?}", (x_hat, y_hat));
+            let scale_factor = window.scale_factor() as f32;
+            let (_, mut transform) = goal_query.single_mut();
+            transform.translation.x = x_hat / scale_factor;
+            transform.translation.y = y_hat / scale_factor;
+        }
     }
 }

@@ -35,8 +35,8 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=wasm32-unknown-unknown --examples
-      - name: "Build Bevy Examples"
-        run: cargo install wasm-bindgen-cli
+      - name: "Bindgen examples"
+        run: cargo install wasm-bindgen-cli && wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/gd_reach.wasm
       - name: Build and deploy
         uses: shalzz/zola-deploy-action@v0.16.1
         env:

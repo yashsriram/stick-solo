@@ -26,6 +26,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=wasm32-unknown-unknown
       - name: Build and deploy
         uses: shalzz/zola-deploy-action@v0.16.1
         env:

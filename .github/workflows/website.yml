@@ -34,7 +34,7 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --release --target=wasm32-unknown-unknown
+          args: --release --target=wasm32-unknown-unknown --examples
       - name: Build and deploy
         uses: shalzz/zola-deploy-action@v0.16.1
         env:

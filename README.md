@@ -1,31 +1,12 @@
 # stick-solo
 
 ## description
-- Simple planning methods for 2D stick-figure free-solo climbing agents.
-- This problem is studied under couple of my projects listed here.
-    1. Uses gradient descent based approach.
-    1. Builds on previous one, adding random sample solves and cross-entropy method based rl.
-
-```mermaid
-flowchart LR
-    problem --> config_space
-    config_space --> finish_point_calculation
-    finish_point_calculation --> obstacles
-    obstacles --> path_planning
-    path_planning --> interplate
-    interplate --> animation
-```
-
-## description
-- Simple planning methods for 2D stick-figure free-solo climbing agents.
 - This work illustrates hierarchical control.
     - Limb-end level control: Using neural network as policy, which is optimized using cross-entropy method.
     - Inverse-kinematics level control: Using random sampling based near global solves + gradient descent based snapping to goal.
 
 ### Assumptions
 - 2D wall and 2D constrained stick-figure agents.
-
-### Chain agent
 - Rigid links + revolute joints.
 - Links arranged serially.
 - N links <=> N joints <=> N sized joint tuple <=> N + 1 ends.

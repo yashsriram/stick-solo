@@ -1,16 +1,11 @@
 +++
 +++
 
- This project models climbing agents using arm manipulators. It illustrates the inverse kinematics of manipulators using closed-form, open-form, sample-based methods. It incorporates center of mass term in inverse kinematics to generate a natural looking motion. It illustrates the need and versetality of using a learning based method for a particular situation. It shows a deep RL method to predict optimal neck position for hold to hold movement.
+<img src="github/12.gif" width=100%>
+
+This project models climbing agents using arm manipulators. It illustrates the inverse kinematics of manipulators using closed-form, open-form, sample-based methods. It incorporates center of mass term in inverse kinematics to generate a natural looking motion. It illustrates the need and versetality of using a learning based method for a particular situation. It shows a deep RL method to predict optimal neck position for hold to hold movement.
 
 
-- The tour of 1. Link to youtube video. Click to play.
-
-[![](http://img.youtube.com/vi/bZg6pS2gGPw/0.jpg)](https://www.youtube.com/watch?v=bZg6pS2gGPw)
-
-- The final result of 2.
-
-![](./github/12.gif)
 
 | Gradient descent IK control | Neural network IK control |
 | --- | --- |

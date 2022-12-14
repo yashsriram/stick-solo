@@ -27,7 +27,7 @@ fn main() {
     App::new()
         .insert_resource(WindowDescriptor {
             width: 500.0,
-            height: 100.0,
+            height: 500.0,
             canvas: Some("#interactive_example".to_string()),
             fit_canvas_to_parent: true,
             ..default()

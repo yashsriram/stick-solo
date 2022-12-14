@@ -1,6 +1,6 @@
 extern crate stick_solo;
-use bevy::asset::AssetServerSettings;
 use bevy::prelude::*;
+use bevy::sprite::MaterialMesh2dBundle;
 use stick_solo::act::switchable_nr::*;
 use stick_solo::game::{
     path_plugin::{Path, PathPlugin},
@@ -22,26 +22,21 @@ fn main() {
     let inf = f32::INFINITY;
     let pi = std::f32::consts::PI;
     App::new()
-        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
-        .insert_resource(AssetServerSettings {
-            asset_folder: "static/assets".to_string(),
-            watch_for_changes: false,
+        .insert_resource(WindowDescriptor {
+            width: 500.0,
+            height: 500.0,
+            canvas: Some("#interactive_example".to_string()),
+            fit_canvas_to_parent: true,
+            ..default()
         })
-        .insert_resource(RestTicks(0))
+        .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .add_startup_system(|mut commands: Commands| {
-            commands.spawn_bundle(Camera3dBundle {
-                transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
-                ..default()
-            });
-            commands.spawn_bundle(PointLightBundle {
-                transform: Transform::from_xyz(0.0, 0.0, 4.0),
-                ..default()
-            });
+            commands.spawn_bundle(Camera2dBundle::default());
         })
         .insert_resource(SwitchableNR::new(
             Vec2::new(0.0, -0.1),
-            &[0.2, 0.2, 0.2, 0.2],
+            &[64.; 4],
             &[-2.0, 0.0, 2.0, 0.0],
             &[
                 (-inf, inf),
@@ -58,37 +53,35 @@ fn main() {
             |mut commands: Commands,
              agent: Res<SwitchableNR>,
              mut meshes: ResMut<Assets<Mesh>>,
-             mut materials: ResMut<Assets<StandardMaterial>>| {
+             mut materials: ResMut<Assets<ColorMaterial>>| {
                 let (n, _, ls, _, _, _) = agent.get_current_state();
                 // Edges
                 for i in 0..n {
                     commands
-                        .spawn_bundle(PbrBundle {
-                            mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)),
+                        .spawn_bundle(MaterialMesh2dBundle {
+                            mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)).into(),
                             material: materials.add(Color::WHITE.into()),
-                            transform: Transform::default().with_scale(Vec3::new(ls[i], 0.01, 1.0)),
+                            transform: Transform::default().with_scale(Vec3::new(ls[i], 10., 1.0)),
                             ..default()
                         })
                         .insert(Edge(i));
                 }
                 // Vertices
                 commands
-                    .spawn_bundle(PbrBundle {
-                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
-                            0.01 * 2.0,
-                            0.01 * 2.0,
-                        )))),
+                    .spawn_bundle(MaterialMesh2dBundle {
+                        mesh: meshes
+                            .add(Mesh::from(shape::Quad::new(Vec2::new(5.0, 5.0))))
+                            .into(),
                         material: materials.add(Color::BLUE.into()),
                         ..default()
                     })
                     .insert(Vertex(0));
                 for i in 0..n {
                     commands
-                        .spawn_bundle(PbrBundle {
-                            mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
-                                0.01 * 2.0,
-                                0.01 * 2.0,
-                            )))),
+                        .spawn_bundle(MaterialMesh2dBundle {
+                            mesh: meshes
+                                .add(Mesh::from(shape::Quad::new(Vec2::new(5.0, 5.0))))
+                                .into(),
                             material: materials.add(Color::BLUE.into()),
                             ..default()
                         })
@@ -96,8 +89,10 @@ fn main() {
                 }
                 // Center of mass
                 commands
-                    .spawn_bundle(PbrBundle {
-                        mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(0.04, 0.04)))),
+                    .spawn_bundle(MaterialMesh2dBundle {
+                        mesh: meshes
+                            .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
+                            .into(),
                         material: materials.add(Color::RED.into()),
                         ..default()
                     })
@@ -138,14 +133,11 @@ fn main() {
         .run();
 }
 
-struct RestTicks(usize);
-
 fn control(
     mut agent: ResMut<SwitchableNR>,
     mut path: ResMut<Path>,
     pause: Res<Pause>,
     mut ticks: ResMut<Ticks>,
-    mut rest_ticks: ResMut<RestTicks>,
 ) {
     // Pause => pause everything
     if pause.0 {
@@ -169,7 +161,6 @@ fn control(
     if (given_goal - last).length() < SwitchableNR::GOAL_REACHED_SLACK {
         agent.switch_pivot();
         path.0.pop_front();
-        rest_ticks.0 = 0;
         return;
     }
 
@@ -200,5 +191,4 @@ fn control(
     );
 
     ticks.0 += 1;
-    rest_ticks.0 += 1;
 }

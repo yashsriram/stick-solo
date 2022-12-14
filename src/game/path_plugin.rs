@@ -1,5 +1,4 @@
-use crate::act::switchable_nr::SwitchableNR;
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use std::collections::LinkedList;
 
 #[derive(Clone)]
@@ -13,24 +12,24 @@ impl Default for Path {
             let parts = 10usize;
             for i in 0..parts {
                 let theta = 2.0 * pi * (i as f32) / (parts as f32);
-                path.push_back(Vec2::new(-2.0 + 2.0 * theta.cos(), 2.0 * theta.sin()) * 0.5);
+                path.push_back(Vec2::new(-100.0 + 100.0 * theta.cos(), 100.0 * theta.sin()));
             }
             let parts = 8usize;
             for i in 0..parts {
                 let theta = 2.0 * pi * ((parts - i) as f32) / (parts as f32) + pi;
-                path.push_back(Vec2::new(1.0 + theta.cos(), theta.sin()) * 0.5);
+                path.push_back(Vec2::new(50.0 + 50. * theta.cos(), 50. * theta.sin()));
             }
             for i in 0..5 {
-                path.push_back(Vec2::new(0.0, 0.5 * i as f32));
+                path.push_back(Vec2::new(0.0, 20. * i as f32));
             }
             for i in 0..5 {
-                path.push_back(Vec2::new(0.5 * i as f32, 2.0));
+                path.push_back(Vec2::new(20. * i as f32, 80.0));
             }
             for i in (0..5).rev() {
-                path.push_back(Vec2::new(2.0, 0.5 * i as f32));
+                path.push_back(Vec2::new(80.0, 20. * i as f32));
             }
             for i in (0..5).rev() {
-                path.push_back(Vec2::new(0.5 * i as f32, 0.0));
+                path.push_back(Vec2::new(20. * i as f32, 0.0));
             }
             path
         })
@@ -61,16 +60,15 @@ fn init_vis(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     path: Res<Path>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     // Vertices
     for (i, vertex) in path.0.iter().enumerate() {
         commands
-            .spawn_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
-                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                    4.0 * SwitchableNR::GOAL_REACHED_SLACK,
-                )))),
+            .spawn_bundle(MaterialMesh2dBundle {
+                mesh: meshes
+                    .add(Mesh::from(shape::Quad::new(Vec2::new(4.0, 4.0))))
+                    .into(),
                 material: materials.add(Color::rgba(0.4, 0.4, 0.4, 0.4).into()),
                 transform: Transform::from_translation(Vec3::new(vertex[0], vertex[1], 0.0)),
                 ..default()
@@ -91,8 +89,10 @@ fn init_vis(
             translation
         };
         commands
-            .spawn_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(shape::Quad::new(Vec2::new(length, 0.005)))),
+            .spawn_bundle(MaterialMesh2dBundle {
+                mesh: meshes
+                    .add(Mesh::from(shape::Quad::new(Vec2::new(length, 3.))))
+                    .into(),
                 material: materials.add(Color::rgb(0.4, 0.4, 0.4).into()),
                 transform,
                 ..default()

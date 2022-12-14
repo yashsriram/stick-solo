@@ -33,26 +33,9 @@ fn main() {
             ..default()
         })
         .insert_resource(ClearColor(Color::BLACK))
-        .insert_resource(GoalQs(Array::zeros(4)))
         .add_plugins(DefaultPlugins)
-        .add_startup_system(|mut commands: Commands| {
-            commands.spawn_bundle(Camera2dBundle::default());
-        })
-        .add_startup_system(
-            |mut commands: Commands,
-             mut meshes: ResMut<Assets<Mesh>>,
-             mut materials: ResMut<Assets<ColorMaterial>>| {
-                commands
-                    .spawn_bundle(MaterialMesh2dBundle {
-                        mesh: meshes
-                            .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
-                            .into(),
-                        material: materials.add(Color::GREEN.into()),
-                        ..default()
-                    })
-                    .insert(Goal);
-            },
-        )
+        .add_plugin(StatusBarPlugin)
+        .add_plugin(PausePlugin)
         .insert_resource(SwitchableNR::new(
             Vec2::new(0.0, 0.1),
             &[64.; 4],
@@ -65,61 +48,72 @@ fn main() {
             ],
             Side::Left,
         ))
-        .add_startup_system(
-            |mut commands: Commands,
-             agent: Res<SwitchableNR>,
-             mut meshes: ResMut<Assets<Mesh>>,
-             mut materials: ResMut<Assets<ColorMaterial>>| {
-                let (n, _, ls, _, _, _) = agent.get_current_state();
-                // Edges
-                for i in 0..n {
-                    commands
-                        .spawn_bundle(MaterialMesh2dBundle {
-                            mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)).into(),
-                            material: materials.add(Color::WHITE.into()),
-                            transform: Transform::default().with_scale(Vec3::new(ls[i], 10., 1.0)),
-                            ..default()
-                        })
-                        .insert(Edge(i));
-                }
-                // Vertices
-                commands
-                    .spawn_bundle(MaterialMesh2dBundle {
-                        mesh: meshes
-                            .add(Mesh::from(shape::Quad::new(Vec2::new(5.0, 5.0))))
-                            .into(),
-                        material: materials.add(Color::BLUE.into()),
-                        ..default()
-                    })
-                    .insert(Vertex(0));
-                for i in 0..n {
-                    commands
-                        .spawn_bundle(MaterialMesh2dBundle {
-                            mesh: meshes
-                                .add(Mesh::from(shape::Quad::new(Vec2::new(5.0, 5.0))))
-                                .into(),
-                            material: materials.add(Color::BLUE.into()),
-                            ..default()
-                        })
-                        .insert(Vertex(i + 1));
-                }
-                // Center of mass
-                commands
-                    .spawn_bundle(MaterialMesh2dBundle {
-                        mesh: meshes
-                            .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
-                            .into(),
-                        material: materials.add(Color::RED.into()),
-                        ..default()
-                    })
-                    .insert(CenterOfMass);
-            },
-        )
-        .add_plugin(StatusBarPlugin)
-        .add_plugin(PausePlugin)
+        .insert_resource(GoalQs(Array::zeros(4)))
+        .add_startup_system(init)
         .add_system(place_goal_and_mcmc_solve)
         .add_system(control)
         .run();
+}
+
+fn init(
+    mut commands: Commands,
+    agent: Res<SwitchableNR>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    commands.spawn_bundle(Camera2dBundle::default());
+    commands
+        .spawn_bundle(MaterialMesh2dBundle {
+            mesh: meshes
+                .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
+                .into(),
+            material: materials.add(Color::GREEN.into()),
+            ..default()
+        })
+        .insert(Goal);
+    let (n, _, ls, _, _, _) = agent.get_current_state();
+    // Edges
+    for i in 0..n {
+        commands
+            .spawn_bundle(MaterialMesh2dBundle {
+                mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)).into(),
+                material: materials.add(Color::WHITE.into()),
+                transform: Transform::default().with_scale(Vec3::new(ls[i], 10., 1.0)),
+                ..default()
+            })
+            .insert(Edge(i));
+    }
+    // Vertices
+    commands
+        .spawn_bundle(MaterialMesh2dBundle {
+            mesh: meshes
+                .add(Mesh::from(shape::Quad::new(Vec2::new(5.0, 5.0))))
+                .into(),
+            material: materials.add(Color::BLUE.into()),
+            ..default()
+        })
+        .insert(Vertex(0));
+    for i in 0..n {
+        commands
+            .spawn_bundle(MaterialMesh2dBundle {
+                mesh: meshes
+                    .add(Mesh::from(shape::Quad::new(Vec2::new(5.0, 5.0))))
+                    .into(),
+                material: materials.add(Color::BLUE.into()),
+                ..default()
+            })
+            .insert(Vertex(i + 1));
+    }
+    // Center of mass
+    commands
+        .spawn_bundle(MaterialMesh2dBundle {
+            mesh: meshes
+                .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
+                .into(),
+            material: materials.add(Color::RED.into()),
+            ..default()
+        })
+        .insert(CenterOfMass);
 }
 
 struct GoalQs(Array1<f32>);

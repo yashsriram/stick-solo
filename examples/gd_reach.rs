@@ -1,10 +1,5 @@
 extern crate stick_solo;
-use bevy::{
-    input::mouse::{MouseButtonInput, MouseMotion, MouseWheel},
-    prelude::*,
-    sprite::MaterialMesh2dBundle,
-    window::CursorMoved,
-};
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
     pause_plugin::Pause,
@@ -37,14 +32,6 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(|mut commands: Commands| {
             commands.spawn_bundle(Camera2dBundle::default());
-            // commands.spawn_bundle(Camera3dBundle {
-            //     transform: Transform::from_xyz(0.0, 0.0, 2.0).looking_at(Vec3::ZERO, Vec3::Y),
-            //     ..default()
-            // });
-            // commands.spawn_bundle(PointLightBundle {
-            //     transform: Transform::from_xyz(0.0, 0.0, 4.0),
-            //     ..default()
-            // });
         })
         .add_startup_system(
             |mut commands: Commands,
@@ -148,28 +135,10 @@ fn main() {
                 }
             },
         )
-        .add_system(
-            |keyboard_input: Res<Input<KeyCode>>,
-             mut goal_query: Query<(&Goal, &mut Transform)>| {
-                let (_, mut transform) = goal_query.single_mut();
-                if keyboard_input.pressed(KeyCode::W) {
-                    transform.translation.y += 0.01;
-                }
-                if keyboard_input.pressed(KeyCode::S) {
-                    transform.translation.y -= 0.01;
-                }
-                if keyboard_input.pressed(KeyCode::A) {
-                    transform.translation.x -= 0.01;
-                }
-                if keyboard_input.pressed(KeyCode::D) {
-                    transform.translation.x += 0.01;
-                }
-            },
-        )
         .add_plugin(StatusBarPlugin)
         .add_plugin(PausePlugin)
         .add_system(control)
-        .add_system(set_goal_using_mouse_click)
+        .add_system(place_goal)
         .run();
 }
 
@@ -202,7 +171,7 @@ fn control(
     ticks.0 += 1;
 }
 
-fn set_goal_using_mouse_click(
+fn place_goal(
     mouse_button_input: Res<Input<MouseButton>>,
     mut windows: ResMut<Windows>,
     mut goal_query: Query<(&Goal, &mut Transform)>,

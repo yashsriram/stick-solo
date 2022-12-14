@@ -52,6 +52,7 @@ fn main() {
         .add_startup_system(init)
         .add_system(place_goal_and_mcmc_solve)
         .add_system(control)
+        .add_system(flush_transforms)
         .run();
 }
 
@@ -170,12 +171,9 @@ fn control(
     goal_qs: ResMut<GoalQs>,
     mut transforms: Query<&mut Transform>,
     goal: Query<(Entity, &Goal)>,
-    mut ticks: ResMut<Ticks>,
+    ticks: ResMut<Ticks>,
     mut agent: ResMut<SwitchableNR>,
     pause: Res<Pause>,
-    mut edge_query: Query<(Entity, &Edge)>,
-    mut vertex_query: Query<(Entity, &Vertex)>,
-    mut com_query: Query<(Entity, &CenterOfMass)>,
 ) {
     // Pause => pause everything
     if pause.0 {
@@ -204,7 +202,16 @@ fn control(
             + gamma * -push_com_x_from_its_goal
             + delta * -push_com_y_upward,
     );
+}
 
+fn flush_transforms(
+    mut transforms: Query<&mut Transform>,
+    mut ticks: ResMut<Ticks>,
+    agent: ResMut<SwitchableNR>,
+    mut edge_query: Query<(Entity, &Edge)>,
+    mut vertex_query: Query<(Entity, &Vertex)>,
+    mut com_query: Query<(Entity, &CenterOfMass)>,
+) {
     let current_transforms = agent.pose_to_transforms();
     let (_, _, ls, _, _, _) = agent.get_current_state();
     for (entity, edge) in edge_query.iter_mut() {

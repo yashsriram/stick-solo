@@ -52,7 +52,7 @@ fn main() {
         .add_startup_system(init)
         .add_system(place_goal_and_mcmc)
         .add_system(control)
-        .add_system(flush_translations)
+        .add_system(flush_transforms)
         .run();
 }
 
@@ -211,7 +211,7 @@ fn control(
     ticks.0 += 1;
 }
 
-fn flush_translations(
+fn flush_transforms(
     agent: Res<SwitchableNR>,
     mut transforms_query: Query<&mut Transform>,
     mut edge_query: Query<(Entity, &Edge)>,

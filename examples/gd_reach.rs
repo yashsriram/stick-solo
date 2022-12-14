@@ -40,8 +40,8 @@ fn main() {
             Side::Left,
         ))
         .add_startup_system(init)
-        .add_system(control)
         .add_system(place_goal)
+        .add_system(control)
         .add_system(flush_transforms)
         .run();
 }

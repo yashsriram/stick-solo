@@ -39,6 +39,8 @@ jobs:
         run: |
          cargo install wasm-bindgen-cli
          wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/gd_reach.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/csrs_gd_reach.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/nprs_gd_reach.wasm
       - name: Build and deploy
         uses: shalzz/zola-deploy-action@v0.16.1
         env:

@@ -13,7 +13,7 @@
 <canvas id="interactive_example"></canvas>
 
 <script type="module">
-import init from './wasm-bindgen/gd_reach.js'
+import init from './wasm-bindgen/reach_gd.js'
 init()
 </script>
 

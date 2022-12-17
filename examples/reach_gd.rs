@@ -1,4 +1,5 @@
 extern crate stick_solo;
+use bevy::asset::AssetServerSettings;
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
@@ -19,31 +20,37 @@ struct Vertex(usize);
 struct CenterOfMass;
 
 fn main() {
-    let inf = f32::INFINITY;
-    App::new()
-        .insert_resource(WindowDescriptor {
-            width: 500.0,
-            height: 500.0,
-            canvas: Some("#interactive_example".to_string()),
-            fit_canvas_to_parent: true,
+    let mut app = App::new();
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        app.insert_resource(AssetServerSettings {
+            asset_folder: "static/assets".to_string(),
             ..default()
-        })
-        .insert_resource(ClearColor(Color::BLACK))
-        .add_plugins(DefaultPlugins)
-        .add_plugin(StatusBarPlugin)
-        .add_plugin(PausePlugin)
-        .insert_resource(SwitchableNR::new(
-            Vec2::new(0.0, 0.0),
-            &[32.; 6],
-            &[0.0; 6],
-            &[(-inf, inf); 6],
-            Side::Left,
-        ))
-        .add_startup_system(init)
-        .add_system(place_goal)
-        .add_system(control)
-        .add_system(flush_transforms)
-        .run();
+        });
+    }
+    app.insert_resource(WindowDescriptor {
+        width: 500.0,
+        height: 500.0,
+        canvas: Some("#interactive_example".to_string()),
+        fit_canvas_to_parent: true,
+        ..default()
+    })
+    .insert_resource(ClearColor(Color::BLACK))
+    .add_plugins(DefaultPlugins)
+    .add_plugin(StatusBarPlugin)
+    .add_plugin(PausePlugin)
+    .insert_resource(SwitchableNR::new(
+        Vec2::new(0.0, 0.0),
+        &[32.; 6],
+        &[0.0; 6],
+        &[(-f32::INFINITY, f32::INFINITY); 6],
+        Side::Left,
+    ))
+    .add_startup_system(init)
+    .add_system(place_goal)
+    .add_system(control)
+    .add_system(flush_transforms)
+    .run();
 }
 
 fn init(

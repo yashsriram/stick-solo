@@ -38,12 +38,7 @@ fn main() {
             Vec2::new(0.0, -0.1),
             &[64.; 4],
             &[-2.0, 0.0, 2.0, 0.0],
-            &[
-                (-inf, inf),
-                (0.0, pi * 0.5),
-                (-pi * 0.5, pi),
-                (0.0, pi * 0.5),
-            ],
+            &[(-inf, inf); 4],
             Side::Left,
         ))
         .add_plugin(PathPlugin::new(Path::default()))
@@ -185,9 +180,8 @@ fn control(
     let com = agent.get_center_of_mass();
     let origin = origin.clone();
     agent.update(
-        beta * take_end_to_given_goal
-            + -0.2 * push_com_x_from_its_goal
-            + -downward_push_coeff(&com, origin) * push_com_y_upward,
+        beta * take_end_to_given_goal, // + -0.2 * push_com_x_from_its_goal
+                                       // + -downward_push_coeff(&com, origin) * push_com_y_upward,
     );
 
     ticks.0 += 1;

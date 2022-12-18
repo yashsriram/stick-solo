@@ -39,18 +39,26 @@ jobs:
         run: |
          cargo install wasm-bindgen-cli
          wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/reach_gd.wasm
-      # - name: Build and deploy
-      #   uses: shalzz/zola-deploy-action@v0.16.1
-      #   env:
-      #     BUILD_DIR: '.'
-      #     BUILD_ONLY: true
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/reach_nprs_gd.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/reach_csrs_gd.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/reach_ohc_manual.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/route_gd.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/route_nprs_gd.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/route_csrs_gd.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/route_relax_gd.wasm
+         wasm-bindgen --no-typescript --target web --out-dir static/wasm-bindgen target/wasm32-unknown-unknown/release/examples/route_ohc.wasm
+      - name: Build and deploy
+        uses: shalzz/zola-deploy-action@v0.16.1
+        env:
+          BUILD_DIR: '.'
+          BUILD_ONLY: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: './static'
+          path: './public'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1

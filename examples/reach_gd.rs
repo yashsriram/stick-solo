@@ -15,8 +15,6 @@ struct Goal;
 #[derive(Component)]
 struct Edge(usize);
 #[derive(Component)]
-struct Vertex(usize);
-#[derive(Component)]
 struct CenterOfMass;
 
 fn main() {
@@ -29,8 +27,8 @@ fn main() {
         });
     }
     app.insert_resource(WindowDescriptor {
-        width: 500.0,
-        height: 500.0,
+        width: 500.,
+        height: 500.,
         canvas: Some("#interactive_example".to_string()),
         fit_canvas_to_parent: true,
         ..default()
@@ -40,9 +38,9 @@ fn main() {
     .add_plugin(StatusBarPlugin)
     .add_plugin(PausePlugin)
     .insert_resource(SwitchableNR::new(
-        Vec2::new(0.0, 0.0),
-        &[32.; 6],
-        &[0.0; 6],
+        Vec2::new(0., 0.),
+        &[64.; 4],
+        &[0.; 4],
         &[(-f32::INFINITY, f32::INFINITY); 6],
         Side::Left,
     ))
@@ -74,33 +72,14 @@ fn init(
     for i in 0..n {
         commands
             .spawn_bundle(MaterialMesh2dBundle {
-                mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)).into(),
+                mesh: meshes
+                    .add(Mesh::from(AxesHuggingUnitSquare { width: 10. }))
+                    .into(),
                 material: materials.add(Color::WHITE.into()),
-                transform: Transform::default().with_scale(Vec3::new(ls[i], 10., 1.0)),
+                transform: Transform::default().with_scale(Vec3::new(ls[i], 1., 1.)),
                 ..default()
             })
             .insert(Edge(i));
-    }
-    // Vertices
-    commands
-        .spawn_bundle(MaterialMesh2dBundle {
-            mesh: meshes
-                .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
-                .into(),
-            material: materials.add(Color::BLUE.into()),
-            ..default()
-        })
-        .insert(Vertex(0));
-    for i in 0..n {
-        commands
-            .spawn_bundle(MaterialMesh2dBundle {
-                mesh: meshes
-                    .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
-                    .into(),
-                material: materials.add(Color::BLUE.into()),
-                ..default()
-            })
-            .insert(Vertex(i + 1));
     }
     // Center of mass
     commands
@@ -125,8 +104,8 @@ fn place_goal(
             let w = window.physical_width();
             let h = window.physical_height();
             let (x_hat, y_hat) = (
-                cursor.x as f32 - w as f32 / 2.0,
-                cursor.y as f32 - h as f32 / 2.0,
+                cursor.x as f32 - w as f32 / 2.,
+                cursor.y as f32 - h as f32 / 2.,
             );
             info!("{:?}", (w, h, cursor.x, cursor.y));
             info!("{:?}", (x_hat, y_hat));
@@ -171,24 +150,15 @@ fn flush_transforms(
     agent: Res<SwitchableNR>,
     mut transforms_query: Query<&mut Transform>,
     mut edge_query: Query<(Entity, &Edge)>,
-    mut vertex_query: Query<(Entity, &Vertex)>,
     mut com_query: Query<(Entity, &CenterOfMass)>,
 ) {
     let transforms = agent.pose_to_transforms();
-    let (_, _, ls, _, _, _) = agent.get_current_state();
     for (entity, edge) in edge_query.iter_mut() {
         let (midpoint, angle) = transforms[edge.0];
         let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = midpoint[0];
         transform.translation[1] = midpoint[1];
-        transform.scale = Vec3::new(ls[edge.0], 0.01, 1.0);
         transform.rotation = Quat::from_rotation_z(angle);
-    }
-    let vertex_positions = agent.get_all_vertices();
-    for (entity, idx) in vertex_query.iter_mut() {
-        let mut transform = transforms_query.get_mut(entity).unwrap();
-        transform.translation[0] = vertex_positions[idx.0][0];
-        transform.translation[1] = vertex_positions[idx.0][1];
     }
     let com = agent.get_center_of_mass();
     for (entity, _) in com_query.iter_mut() {

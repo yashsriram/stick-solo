@@ -60,9 +60,9 @@ fn init_vis(
             let texture_handle = asset_server.load("sprites/bone.png");
             commands
                 .spawn_bundle(PbrBundle {
-                    mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare)),
+                    mesh: meshes.add(Mesh::from(AxesHuggingUnitSquare { width: 0.05 })),
                     material: materials.add(texture_handle.into()),
-                    transform: Transform::default().with_scale(Vec3::new(ls[i], 0.05, 1.0)),
+                    transform: Transform::default().with_scale(Vec3::new(ls[i], 1., 1.)),
                     ..default()
                 })
                 .insert(Edge(i))

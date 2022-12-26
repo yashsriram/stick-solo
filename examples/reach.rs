@@ -1,8 +1,7 @@
 extern crate stick_solo;
 use bevy::asset::AssetServerSettings;
-use bevy::prelude::*;
-use bevy::sprite::MaterialMesh2dBundle;
-use ndarray::prelude::*;
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use ndarray::{Array, Array1};
 use stick_solo::act::switchable_nr::{Side, SwitchableNR};
 use stick_solo::game::{
     pause_plugin::Pause,
@@ -10,7 +9,9 @@ use stick_solo::game::{
     status_bar_plugin::{StatusBarPlugin, Ticks},
 };
 use stick_solo::plan::gradient_descent::*;
-use stick_solo::plan::random_sampling::*;
+use stick_solo::plan::random_sampling::{
+    from_current_state_random_sample_optimizer, no_prior_random_sample_optimizer,
+};
 use stick_solo::AxesHuggingUnitSquare;
 
 #[derive(Component)]
@@ -19,6 +20,15 @@ struct Goal;
 struct Edge(usize);
 #[derive(Component)]
 struct CenterOfMass;
+
+struct NPRSGoalQs(Array1<f32>);
+struct CSRSGoalQs(Array1<f32>);
+
+enum Algorithm {
+    GradientDescent,
+    NoPriorRandomSampleWithGradientDescent,
+    CurrentStateRandomSampleWithGradientDescent,
+}
 
 fn main() {
     let inf = f32::INFINITY;
@@ -32,8 +42,8 @@ fn main() {
         });
     }
     app.insert_resource(WindowDescriptor {
-        width: 500.0,
-        height: 500.0,
+        width: 500.,
+        height: 500.,
         canvas: Some("#interactive_example".to_string()),
         fit_canvas_to_parent: true,
         ..default()
@@ -43,9 +53,9 @@ fn main() {
     .add_plugin(StatusBarPlugin)
     .add_plugin(PausePlugin)
     .insert_resource(SwitchableNR::new(
-        Vec2::new(0.0, 0.1),
+        Vec2::new(0., 0.),
         &[64.; 4],
-        &[-7.0, 0.1, 0.5, 0.5],
+        &[0.; 4],
         &[
             (-inf, inf),
             (0.0, pi * 0.5),
@@ -54,11 +64,14 @@ fn main() {
         ],
         Side::Left,
     ))
-    .insert_resource(GoalQs(Array::zeros(4)))
+    .insert_resource(NPRSGoalQs(Array::zeros(4)))
+    .insert_resource(CSRSGoalQs(Array::zeros(4)))
+    .insert_resource(Algorithm::GradientDescent)
     .add_startup_system(init)
     .add_system(place_goal)
     .add_system(control)
     .add_system(flush_transforms)
+    .add_system(change_algorithm)
     .run();
 }
 
@@ -72,7 +85,7 @@ fn init(
     commands
         .spawn_bundle(MaterialMesh2dBundle {
             mesh: meshes
-                .add(Mesh::from(shape::Quad::new(Vec2::new(5., 5.))))
+                .add(Mesh::from(shape::Quad::new(Vec2::new(8., 8.))))
                 .into(),
             material: materials.add(Color::GREEN.into()),
             ..default()
@@ -104,16 +117,16 @@ fn init(
         .insert(CenterOfMass);
 }
 
-struct GoalQs(Array1<f32>);
-
 fn place_goal(
     mouse_button_input: Res<Input<MouseButton>>,
     mut windows: ResMut<Windows>,
     agent: Res<SwitchableNR>,
-    mut goal_qs: ResMut<GoalQs>,
+    mut nprs_goal_qs: ResMut<NPRSGoalQs>,
+    mut csrs_goal_qs: ResMut<CSRSGoalQs>,
     mut transforms: Query<&mut Transform>,
     goal: Query<(Entity, &Goal)>,
     mut ticks: ResMut<Ticks>,
+    algorithm: Res<Algorithm>,
 ) {
     let (goal, _) = goal.single();
     let mut goal_transform = transforms.get_mut(goal).unwrap();
@@ -123,15 +136,33 @@ fn place_goal(
             let w = window.physical_width();
             let h = window.physical_height();
             let (x_hat, y_hat) = (
-                cursor.x as f32 - w as f32 / 2.0,
-                cursor.y as f32 - h as f32 / 2.0,
+                cursor.x as f32 - w as f32 / 2.,
+                cursor.y as f32 - h as f32 / 2.,
             );
             info!("{:?}", (w, h, cursor.x, cursor.y));
             info!("{:?}", (x_hat, y_hat));
             let scale_factor = window.scale_factor() as f32;
             goal_transform.translation.x = x_hat / scale_factor;
             goal_transform.translation.y = y_hat / scale_factor;
+
             let (n, origin, ls, qs, q_clamps, pivoting_side) = agent.get_current_state();
+
+            let (_min_loss, best_q) = no_prior_random_sample_optimizer(
+                10_000,
+                origin,
+                ls,
+                qs[0],
+                pivoting_side,
+                q_clamps,
+                &Vec2::new(goal_transform.translation.x, goal_transform.translation.y),
+                |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
+                    5.0 * (end.clone() - goal.clone()).length()
+                        + com[1]
+                        + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
+                },
+            );
+            nprs_goal_qs.0 = best_q;
+
             let (_min_loss, best_q) = from_current_state_random_sample_optimizer(
                 10_000,
                 2.0,
@@ -148,23 +179,8 @@ fn place_goal(
                         + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
                 },
             );
-            let (_min_loss, best_q) = no_prior_random_sample_optimizer(
-                10_000,
-                origin,
-                ls,
-                qs[0],
-                pivoting_side,
-                q_clamps,
-                &Vec2::new(goal_transform.translation.x, goal_transform.translation.y),
-                |end: &Vec2, com: &Vec2, goal: &Vec2, origin: &Vec2| {
-                    5.0 * (end.clone() - goal.clone()).length()
-                        + com[1]
-                        + (com[0] - (origin[0] + goal[0]) / 2.0).abs()
-                },
-            );
-            // println!("{:?}", min_loss);
-            // println!("{:?}", best_q[0]);
-            goal_qs.0 = best_q;
+            csrs_goal_qs.0 = best_q;
+
             ticks.0 = 0;
         }
     }
@@ -176,7 +192,9 @@ fn control(
     transforms: Query<&mut Transform>,
     goal: Query<(Entity, &Goal)>,
     mut ticks: ResMut<Ticks>,
-    goal_qs: Res<GoalQs>,
+    nprs_goal_qs: Res<NPRSGoalQs>,
+    csrs_goal_qs: Res<CSRSGoalQs>,
+    algorithm: Res<Algorithm>,
 ) {
     // Pause => pause everything
     if pause.0 {
@@ -184,12 +202,11 @@ fn control(
     }
     let (_, origin, ls, qs, _, _) = agent.get_current_state();
 
-    let global_delta_qs = &goal_qs.0 - qs;
-
     let (goal, _) = goal.single();
     let goal_transform = transforms.get(goal).unwrap();
     let given_goal = Vec2::new(goal_transform.translation.x, goal_transform.translation.y);
-    let (take_end_to_given_goal, push_com_x_from_its_goal, push_com_y_upward) = gradient_descent(
+
+    let (take_end_to_given_goal, push_com_x_from_its_goal, _) = gradient_descent(
         origin,
         ls,
         qs,
@@ -198,15 +215,38 @@ fn control(
         COMXGoalType::PivotGoalMidpoint,
     );
 
-    let alpha = 1.0 / (1.0 + ticks.0 as f32).powf(0.5);
-    let beta = 1.0 - alpha;
-    let gamma = 0.1;
-    let delta = 0.1 / (1.0 + ticks.0 as f32).powf(1.0);
-    agent.update(
-        global_delta_qs, // + beta * take_end_to_given_goal
-                         // + gamma * -push_com_x_from_its_goal
-                         // + delta * -push_com_y_upward,
-    );
+    match *algorithm {
+        Algorithm::GradientDescent => {
+            agent.update(take_end_to_given_goal + -0.2 * push_com_x_from_its_goal);
+        }
+        Algorithm::NoPriorRandomSampleWithGradientDescent => {
+            let alpha = 1.0 / (1.0 + ticks.0 as f32).powf(0.5);
+            let beta = 1.0 - alpha;
+            let gamma = 0.1;
+            let delta = 0.1 / (1.0 + ticks.0 as f32).powf(1.0);
+
+            let global_delta_qs = &nprs_goal_qs.0 - qs;
+            agent.update(
+                global_delta_qs, // + beta * take_end_to_given_goal
+                                 // + gamma * -push_com_x_from_its_goal
+                                 // + delta * -push_com_y_upward,
+            );
+        }
+        Algorithm::CurrentStateRandomSampleWithGradientDescent => {
+            let alpha = 1.0 / (1.0 + ticks.0 as f32).powf(0.5);
+            let beta = 1.0 - alpha;
+            let gamma = 0.1;
+            let delta = 0.1 / (1.0 + ticks.0 as f32).powf(1.0);
+
+            let global_delta_qs = &csrs_goal_qs.0 - qs;
+            agent.update(
+                global_delta_qs, // + beta * take_end_to_given_goal
+                                 // + gamma * -push_com_x_from_its_goal
+                                 // + delta * -push_com_y_upward,
+            );
+        }
+    }
+
     ticks.0 += 1;
 }
 
@@ -229,5 +269,17 @@ fn flush_transforms(
         let mut transform = transforms_query.get_mut(entity).unwrap();
         transform.translation[0] = com[0];
         transform.translation[1] = com[1];
+    }
+}
+
+fn change_algorithm(input: Res<Input<KeyCode>>, mut algorithm: ResMut<Algorithm>) {
+    if input.just_pressed(KeyCode::Key1) {
+        *algorithm = Algorithm::GradientDescent;
+    }
+    if input.just_pressed(KeyCode::Key2) {
+        *algorithm = Algorithm::NoPriorRandomSampleWithGradientDescent;
+    }
+    if input.just_pressed(KeyCode::Key3) {
+        *algorithm = Algorithm::CurrentStateRandomSampleWithGradientDescent;
     }
 }
